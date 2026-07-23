@@ -38,3 +38,4 @@ _backup_webapp_git.bundle
 
 # Logs de scraping (regenerables, no aportan valor versionados)
 *.log
+.claude/settings.local.json
