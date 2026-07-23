@@ -1,0 +1,989 @@
+campo,query_usada,lat,lon,codigo_postal,municipio,confianza,encontrado
+CEIP 8 de Març,"CEIP 8 de Març, Comunitat Valenciana, España",39.4647297,-0.3956992,46018,València,7.688792248412325e-05,si
+CEIP Amistad,"CEIP Amistad, Comunitat Valenciana, España",39.4720181,-0.3498792,46021,València,7.688792248412325e-05,si
+CEIP Angelina Carnicer,"CEIP Angelina Carnicer, Comunitat Valenciana, España",,,,,,no
+CEIP Camp del Turia Rib-Roja del Turia,"CEIP Camp del Turia Rib-Roja del Turia, Comunitat Valenciana, España",,,,,,no
+CEIP Carmelo Ripoll,"CEIP Carmelo Ripoll, Comunitat Valenciana, España",,,,,,no
+CEIP Cervantes Alboraya,"CEIP Cervantes Alboraya, Comunitat Valenciana, España",39.5026235,-0.3472470,46120,Alboraia / Alboraya,5.8766308079606584e-05,si
+CEIP El Baladre Pista 1,"CEIP El Baladre Pista 1, Comunitat Valenciana, España",,,,,,no
+CEIP Eliseo Vidal,"CEIP Eliseo Vidal, Comunitat Valenciana, España",39.4572381,-0.3986053,46014,València,7.688792248412325e-05,si
+CEIP José Soto Micó,"CEIP José Soto Micó, Comunitat Valenciana, España",39.4501564,-0.3901543,46017,València,7.688792248412325e-05,si
+CEIP La Fila,"CEIP La Fila, Comunitat Valenciana, España",,,,,,no
+CEIP Les Terretes Torrent Pista 1,"CEIP Les Terretes Torrent Pista 1, Comunitat Valenciana, España",,,,,,no
+CEIP Miquel Adlert i Noguerol,"CEIP Miquel Adlert i Noguerol, Comunitat Valenciana, España",,,,,,no
+CEIP Monteolivete,"CEIP Monteolivete, Comunitat Valenciana, España",,,,,,no
+CEIP Padre Catala,"CEIP Padre Catala, Comunitat Valenciana, España",,,,,,no
+CEIP Rodriguez Fornos,"CEIP Rodriguez Fornos, Comunitat Valenciana, España",,,,,,no
+CEIP Tomas de Montañana,"CEIP Tomas de Montañana, Comunitat Valenciana, España",39.4613194,-0.3516222,46023,València,7.688792248412325e-05,si
+CEIP Tuejar,"CEIP Tuejar, Comunitat Valenciana, España",39.7676148,-1.0432360,,Tuéjar,5.774090180814858e-05,si
+COL. LA PURISIMA- FRANCISCANAS,"COL. LA PURISIMA- FRANCISCANAS, Comunitat Valenciana, España",,,,,,no
+Camp D' Esport Mpal. Javea F-11,"Camp D' Esport Mpal. Javea F-11, Comunitat Valenciana, España",,,,,,no
+Camp D' Esport Mpal. Jàvea F-8 Campo 1,"Camp D' Esport Mpal. Jàvea F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Camp D' Esport Mpal. Jàvea F-8 Campo 2,"Camp D' Esport Mpal. Jàvea F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Camp D' Esports Riu Magre Carlet F-11,"Camp D' Esports Riu Magre Carlet F-11, Comunitat Valenciana, España",,,,,,no
+Camp D' Esports Riu Magre Carlet F-8 Campo 1,"Camp D' Esports Riu Magre Carlet F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Camp D' Esports Riu Magre Carlet F-8 Campo 2,"Camp D' Esports Riu Magre Carlet F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Camp D' Esports Santa Barbara F-8 Campo 1-A Monóvar,"Camp D' Esports Santa Barbara F-8 Campo 1-A Monóvar, Comunitat Valenciana, España",,,,,,no
+Camp D' Esports Santa Barbara F-8 Campo 2-A Monóvar,"Camp D' Esports Santa Barbara F-8 Campo 2-A Monóvar, Comunitat Valenciana, España",,,,,,no
+Camp D' Esports Santa Barbara Monovar F-11 Campo 1,"Camp D' Esports Santa Barbara Monovar F-11 Campo 1, Comunitat Valenciana, España",,,,,,no
+Camp D`Esports Riu Magre F-8 Campo 3 Carlet,"Camp D`Esports Riu Magre F-8 Campo 3 Carlet, Comunitat Valenciana, España",,,,,,no
+Camp D`Esports Riu Magre F-8 Campo 4 Carlet,"Camp D`Esports Riu Magre F-8 Campo 4 Carlet, Comunitat Valenciana, España",,,,,,no
+Camp D`Esports Riu Magre F-8 Campo 5 Carlet,"Camp D`Esports Riu Magre F-8 Campo 5 Carlet, Comunitat Valenciana, España",,,,,,no
+Camp Els Arcs F-5 Campo B Campo 1A,"Camp Els Arcs F-5 Campo B Campo 1A, Comunitat Valenciana, España",,,,,,no
+Camp Els Arcs F-8 Campo 3 L`Alcudia,"Camp Els Arcs F-8 Campo 3 L`Alcudia, Comunitat Valenciana, España",,,,,,no
+Camp Els Arcs F-8 Campo 4 L`Alcudia,"Camp Els Arcs F-8 Campo 4 L`Alcudia, Comunitat Valenciana, España",,,,,,no
+Camp Els Arcs F-8 Campo B1 L`Alcudia,"Camp Els Arcs F-8 Campo B1 L`Alcudia, Comunitat Valenciana, España",,,,,,no
+Camp Els Arcs F-8 Campo B2 L´Alcudia,"Camp Els Arcs F-8 Campo B2 L´Alcudia, Comunitat Valenciana, España",,,,,,no
+Camp Els Arcs L`Alcudia F-11 Campo A,"Camp Els Arcs L`Alcudia F-11 Campo A, Comunitat Valenciana, España",,,,,,no
+Camp Els Arcs L`Alcudia F-11 Campo B,"Camp Els Arcs L`Alcudia F-11 Campo B, Comunitat Valenciana, España",,,,,,no
+Camp Els Xops Daimus F-11,"Camp Els Xops Daimus F-11, Comunitat Valenciana, España",,,,,,no
+Camp Els Xops F-8 Campo 1 Daimús,"Camp Els Xops F-8 Campo 1 Daimús, Comunitat Valenciana, España",,,,,,no
+Camp Els Xops F-8 Campo 2 Daimús,"Camp Els Xops F-8 Campo 2 Daimús, Comunitat Valenciana, España",,,,,,no
+Camp Futbol Quatre Camins Canals F-11,"Camp Futbol Quatre Camins Canals F-11, Comunitat Valenciana, España",,,,,,no
+Camp Futbol Quatre Camins F-8 Campo 1 Canals,"Camp Futbol Quatre Camins F-8 Campo 1 Canals, Comunitat Valenciana, España",,,,,,no
+Camp Futbol Quatre Camins F-8 Campo 2 Canals,"Camp Futbol Quatre Camins F-8 Campo 2 Canals, Comunitat Valenciana, España",,,,,,no
+Camp La Plana F-8 Campo 1 La Font d´Encarros,"Camp La Plana F-8 Campo 1 La Font d´Encarros, Comunitat Valenciana, España",,,,,,no
+Camp La Plana F-8 Campo 2 La Font d´Encarros,"Camp La Plana F-8 Campo 2 La Font d´Encarros, Comunitat Valenciana, España",,,,,,no
+Camp La Plana Font D`Encarros- F-11,"Camp La Plana Font D`Encarros- F-11, Comunitat Valenciana, España",,,,,,no
+Camp Manuel Aparisi F-11 Albalat Sorells,"Camp Manuel Aparisi F-11 Albalat Sorells, Comunitat Valenciana, España",,,,,,no
+Camp Manuel Aparisi F-8 Campo 1 Albalat dels Sorells,"Camp Manuel Aparisi F-8 Campo 1 Albalat dels Sorells, Comunitat Valenciana, España",,,,,,no
+Camp Manuel Aparisi F-8 Campo 2 Albalat dels Sorells,"Camp Manuel Aparisi F-8 Campo 2 Albalat dels Sorells, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. El Moli F-8 Campo 1 Miramar,"Camp Mpal. El Moli F-8 Campo 1 Miramar, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. El Moli F-8 Campo 2 Miramar,"Camp Mpal. El Moli F-8 Campo 2 Miramar, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. El Moli Miramar F-11,"Camp Mpal. El Moli Miramar F-11, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. El Sequiol F-11,"Camp Mpal. El Sequiol F-11, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. El Sequiol F-8 Campo 1 Llosa Ranes,"Camp Mpal. El Sequiol F-8 Campo 1 Llosa Ranes, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. El Sequiol F-8 Campo 2 Llosa Ranes,"Camp Mpal. El Sequiol F-8 Campo 2 Llosa Ranes, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. Enrique Sancho F-11 Benasal,"Camp Mpal. Enrique Sancho F-11 Benasal, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. Jorge Molina F-11 Alcoi,"Camp Mpal. Jorge Molina F-11 Alcoi, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. Jorge Molina F-8 campo 1 Alcoy,"Camp Mpal. Jorge Molina F-8 campo 1 Alcoy, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. Jorge Molina F-8 campo 2 Alcoy,"Camp Mpal. Jorge Molina F-8 campo 2 Alcoy, Comunitat Valenciana, España",,,,,,no
+Camp Mpal. Terres Noves F-11 Senyera,"Camp Mpal. Terres Noves F-11 Senyera, Comunitat Valenciana, España",,,,,,no
+Camp Nou José Gramage F-11 L`Alcudia Crespins,"Camp Nou José Gramage F-11 L`Alcudia Crespins, Comunitat Valenciana, España",,,,,,no
+Camp Nou José Gramage F-8 Campo 1 L`Alcudia Crespins,"Camp Nou José Gramage F-8 Campo 1 L`Alcudia Crespins, Comunitat Valenciana, España",,,,,,no
+Camp Nou José Gramage F-8 Campo 2 L`Alcudia Crespins,"Camp Nou José Gramage F-8 Campo 2 L`Alcudia Crespins, Comunitat Valenciana, España",,,,,,no
+Camp Nou Los Olmos Mutxamel F-11,"Camp Nou Los Olmos Mutxamel F-11, Comunitat Valenciana, España",,,,,,no
+Camp Nou Los Olmos Mutxamel F-8 Campo 1,"Camp Nou Los Olmos Mutxamel F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Camp Nou Los Olmos Mutxamel F-8 Campo 2,"Camp Nou Los Olmos Mutxamel F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Camp Nou de Morvedre F-11 Sagunto,"Camp Nou de Morvedre F-11 Sagunto, Comunitat Valenciana, España",,,,,,no
+Camp Nou de Morvedre F-8 Campo 1 Sagunto,"Camp Nou de Morvedre F-8 Campo 1 Sagunto, Comunitat Valenciana, España",,,,,,no
+Camp Nou de Morvedre F-8 Campo 2 Sagunto,"Camp Nou de Morvedre F-8 Campo 2 Sagunto, Comunitat Valenciana, España",,,,,,no
+"Camp de Futbol ""Ferran Torres"" F-8 Campo 1 Foios","Camp de Futbol ""Ferran Torres"" F-8 Campo 1 Foios, Comunitat Valenciana, España",,,,,,no
+"Camp de Futbol ""Ferran Torres"" F-8 Campo 2 Foios","Camp de Futbol ""Ferran Torres"" F-8 Campo 2 Foios, Comunitat Valenciana, España",,,,,,no
+"Camp de Futbol ""Ferran Torres"" Foios F-11","Camp de Futbol ""Ferran Torres"" Foios F-11, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol J. Vidal Serena Tito F-8 Campo 1 Rafelguaraf,"Camp de Futbol J. Vidal Serena Tito F-8 Campo 1 Rafelguaraf, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol J. Vidal Serena Tito F-8 Campo 2 Rafelguaraf,"Camp de Futbol J. Vidal Serena Tito F-8 Campo 2 Rafelguaraf, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol J. Vidal Serena Tito Rafelguaraf F-11,"Camp de Futbol J. Vidal Serena Tito Rafelguaraf F-11, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Juan Vidal Agullent F-11,"Camp de Futbol Juan Vidal Agullent F-11, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Juan Vidal F-8 Campo 1 Agullent,"Camp de Futbol Juan Vidal F-8 Campo 1 Agullent, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Juan Vidal F-8 Campo 2 Agullent,"Camp de Futbol Juan Vidal F-8 Campo 2 Agullent, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol L`Ermita Alginet F-11,"Camp de Futbol L`Ermita Alginet F-11, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol L`Ermita F-5 Campo 1 - A,"Camp de Futbol L`Ermita F-5 Campo 1 - A, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol L`Ermita F-8 Campo 1 Alginet,"Camp de Futbol L`Ermita F-8 Campo 1 Alginet, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol L`Ermita F-8 Campo 2 Alginet,"Camp de Futbol L`Ermita F-8 Campo 2 Alginet, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Les Mesquides F-8 Jávea,"Camp de Futbol Les Mesquides F-8 Jávea, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Mpal. Tres Creus F-11 Valencia,"Camp de Futbol Mpal. Tres Creus F-11 Valencia, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Mpal. Tres Creus F-8 Campo 1,"Camp de Futbol Mpal. Tres Creus F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Mpal. Tres Creus F-8 Campo 2,"Camp de Futbol Mpal. Tres Creus F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Mpal. de Faura F11,"Camp de Futbol Mpal. de Faura F11, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Mpal. de Faura F8 Campo 1,"Camp de Futbol Mpal. de Faura F8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Mpal. de Faura F8 Campo 2,"Camp de Futbol Mpal. de Faura F8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Pere Ciscar Bellreguard F-11,"Camp de Futbol Pere Ciscar Bellreguard F-11, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Pere Ciscar F-8 Campo 1 Bellreguard,"Camp de Futbol Pere Ciscar F-8 Campo 1 Bellreguard, Comunitat Valenciana, España",,,,,,no
+Camp de Futbol Pere Ciscar F-8 Campo 2 Bellreguard,"Camp de Futbol Pere Ciscar F-8 Campo 2 Bellreguard, Comunitat Valenciana, España",,,,,,no
+Camp de Fútbol Aeria Cullera F-11,"Camp de Fútbol Aeria Cullera F-11, Comunitat Valenciana, España",,,,,,no
+Camp de Fútbol Pep Castillo Almoines F-11,"Camp de Fútbol Pep Castillo Almoines F-11, Comunitat Valenciana, España",,,,,,no
+Camp de Fútbol Pep Castillo F-8 Campo 1 Almoines,"Camp de Fútbol Pep Castillo F-8 Campo 1 Almoines, Comunitat Valenciana, España",,,,,,no
+Camp de Fútbol Pep Castillo F-8 Campo 2 Almoines,"Camp de Fútbol Pep Castillo F-8 Campo 2 Almoines, Comunitat Valenciana, España",,,,,,no
+Camp de Fútbol Pep Castillo F-8 Campo 3 Almoines,"Camp de Fútbol Pep Castillo F-8 Campo 3 Almoines, Comunitat Valenciana, España",,,,,,no
+Camp de L`Infantil F-8 Campo 1 Sueca,"Camp de L`Infantil F-8 Campo 1 Sueca, Comunitat Valenciana, España",,,,,,no
+Camp de L`Infantil F-8 Campo 2 Sueca,"Camp de L`Infantil F-8 Campo 2 Sueca, Comunitat Valenciana, España",,,,,,no
+Camp de L`Infantil Sueca F-11,"Camp de L`Infantil Sueca F-11, Comunitat Valenciana, España",,,,,,no
+Camp de L`Infantil Sueca F-5,"Camp de L`Infantil Sueca F-5, Comunitat Valenciana, España",,,,,,no
+"Campo ""Manolo Moreno Cabanes"" Alcoi F-11","Campo ""Manolo Moreno Cabanes"" Alcoi F-11, Comunitat Valenciana, España",,,,,,no
+Campo Arena Alicante F-11 Campo 1,"Campo Arena Alicante F-11 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Arena Alicante F-11Campo 2,"Campo Arena Alicante F-11Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Arena Alicante F-8 Campo 1 A,"Campo Arena Alicante F-8 Campo 1 A, Comunitat Valenciana, España",,,,,,no
+Campo Arena Alicante F-8 Campo 1 B,"Campo Arena Alicante F-8 Campo 1 B, Comunitat Valenciana, España",,,,,,no
+Campo Barrio San Jose F-11,"Campo Barrio San Jose F-11, Comunitat Valenciana, España",,,,,,no
+Campo Barrio San Jose F-8 Campo 1 Callosa del Segura,"Campo Barrio San Jose F-8 Campo 1 Callosa del Segura, Comunitat Valenciana, España",,,,,,no
+Campo Barrio San Jose F-8 Campo 2 Callosa del Segura,"Campo Barrio San Jose F-8 Campo 2 Callosa del Segura, Comunitat Valenciana, España",,,,,,no
+Campo Beltran Baguena Buñol F-11,"Campo Beltran Baguena Buñol F-11, Comunitat Valenciana, España",,,,,,no
+Campo Beltran Baguena F-8 Campo 1 Buñol,"Campo Beltran Baguena F-8 Campo 1 Buñol, Comunitat Valenciana, España",,,,,,no
+Campo Beltran Baguena F-8 Campo 2 Buñol,"Campo Beltran Baguena F-8 Campo 2 Buñol, Comunitat Valenciana, España",,,,,,no
+Campo Caxton College F-11,"Campo Caxton College F-11, Comunitat Valenciana, España",,,,,,no
+Campo Caxton College F-8 Campo 1 Puçol,"Campo Caxton College F-8 Campo 1 Puçol, Comunitat Valenciana, España",,,,,,no
+Campo Caxton College F-8 Campo 2 Puçol,"Campo Caxton College F-8 Campo 2 Puçol, Comunitat Valenciana, España",,,,,,no
+Campo Ciudad Jardin F-11 Paterna,"Campo Ciudad Jardin F-11 Paterna, Comunitat Valenciana, España",,,,,,no
+Campo Ciudad Jardin F-8 Campo 1 Paterna,"Campo Ciudad Jardin F-8 Campo 1 Paterna, Comunitat Valenciana, España",,,,,,no
+Campo Ciudad Jardin F-8 Campo 2 Paterna,"Campo Ciudad Jardin F-8 Campo 2 Paterna, Comunitat Valenciana, España",,,,,,no
+Campo El Llimoner F-8 Campo 1 Canals,"Campo El Llimoner F-8 Campo 1 Canals, Comunitat Valenciana, España",,,,,,no
+Campo El Llimoner F-8 Campo 2 Canals,"Campo El Llimoner F-8 Campo 2 Canals, Comunitat Valenciana, España",,,,,,no
+Campo El Morer F-11 Oliva,"Campo El Morer F-11 Oliva, Comunitat Valenciana, España",,,,,,no
+Campo El Morer F-8 Campo 1 Oliva,"Campo El Morer F-8 Campo 1 Oliva, Comunitat Valenciana, España",,,,,,no
+Campo El Morer F-8 Campo 2 Oliva,"Campo El Morer F-8 Campo 2 Oliva, Comunitat Valenciana, España",,,,,,no
+Campo Fabrica Giner F-11 Morella,"Campo Fabrica Giner F-11 Morella, Comunitat Valenciana, España",,,,,,no
+Campo Fabrica Giner F-8 Campo 1 Morella,"Campo Fabrica Giner F-8 Campo 1 Morella, Comunitat Valenciana, España",,,,,,no
+Campo Fabrica Giner F-8 Campo 2 Morella,"Campo Fabrica Giner F-8 Campo 2 Morella, Comunitat Valenciana, España",,,,,,no
+"Campo Futbol ""San Juan"" Tales F-11","Campo Futbol ""San Juan"" Tales F-11, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Colegio Julio Verne Grupo Sorolla F-8 Torrent,"Campo Futbol Colegio Julio Verne Grupo Sorolla F-8 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Doctor Lluch F-11,"Campo Futbol Doctor Lluch F-11, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Doctor Lluch F-8 Campo 1,"Campo Futbol Doctor Lluch F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Doctor Lluch F-8 Campo 2,"Campo Futbol Doctor Lluch F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Garcia Berlanga F-11 Camporrobles,"Campo Futbol Garcia Berlanga F-11 Camporrobles, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Garcia Berlanga F-8 Campo 1 Camporrobles,"Campo Futbol Garcia Berlanga F-8 Campo 1 Camporrobles, Comunitat Valenciana, España",,,,,,no
+Campo Futbol La Llacuneta Vilanova D´Alcolea,"Campo Futbol La Llacuneta Vilanova D´Alcolea, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Miquel Soler Parque Dptvo. Sindical F-11 Castellón,"Campo Futbol Miquel Soler Parque Dptvo. Sindical F-11 Castellón, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Baldomero Gonzalez Garcia F-11 Turis,"Campo Futbol Mpal. Baldomero Gonzalez Garcia F-11 Turis, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Baldomero Gonzalez Garcia F-8 Campo 1 Túris,"Campo Futbol Mpal. Baldomero Gonzalez Garcia F-8 Campo 1 Túris, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Baldomero Gonzalez Garcia F-8 Campo 2 Túris,"Campo Futbol Mpal. Baldomero Gonzalez Garcia F-8 Campo 2 Túris, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. El Albir Alfas del Pi F-11,"Campo Futbol Mpal. El Albir Alfas del Pi F-11, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. El Albir F-8 Campo 1 L`Alfas del Pì,"Campo Futbol Mpal. El Albir F-8 Campo 1 L`Alfas del Pì, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. El Albir F-8 Campo 2 L`Alfas del Pi,"Campo Futbol Mpal. El Albir F-8 Campo 2 L`Alfas del Pi, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. El Albir F-8 Campo 3 L`Alfas del Pì,"Campo Futbol Mpal. El Albir F-8 Campo 3 L`Alfas del Pì, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Francisco Soriano Raga F-11 Riba-roja,"Campo Futbol Mpal. Francisco Soriano Raga F-11 Riba-roja, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Francisco Soriano Raga F-8 Campo 1 Riba-roja,"Campo Futbol Mpal. Francisco Soriano Raga F-8 Campo 1 Riba-roja, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Francisco Soriano Raga F-8 Campo 2 Riba-roja,"Campo Futbol Mpal. Francisco Soriano Raga F-8 Campo 2 Riba-roja, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. La Murta F-11 Xativa,"Campo Futbol Mpal. La Murta F-11 Xativa, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. La Torre-Faitanar F-11 Valencia,"Campo Futbol Mpal. La Torre-Faitanar F-11 Valencia, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. La Torre-Faitanar F-8 Campo 1 (Valencia ),"Campo Futbol Mpal. La Torre-Faitanar F-8 Campo 1 (Valencia ), Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. La Torre-Faitanar F-8 Campo 2 (Valencia ),"Campo Futbol Mpal. La Torre-Faitanar F-8 Campo 2 (Valencia ), Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Llucena F-8 Lucena del Cid,"Campo Futbol Mpal. Llucena F-8 Lucena del Cid, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Roberto Gil F-11 Riba-roja,"Campo Futbol Mpal. Roberto Gil F-11 Riba-roja, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Roberto Gil F-8 Campo 1 Riba-roja,"Campo Futbol Mpal. Roberto Gil F-8 Campo 1 Riba-roja, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Roberto Gil F-8 Campo 2 Riba-roja,"Campo Futbol Mpal. Roberto Gil F-8 Campo 2 Riba-roja, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. Viejo Pepico Amat F-11 Elda,"Campo Futbol Mpal. Viejo Pepico Amat F-11 Elda, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. de Almussafes F-11 Campo 1,"Campo Futbol Mpal. de Almussafes F-11 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. de Almussafes F-11 Campo 2,"Campo Futbol Mpal. de Almussafes F-11 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. de Almussafes F-8 Campo 1 A,"Campo Futbol Mpal. de Almussafes F-8 Campo 1 A, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. de Almussafes F-8 Campo 1 B,"Campo Futbol Mpal. de Almussafes F-8 Campo 1 B, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. de Almussafes F-8 Campo 2 A,"Campo Futbol Mpal. de Almussafes F-8 Campo 2 A, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Mpal. de Almussafes F-8 Campo 2 B,"Campo Futbol Mpal. de Almussafes F-8 Campo 2 B, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Nerea Perez Machado Benidorm F-11,"Campo Futbol Nerea Perez Machado Benidorm F-11, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Nerea Perez Machado Benidorm F-8 Campo 1-A,"Campo Futbol Nerea Perez Machado Benidorm F-8 Campo 1-A, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Nerea Perez Machado Benidorm F-8 Campo 1-B,"Campo Futbol Nerea Perez Machado Benidorm F-8 Campo 1-B, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Nova Vida C.T.C F-11 Torrent,"Campo Futbol Nova Vida C.T.C F-11 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Nova Vida C.T.C F-8 Campo 1 Torrent,"Campo Futbol Nova Vida C.T.C F-8 Campo 1 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Nova Vida C.T.C F-8 Campo 2 Torrent,"Campo Futbol Nova Vida C.T.C F-8 Campo 2 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Salvador Baidal F-8 Benissa,"Campo Futbol Salvador Baidal F-8 Benissa, Comunitat Valenciana, España",,,,,,no
+Campo Futbol San Marcelino F-11,"Campo Futbol San Marcelino F-11, Comunitat Valenciana, España",,,,,,no
+Campo Futbol San Marcelino F-8 Campo 1,"Campo Futbol San Marcelino F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Futbol San Marcelino F-8 Campo 2,"Campo Futbol San Marcelino F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Futbol San Marcelino F-8 Campo 3,"Campo Futbol San Marcelino F-8 Campo 3, Comunitat Valenciana, España",,,,,,no
+Campo Futbol San Marcelino F-8 Campo 4,"Campo Futbol San Marcelino F-8 Campo 4, Comunitat Valenciana, España",,,,,,no
+Campo Futbol Universid. Jaime I Castellón de la Plana F-11,"Campo Futbol Universid. Jaime I Castellón de la Plana F-11, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Miquel Soler Parque Dptvo. Sindical F-8 Campo 1 Castellón de la Plana,"Campo Fútbol Miquel Soler Parque Dptvo. Sindical F-8 Campo 1 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Miquel Soler Parque Dptvo. Sindical F-8 Campo 2 Castellón de la Plana,"Campo Fútbol Miquel Soler Parque Dptvo. Sindical F-8 Campo 2 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Mpal. Ricardo Chafer Ases F-11 Montaverner,"Campo Fútbol Mpal. Ricardo Chafer Ases F-11 Montaverner, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Mpal. Vista Alegre F-11 Chiva,"Campo Fútbol Mpal. Vista Alegre F-11 Chiva, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Mpal. Vista Alegre F-8 Campo 1 Chiva,"Campo Fútbol Mpal. Vista Alegre F-8 Campo 1 Chiva, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Mpal. Vista Alegre F-8 Campo 2 Chiva,"Campo Fútbol Mpal. Vista Alegre F-8 Campo 2 Chiva, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Parque Mérida Castellón de la Plana F-11,"Campo Fútbol Parque Mérida Castellón de la Plana F-11, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Parque Mérida F-8 Campo 1 Castellón de la Plana,"Campo Fútbol Parque Mérida F-8 Campo 1 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Fútbol Parque Mérida F-8 Campo 2 Castellón de la Plana,"Campo Fútbol Parque Mérida F-8 Campo 2 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Gabriel Samper F-11 Torrevieja,"Campo Gabriel Samper F-11 Torrevieja, Comunitat Valenciana, España",,,,,,no
+Campo Gabriel Samper Torrevieja F-8 Campo 1,"Campo Gabriel Samper Torrevieja F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Galbis F-11 Callosa d`Ensarria,"Campo Galbis F-11 Callosa d`Ensarria, Comunitat Valenciana, España",,,,,,no
+Campo Galbis F-8 Campo 1 Callosa d´En Sarria,"Campo Galbis F-8 Campo 1 Callosa d´En Sarria, Comunitat Valenciana, España",,,,,,no
+Campo Galbis F-8 Campo 2 Callosa d´En Sarria,"Campo Galbis F-8 Campo 2 Callosa d´En Sarria, Comunitat Valenciana, España",,,,,,no
+Campo Gran Via F-11 Castellón de la Plana,"Campo Gran Via F-11 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Gran Via F-8 Campo 1 Castellón de la Plana,"Campo Gran Via F-8 Campo 1 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Gran Via F-8 Campo 2 Castellón de la Plana,"Campo Gran Via F-8 Campo 2 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo J. G. Nito Torrevieja F-8 Campo 1,"Campo J. G. Nito Torrevieja F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo J. G. Nito Torrevieja F-8 Campo 2,"Campo J. G. Nito Torrevieja F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo L`Avenc F-8 Campo 1B Vall d`Alba,"Campo L`Avenc F-8 Campo 1B Vall d`Alba, Comunitat Valenciana, España",,,,,,no
+Campo L`Avenc F-8 Campo 2A Vall d`Alba,"Campo L`Avenc F-8 Campo 2A Vall d`Alba, Comunitat Valenciana, España",,,,,,no
+Campo L`Avenc Vall d`Alba Campo 1 F-11 Vall D´Alba,"Campo L`Avenc Vall d`Alba Campo 1 F-11 Vall D´Alba, Comunitat Valenciana, España",,,,,,no
+Campo L`Avenc Vall d`Alba Campo 2 F-11,"Campo L`Avenc Vall d`Alba Campo 2 F-11, Comunitat Valenciana, España",,,,,,no
+Campo La Cosa F-11 Benisanó,"Campo La Cosa F-11 Benisanó, Comunitat Valenciana, España",,,,,,no
+Campo La Cosa F-8 Campo 1 Benisanó,"Campo La Cosa F-8 Campo 1 Benisanó, Comunitat Valenciana, España",,,,,,no
+Campo La Cosa F-8 Campo 2 Benisanó,"Campo La Cosa F-8 Campo 2 Benisanó, Comunitat Valenciana, España",,,,,,no
+Campo La Figuereta F-11 Canet Berenguer,"Campo La Figuereta F-11 Canet Berenguer, Comunitat Valenciana, España",,,,,,no
+Campo La Figuereta F-8 Campo 1 Canet Berenguer,"Campo La Figuereta F-8 Campo 1 Canet Berenguer, Comunitat Valenciana, España",,,,,,no
+Campo La Figuereta F-8 Campo 2 Canet Berenguer,"Campo La Figuereta F-8 Campo 2 Canet Berenguer, Comunitat Valenciana, España",,,,,,no
+Campo La Malvarrosa F-11,"Campo La Malvarrosa F-11, Comunitat Valenciana, España",,,,,,no
+Campo La Malvarrosa F-8 Campo 1,"Campo La Malvarrosa F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo La Malvarrosa F-8 Campo 2,"Campo La Malvarrosa F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo La Palmera F-11 Granja de Rocamora,"Campo La Palmera F-11 Granja de Rocamora, Comunitat Valenciana, España",,,,,,no
+Campo La Palmera F-8 Campo 1 Granja de Rocamora,"Campo La Palmera F-8 Campo 1 Granja de Rocamora, Comunitat Valenciana, España",,,,,,no
+Campo La Solana F-11 Villena,"Campo La Solana F-11 Villena, Comunitat Valenciana, España",,,,,,no
+Campo La Solana F-8 Campo 1 Villena,"Campo La Solana F-8 Campo 1 Villena, Comunitat Valenciana, España",,,,,,no
+Campo Las Fuentes F-11 Benimaclet,"Campo Las Fuentes F-11 Benimaclet, Comunitat Valenciana, España",,,,,,no
+Campo Las Fuentes F-5 Benimaclet,"Campo Las Fuentes F-5 Benimaclet, Comunitat Valenciana, España",,,,,,no
+Campo Las Fuentes F-8 Campo 1 Benimaclet,"Campo Las Fuentes F-8 Campo 1 Benimaclet, Comunitat Valenciana, España",,,,,,no
+Campo Las Oliveras F-8 Burjassot,"Campo Las Oliveras F-8 Burjassot, Comunitat Valenciana, España",,,,,,no
+Campo Lledo International School Castellón de la Plana,"Campo Lledo International School Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Miguel Angel Benitez F-8 Anexo Calpe,"Campo Miguel Angel Benitez F-8 Anexo Calpe, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. 4 Caminos F-8 Campo 1 Macastre,"Campo Mpal. 4 Caminos F-8 Campo 1 Macastre, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. 4 Caminos F-8 Campo 2 Macastre,"Campo Mpal. 4 Caminos F-8 Campo 2 Macastre, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. 4 Caminos Macastre F-11,"Campo Mpal. 4 Caminos Macastre F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Agustin Sancho Benlloch F-11,"Campo Mpal. Agustin Sancho Benlloch F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Agustin Sancho F-8 Campo 2 Benlloch,"Campo Mpal. Agustin Sancho F-8 Campo 2 Benlloch, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Algueña F-11,"Campo Mpal. Algueña F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Jover F-11 Agost,"Campo Mpal. Antonio Jover F-11 Agost, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Jover F-8 Campo 1 Agost,"Campo Mpal. Antonio Jover F-8 Campo 1 Agost, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Jover F-8 Campo 2 Agost,"Campo Mpal. Antonio Jover F-8 Campo 2 Agost, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Pascual Gil F-11,"Campo Mpal. Antonio Pascual Gil F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Pascual Gil F-8 Campo 1 Redován,"Campo Mpal. Antonio Pascual Gil F-8 Campo 1 Redován, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Solana Anexo F-11,"Campo Mpal. Antonio Solana Anexo F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Solana Anexo F-8 Campo 1,"Campo Mpal. Antonio Solana Anexo F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Antonio Solana F-11,"Campo Mpal. Antonio Solana F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Barrio La Luz F-11 Valencia,"Campo Mpal. Barrio La Luz F-11 Valencia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Barrio La Luz F-8 Campo 1,"Campo Mpal. Barrio La Luz F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Barrio La Luz F-8 Campo 2,"Campo Mpal. Barrio La Luz F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Benedicto XIII F-11 Peñiscola,"Campo Mpal. Benedicto XIII F-11 Peñiscola, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Benedicto XIII F-8 Campo 1 Peñiscola,"Campo Mpal. Benedicto XIII F-8 Campo 1 Peñiscola, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Benedicto XIII F-8 Campo 2 Peñiscola,"Campo Mpal. Benedicto XIII F-8 Campo 2 Peñiscola, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Benifairo de la Valldigna F-11,"Campo Mpal. Benifairo de la Valldigna F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Benifairo de la Valldigna F-8 Campo 1,"Campo Mpal. Benifairo de la Valldigna F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Cabo Las Huertas F-11,"Campo Mpal. Cabo Las Huertas F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Cabo Las Huertas F-8 Campo 1,"Campo Mpal. Cabo Las Huertas F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Cabo Las Huertas F-8 Campo 2,"Campo Mpal. Cabo Las Huertas F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Carraixet F-11 Tavernes Blanques,"Campo Mpal. Carraixet F-11 Tavernes Blanques, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Carraixet F-5 Campo 1,"Campo Mpal. Carraixet F-5 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Carraixet F-8 Campo 1 Tavernes Blanques,"Campo Mpal. Carraixet F-8 Campo 1 Tavernes Blanques, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Carraixet F-8 Campo 2 Tavernes Blanques,"Campo Mpal. Carraixet F-8 Campo 2 Tavernes Blanques, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Cervantes F-11 Pego,"Campo Mpal. Cervantes F-11 Pego, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Cervantes F-8 Campo 1 Pego,"Campo Mpal. Cervantes F-8 Campo 1 Pego, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Dep. Torreblanca F-11 Campo 1,"Campo Mpal. Dep. Torreblanca F-11 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Dep. Torreblanca F-8 Campo 1B Torreblanca,"Campo Mpal. Dep. Torreblanca F-8 Campo 1B Torreblanca, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Dep. Torreblanca F-8 Campo 2B Torreblanca,"Campo Mpal. Dep. Torreblanca F-8 Campo 2B Torreblanca, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Divina Pastora Alicante F-11,"Campo Mpal. Divina Pastora Alicante F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Divina Pastora F-8 Campo 1,"Campo Mpal. Divina Pastora F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Divina Pastora F-8 Campo 2,"Campo Mpal. Divina Pastora F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Altet F-11,"Campo Mpal. El Altet F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Altet F-5 Campo 2,"Campo Mpal. El Altet F-5 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Altet F-8 Campo 1,"Campo Mpal. El Altet F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Altet F-8 Campo 2,"Campo Mpal. El Altet F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Arco F-11 Soneja,"Campo Mpal. El Arco F-11 Soneja, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Arco F-8 Campo 1 Soneja,"Campo Mpal. El Arco F-8 Campo 1 Soneja, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Arco F-8 Campo 2 Soneja,"Campo Mpal. El Arco F-8 Campo 2 Soneja, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barranc F-11 Bonrepos,"Campo Mpal. El Barranc F-11 Bonrepos, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barranc F-8 Campo 1 Bonrepos i Mirambell,"Campo Mpal. El Barranc F-8 Campo 1 Bonrepos i Mirambell, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barranc F-8 Campo 2 Bonrepos i Mirambell,"Campo Mpal. El Barranc F-8 Campo 2 Bonrepos i Mirambell, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barranquet Benaguasil F-11,"Campo Mpal. El Barranquet Benaguasil F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barranquet F-8 Campo 1 Benaguasil,"Campo Mpal. El Barranquet F-8 Campo 1 Benaguasil, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barranquet F-8 Campo 2 Benaguasil,"Campo Mpal. El Barranquet F-8 Campo 2 Benaguasil, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barranquet F-8 Campo 3 Benaguasil,"Campo Mpal. El Barranquet F-8 Campo 3 Benaguasil, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barxell F-11 Petrer,"Campo Mpal. El Barxell F-11 Petrer, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barxell F-8 Campo 1 Petrer,"Campo Mpal. El Barxell F-8 Campo 1 Petrer, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barxell F-8 Campo 2 Petrer,"Campo Mpal. El Barxell F-8 Campo 2 Petrer, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Barxell F-8 Campo 3 Petrer,"Campo Mpal. El Barxell F-8 Campo 3 Petrer, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Calvario F-11 Albatera,"Campo Mpal. El Calvario F-11 Albatera, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Calvario F-8 Campo 1 Albatera,"Campo Mpal. El Calvario F-8 Campo 1 Albatera, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Calvario F-8 Campo 2 Albatera,"Campo Mpal. El Calvario F-8 Campo 2 Albatera, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Camino F-11 Caudete de las Fuentes,"Campo Mpal. El Camino F-11 Caudete de las Fuentes, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Cano F-11 Campo 1 Lliria,"Campo Mpal. El Cano F-11 Campo 1 Lliria, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Cano F-11 Campo 2 Lliria,"Campo Mpal. El Cano F-11 Campo 2 Lliria, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Cano F-8 Campo 1A Lliria,"Campo Mpal. El Cano F-8 Campo 1A Lliria, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Cano F-8 Campo 1B Lliria,"Campo Mpal. El Cano F-8 Campo 1B Lliria, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Cano F-8 Campo 2A Lliria,"Campo Mpal. El Cano F-8 Campo 2A Lliria, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Cano F-8 Campo 2B Lliria,"Campo Mpal. El Cano F-8 Campo 2B Lliria, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Colomer F-11 Traiguera,"Campo Mpal. El Colomer F-11 Traiguera, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Colomer F-8 Campo 1 Traiguera,"Campo Mpal. El Colomer F-8 Campo 1 Traiguera, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Molino F-11 Bigastro,"Campo Mpal. El Molino F-11 Bigastro, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Molino F-8 Campo 1 Bigastro,"Campo Mpal. El Molino F-8 Campo 1 Bigastro, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Molino F-8 Campo 2 Bigastro,"Campo Mpal. El Molino F-8 Campo 2 Bigastro, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Moreral F-11 Fuenterrobles,"Campo Mpal. El Moreral F-11 Fuenterrobles, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Olivar F-11 Caudiel,"Campo Mpal. El Olivar F-11 Caudiel, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Olivar F-11 Els Ibarsos-Sierra Engarcerán,"Campo Mpal. El Olivar F-11 Els Ibarsos-Sierra Engarcerán, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Olivar F-8 Campo 1 Caudiel,"Campo Mpal. El Olivar F-8 Campo 1 Caudiel, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Palmar F-11 Borriol,"Campo Mpal. El Palmar F-11 Borriol, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Palmar F-8 Campo 1 Borriol,"Campo Mpal. El Palmar F-8 Campo 1 Borriol, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Palmar F-8 Campo 2 Borriol,"Campo Mpal. El Palmar F-8 Campo 2 Borriol, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Palmeral F-11 Callosa de Segura,"Campo Mpal. El Palmeral F-11 Callosa de Segura, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Pardo F-11 Sax,"Campo Mpal. El Pardo F-11 Sax, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Pardo F-8 Campo 1 Sax,"Campo Mpal. El Pardo F-8 Campo 1 Sax, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Pardo F-8 Campo 2 Sax,"Campo Mpal. El Pardo F-8 Campo 2 Sax, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Parral F-11 Pedralba,"Campo Mpal. El Parral F-11 Pedralba, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Parral F-8 Campo 1 Pedralba,"Campo Mpal. El Parral F-8 Campo 1 Pedralba, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Parral F-8 Campo 2 Pedralba,"Campo Mpal. El Parral F-8 Campo 2 Pedralba, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Perdiguer F-11 Aldaia,"Campo Mpal. El Perdiguer F-11 Aldaia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Perdiguer F-5,"Campo Mpal. El Perdiguer F-5, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Perdiguer F-8 Campo 1,"Campo Mpal. El Perdiguer F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Perdiguer F-8 Campo 2,"Campo Mpal. El Perdiguer F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Pla 2 F-11 Alcásser,"Campo Mpal. El Pla 2 F-11 Alcásser, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Pla 2 F-5 Alcasser,"Campo Mpal. El Pla 2 F-5 Alcasser, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Pla 2 F-8 Campo 1 Alcàsser,"Campo Mpal. El Pla 2 F-8 Campo 1 Alcàsser, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Pla 2 F-8 Campo 2 Alcàsser,"Campo Mpal. El Pla 2 F-8 Campo 2 Alcàsser, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Plano F-11 Altura,"Campo Mpal. El Plano F-11 Altura, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Plano F-8 Campo 1 Altura,"Campo Mpal. El Plano F-8 Campo 1 Altura, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Porrejat F-11 Atzeneta Maestrat,"Campo Mpal. El Porrejat F-11 Atzeneta Maestrat, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Porrejat F-8 Campo 1 Atzeneta del Maestrat,"Campo Mpal. El Porrejat F-8 Campo 1 Atzeneta del Maestrat, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Recreo F-11 Godelleta,"Campo Mpal. El Recreo F-11 Godelleta, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Recreo F-8 Campo 1 Godelleta,"Campo Mpal. El Recreo F-8 Campo 1 Godelleta, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Rodat F-11 Denia,"Campo Mpal. El Rodat F-11 Denia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Rodat F-5 Campo 1 - A,"Campo Mpal. El Rodat F-5 Campo 1 - A, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Rodat F-8 Campo 1 Denia,"Campo Mpal. El Rodat F-8 Campo 1 Denia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Rodat F-8 Campo 2 Denia,"Campo Mpal. El Rodat F-8 Campo 2 Denia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Saltador F-11 L`Alcora,"Campo Mpal. El Saltador F-11 L`Alcora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Saltador F-8 Campo 1 Alcora,"Campo Mpal. El Saltador F-8 Campo 1 Alcora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Saltador F-8 Campo 2 Alcora,"Campo Mpal. El Saltador F-8 Campo 2 Alcora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Serrito F-11 Villafranca del Cid,"Campo Mpal. El Serrito F-11 Villafranca del Cid, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Serrito F-8 Campo 1 Villafranca del Cid,"Campo Mpal. El Serrito F-8 Campo 1 Villafranca del Cid, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Temple F-11 Coves de Vinromá,"Campo Mpal. El Temple F-11 Coves de Vinromá, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Verger F-11,"Campo Mpal. El Verger F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. El Verger F-8 Campo 1,"Campo Mpal. El Verger F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Enrique Saura Gil F-11 Onda,"Campo Mpal. Enrique Saura Gil F-11 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Enrique Saura Gil F-8 Campo 1 Onda,"Campo Mpal. Enrique Saura Gil F-8 Campo 1 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Enrique Saura Gil F-8 Campo 2 Onda,"Campo Mpal. Enrique Saura Gil F-8 Campo 2 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Esteban Rosado F-11 Torrevieja,"Campo Mpal. Esteban Rosado F-11 Torrevieja, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Esteban Rosado F-8 Campo 1 Torrevieja,"Campo Mpal. Esteban Rosado F-8 Campo 1 Torrevieja, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Ferreres-Arayo F-11 Calig,"Campo Mpal. Ferreres-Arayo F-11 Calig, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Ferreres-Arayo F-8 Campo 1 Calig,"Campo Mpal. Ferreres-Arayo F-8 Campo 1 Calig, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Florida Babel F-11 Alicante,"Campo Mpal. Florida Babel F-11 Alicante, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Florida Babel. F-5 Campo 1 - A,"Campo Mpal. Florida Babel. F-5 Campo 1 - A, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Florida Babel. F-8 Campo 1,"Campo Mpal. Florida Babel. F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Florida Babel. F-8 Campo 2,"Campo Mpal. Florida Babel. F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Fuente de la Salud F-11 Yatova,"Campo Mpal. Fuente de la Salud F-11 Yatova, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Fuente de la Salud F-8 Campo 1 Yatova,"Campo Mpal. Fuente de la Salud F-8 Campo 1 Yatova, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Fuente de la Salud F-8 Campo 2 Yatova,"Campo Mpal. Fuente de la Salud F-8 Campo 2 Yatova, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Futbol Bernardo Font Vallés F-11 Teulada,"Campo Mpal. Futbol Bernardo Font Vallés F-11 Teulada, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Futbol Bernardo Font Vallés F-8 Campo 1 Teulada,"Campo Mpal. Futbol Bernardo Font Vallés F-8 Campo 1 Teulada, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Futbol Bernardo Font Vallés F-8 Campo 2 Teulada,"Campo Mpal. Futbol Bernardo Font Vallés F-8 Campo 2 Teulada, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Futbol La Nia F-8 Aspe,"Campo Mpal. Futbol La Nia F-8 Aspe, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Futbol de Vallada F-11,"Campo Mpal. Futbol de Vallada F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Garganes Altea F-11 Campo A,"Campo Mpal. Garganes Altea F-11 Campo A, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Garganes Altea F-11 Campo B,"Campo Mpal. Garganes Altea F-11 Campo B, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Garganes F-8 Campo 1 Altea,"Campo Mpal. Garganes F-8 Campo 1 Altea, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Garganes F-8 Campo 2 Altea,"Campo Mpal. Garganes F-8 Campo 2 Altea, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Germans Albiol F-11 Vilamarxant,"Campo Mpal. Germans Albiol F-11 Vilamarxant, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Germans Albiol F-8 Campo 1 Vilamarxant,"Campo Mpal. Germans Albiol F-8 Campo 1 Vilamarxant, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Germans Albiol F-8 Campo 2 Vilamarxant,"Campo Mpal. Germans Albiol F-8 Campo 2 Vilamarxant, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Girona F-11 Beniarbeig,"Campo Mpal. Girona F-11 Beniarbeig, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Javier Marquina F-11 Castellón,"Campo Mpal. Javier Marquina F-11 Castellón, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Javier Marquina F-8 Campo 1A Castellón de la Plana,"Campo Mpal. Javier Marquina F-8 Campo 1A Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Javier Marquina F-8 Campo 1B Castellón de la Plana,"Campo Mpal. Javier Marquina F-8 Campo 1B Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Javier Marquina F-8 Campo 2 Castellón de la Plana,"Campo Mpal. Javier Marquina F-8 Campo 2 Castellón de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Jesus Beire Gil F-11 Sant Joan de Moró,"Campo Mpal. Jesus Beire Gil F-11 Sant Joan de Moró, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Jesus Beire Gil F-8 Campo 1 Sant Joan de Moró,"Campo Mpal. Jesus Beire Gil F-8 Campo 1 Sant Joan de Moró, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Jesus Beire Gil F-8 Campo 2 Sant Joan de Moró,"Campo Mpal. Jesus Beire Gil F-8 Campo 2 Sant Joan de Moró, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan B. Planelles Marco F-11 Burriana,"Campo Mpal. Joan B. Planelles Marco F-11 Burriana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan B. Planelles Marco F-8 Campo 1 Burriana,"Campo Mpal. Joan B. Planelles Marco F-8 Campo 1 Burriana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan B. Planelles Marco F-8 Campo 2 Burriana,"Campo Mpal. Joan B. Planelles Marco F-8 Campo 2 Burriana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan Manuel Canós Ferrer Burriana F-11 Campo 1,"Campo Mpal. Joan Manuel Canós Ferrer Burriana F-11 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan Manuel Canós Ferrer Burriana F-11 Campo 2,"Campo Mpal. Joan Manuel Canós Ferrer Burriana F-11 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 1A Burriana,"Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 1A Burriana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 1B Burriana,"Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 1B Burriana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 2A Burriana,"Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 2A Burriana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 2B Burriana,"Campo Mpal. Joan Manuel Canós Ferrer F-8 Campo 2B Burriana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joaquín Pastor F-11 Rafal,"Campo Mpal. Joaquín Pastor F-11 Rafal, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joaquín Pastor F-8 Campo 1 Rafal,"Campo Mpal. Joaquín Pastor F-8 Campo 1 Rafal, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Joaquín Pastor F-8 Campo 2 Rafal,"Campo Mpal. Joaquín Pastor F-8 Campo 2 Rafal, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Jose Manuel Pesudo F-11 Almassora,"Campo Mpal. Jose Manuel Pesudo F-11 Almassora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Jose Manuel Pesudo F-8 Campo 1 Almazora,"Campo Mpal. Jose Manuel Pesudo F-8 Campo 1 Almazora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Jose Manuel Pesudo F-8 Campo 2 Almazora,"Campo Mpal. Jose Manuel Pesudo F-8 Campo 2 Almazora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Jose Martinez F-11 La Llosa,"Campo Mpal. Jose Martinez F-11 La Llosa, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. José Villaescusa Carrasco F-8 Campo 1 Pilar Horadada,"Campo Mpal. José Villaescusa Carrasco F-8 Campo 1 Pilar Horadada, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. José Villaescusa Carrasco Pilar de Horadada F-11,"Campo Mpal. José Villaescusa Carrasco Pilar de Horadada F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Bta. Clement Amoros F-11 Santa Pola,"Campo Mpal. Juan Bta. Clement Amoros F-11 Santa Pola, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Bta. Clement Amoros F-8 Campo 1 Santa Pola,"Campo Mpal. Juan Bta. Clement Amoros F-8 Campo 1 Santa Pola, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Bta. Clement Amoros F-8 Campo 2 Santa Pola,"Campo Mpal. Juan Bta. Clement Amoros F-8 Campo 2 Santa Pola, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Montoliu Gallart F-11 Artana,"Campo Mpal. Juan Montoliu Gallart F-11 Artana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Montoliu Gallart F-8 Campo 1 Artana,"Campo Mpal. Juan Montoliu Gallart F-8 Campo 1 Artana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Peiro F-11 Real de Gandia,"Campo Mpal. Juan Peiro F-11 Real de Gandia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Peiro F-8 Campo 1 Real de Gandia,"Campo Mpal. Juan Peiro F-8 Campo 1 Real de Gandia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Juan Peiro F-8 Campo 2 Real de Gandia,"Campo Mpal. Juan Peiro F-8 Campo 2 Real de Gandia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L' Alter F-11 Xilxes,"Campo Mpal. L' Alter F-11 Xilxes, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L' Alter Xilxes F-8 Campo 1 Xilxes,"Campo Mpal. L' Alter Xilxes F-8 Campo 1 Xilxes, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L' Alter Xilxes F-8 Campo 2 Xilxes,"Campo Mpal. L' Alter Xilxes F-8 Campo 2 Xilxes, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L' Assut F-11 Anna,"Campo Mpal. L' Assut F-11 Anna, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L' Horta F-11 Castellar,"Campo Mpal. L' Horta F-11 Castellar, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L' Horta F-8 Campo 1 Castellar,"Campo Mpal. L' Horta F-8 Campo 1 Castellar, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L'Alqueria Comtesa F-11,"Campo Mpal. L'Alqueria Comtesa F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L'Alqueria Comtesa F-8 Campo 1,"Campo Mpal. L'Alqueria Comtesa F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. L'Alqueria Comtesa F-8 Campo 2,"Campo Mpal. L'Alqueria Comtesa F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Alameda F-11 Dolores,"Campo Mpal. La Alameda F-11 Dolores, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Alameda F-8 Campo 1 Dolores,"Campo Mpal. La Alameda F-8 Campo 1 Dolores, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Arboleda F-11 Sant Mateu,"Campo Mpal. La Arboleda F-11 Sant Mateu, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Arboleda F-8 Campo 1 Sant Mateu,"Campo Mpal. La Arboleda F-8 Campo 1 Sant Mateu, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Arboleda F-8 Campo 2 Sant Mateu,"Campo Mpal. La Arboleda F-8 Campo 2 Sant Mateu, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cantera F-11 La Vilavella,"Campo Mpal. La Cantera F-11 La Vilavella, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cantera F-8 Campo 1 Villavieja,"Campo Mpal. La Cantera F-8 Campo 1 Villavieja, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cantera F-8 Campo 2 Villavieja,"Campo Mpal. La Cantera F-8 Campo 2 Villavieja, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cigüeña F-11 Alicante,"Campo Mpal. La Cigüeña F-11 Alicante, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cigüeña F-8 Campo 1,"Campo Mpal. La Cigüeña F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cigüeña F-8 Campo 2,"Campo Mpal. La Cigüeña F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Corona Almenara F-11 Campo 1,"Campo Mpal. La Corona Almenara F-11 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Corona F-8 Campo 1A Almenara,"Campo Mpal. La Corona F-8 Campo 1A Almenara, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Corona F-8 Campo 2A Almenara,"Campo Mpal. La Corona F-8 Campo 2A Almenara, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cossa F-11 Onda,"Campo Mpal. La Cossa F-11 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cossa F-8 Campo 1 Onda,"Campo Mpal. La Cossa F-8 Campo 1 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Cossa F-8 Campo 2 Onda,"Campo Mpal. La Cossa F-8 Campo 2 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Costa F-11 Benissa,"Campo Mpal. La Costa F-11 Benissa, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Costa F-8 Campo 1 Benissa,"Campo Mpal. La Costa F-8 Campo 1 Benissa, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Costa F-8 Campo 2 Benissa,"Campo Mpal. La Costa F-8 Campo 2 Benissa, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Exposicion F-11,"Campo Mpal. La Exposicion F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Exposicion F-7 Campo 1,"Campo Mpal. La Exposicion F-7 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Exposicion F-7 Campo 2,"Campo Mpal. La Exposicion F-7 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Foia F-11 Finestrat,"Campo Mpal. La Foia F-11 Finestrat, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Foia F-8 Campo 1 Finestrat,"Campo Mpal. La Foia F-8 Campo 1 Finestrat, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Foia F-8 Campo 2 Finestrat,"Campo Mpal. La Foia F-8 Campo 2 Finestrat, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Font F-11 Benitachell,"Campo Mpal. La Font F-11 Benitachell, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Font F-8 Campo 1 Benitachell,"Campo Mpal. La Font F-8 Campo 1 Benitachell, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Llometa F-11 Muro de Alcoy,"Campo Mpal. La Llometa F-11 Muro de Alcoy, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Llometa F-8 Campo 1 Muro,"Campo Mpal. La Llometa F-8 Campo 1 Muro, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Llometa F-8 Campo 2 Muro,"Campo Mpal. La Llometa F-8 Campo 2 Muro, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Magdalena F-11 Novelda,"Campo Mpal. La Magdalena F-11 Novelda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Malaitxa F-11 Gilet,"Campo Mpal. La Malaitxa F-11 Gilet, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Malaitxa F-8 Campo 1 Gilet,"Campo Mpal. La Malaitxa F-8 Campo 1 Gilet, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Malaitxa F-8 Campo 2 Gilet,"Campo Mpal. La Malaitxa F-8 Campo 2 Gilet, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Marjal F-11 Orba,"Campo Mpal. La Marjal F-11 Orba, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Mina F-11 Castellnovo,"Campo Mpal. La Mina F-11 Castellnovo, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Morera F-11 Cocentaina,"Campo Mpal. La Morera F-11 Cocentaina, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Morera F-8 Campo 1 Cocentaina,"Campo Mpal. La Morera F-8 Campo 1 Cocentaina, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Morera F-8 Campo 2 Cocentaina,"Campo Mpal. La Morera F-8 Campo 2 Cocentaina, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Murta Chiva F-11,"Campo Mpal. La Murta Chiva F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Murta Chiva F-5,"Campo Mpal. La Murta Chiva F-5, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Murta Chiva F-8 Campo 1,"Campo Mpal. La Murta Chiva F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Murta Chiva F-8 Campo 2,"Campo Mpal. La Murta Chiva F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Parada F-11 Beniarrés,"Campo Mpal. La Parada F-11 Beniarrés, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Paz F-11 Villar del Arzobispo,"Campo Mpal. La Paz F-11 Villar del Arzobispo, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Paz F-8 Campo 1 Villar del Arzobispo,"Campo Mpal. La Paz F-8 Campo 1 Villar del Arzobispo, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Plana F-11 Llutxent,"Campo Mpal. La Plana F-11 Llutxent, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Plana F-8 Campo 1 Llutxent,"Campo Mpal. La Plana F-8 Campo 1 Llutxent, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Plana F-8 Campo 2 Llutxent,"Campo Mpal. La Plana F-8 Campo 2 Llutxent, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Planeta F-11 Albocasser,"Campo Mpal. La Planeta F-11 Albocasser, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Planeta F-11 Rosell,"Campo Mpal. La Planeta F-11 Rosell, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Puebla Daya Nueva F-11,"Campo Mpal. La Puebla Daya Nueva F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Puebla F-8 Campo 1 Daya Nueva,"Campo Mpal. La Puebla F-8 Campo 1 Daya Nueva, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Purisima F-11 Ontinyent,"Campo Mpal. La Purisima F-11 Ontinyent, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Purisima F-8 Campo 1 Ontinyent,"Campo Mpal. La Purisima F-8 Campo 1 Ontinyent, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Purisima F-8 Campo 2 Ontinyent,"Campo Mpal. La Purisima F-8 Campo 2 Ontinyent, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Purisima F-8 Campo 3 Ontinyent,"Campo Mpal. La Purisima F-8 Campo 3 Ontinyent, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Rincona F-11 Ribesalbes,"Campo Mpal. La Rincona F-11 Ribesalbes, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Romana F-11,"Campo Mpal. La Romana F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Romana F-8 Campo 1,"Campo Mpal. La Romana F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Romana F-8 Campo 2,"Campo Mpal. La Romana F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Runa F-11 Rafelcofer,"Campo Mpal. La Runa F-11 Rafelcofer, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Runa F-8 Campo 1 Rafelcofer,"Campo Mpal. La Runa F-8 Campo 1 Rafelcofer, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Torreta F-11 Sollana,"Campo Mpal. La Torreta F-11 Sollana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Torreta F-8 Campo 1 Sollana,"Campo Mpal. La Torreta F-8 Campo 1 Sollana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Torreta F-8 Campo 2 Sollana,"Campo Mpal. La Torreta F-8 Campo 2 Sollana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Viña Cheste F-11,"Campo Mpal. La Viña Cheste F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Viña Cheste F-8 Campo 1,"Campo Mpal. La Viña Cheste F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Viña Cheste F-8 Campo 2,"Campo Mpal. La Viña Cheste F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. La Viña F-11 Casas de Utiel,"Campo Mpal. La Viña F-11 Casas de Utiel, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Acacias F-11 Venta del Moro,"Campo Mpal. Las Acacias F-11 Venta del Moro, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Boqueras F-11 Almassora,"Campo Mpal. Las Boqueras F-11 Almassora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Boqueras F-8 Campo 1A Almazora,"Campo Mpal. Las Boqueras F-8 Campo 1A Almazora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Boqueras F-8 Campo 1B Almazora,"Campo Mpal. Las Boqueras F-8 Campo 1B Almazora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Boqueras F-8 Campo 2 Almazora,"Campo Mpal. Las Boqueras F-8 Campo 2 Almazora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Eras F-11 Chella,"Campo Mpal. Las Eras F-11 Chella, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Eras F-8 Campo 1 Chella,"Campo Mpal. Las Eras F-8 Campo 1 Chella, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Fuentes F-11 Aspe,"Campo Mpal. Las Fuentes F-11 Aspe, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Fuentes F-11 Aspe Campo Anexo,"Campo Mpal. Las Fuentes F-11 Aspe Campo Anexo, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Fuentes F-8 Anexo Campo 1 Aspe,"Campo Mpal. Las Fuentes F-8 Anexo Campo 1 Aspe, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Fuentes F-8 Anexo Campo 2 Aspe,"Campo Mpal. Las Fuentes F-8 Anexo Campo 2 Aspe, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Fuentes F-8 Campo 1 Aspe,"Campo Mpal. Las Fuentes F-8 Campo 1 Aspe, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Fuentes F-8 Campo 2 Aspe,"Campo Mpal. Las Fuentes F-8 Campo 2 Aspe, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Rabosas F-11 Guardamar,"Campo Mpal. Las Rabosas F-11 Guardamar, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Las Rabosas F-8 Campo 1 Guardamar,"Campo Mpal. Las Rabosas F-8 Campo 1 Guardamar, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Les Comes F-11 Canet Lo Roig,"Campo Mpal. Les Comes F-11 Canet Lo Roig, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Les Cometes F-11 La Jana,"Campo Mpal. Les Cometes F-11 La Jana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Les Costeres F-11 Gata,"Campo Mpal. Les Costeres F-11 Gata, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Les Costeres F-8 Campo 1 Gata Gorgos,"Campo Mpal. Les Costeres F-8 Campo 1 Gata Gorgos, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Les Forques F-11 Xert,"Campo Mpal. Les Forques F-11 Xert, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Les Viles F-11 Salsadella,"Campo Mpal. Les Viles F-11 Salsadella, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Los Arcos F-11 Orihuela,"Campo Mpal. Los Arcos F-11 Orihuela, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Luis Gomez F-11 Alicante,"Campo Mpal. Luis Gomez F-11 Alicante, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Luis Gomez F-5 Campo 1A,"Campo Mpal. Luis Gomez F-5 Campo 1A, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Luis Gomez F-8 Campo 1,"Campo Mpal. Luis Gomez F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Luis Gomez F-8 Campo 2,"Campo Mpal. Luis Gomez F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Luis Rocamora F-11 Benferri,"Campo Mpal. Luis Rocamora F-11 Benferri, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Luis Rocamora F-8 Campo 1 Benferri,"Campo Mpal. Luis Rocamora F-8 Campo 1 Benferri, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Luis Rocamora F-8 Campo 2 Benferri,"Campo Mpal. Luis Rocamora F-8 Campo 2 Benferri, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Moncofa F-11,"Campo Mpal. Moncofa F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Moncofa F-8 Campo 1 Moncofa,"Campo Mpal. Moncofa F-8 Campo 1 Moncofa, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Moncofa F-8 Campo 2 Moncofa,"Campo Mpal. Moncofa F-8 Campo 2 Moncofa, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Montesico Blanco F-11 S. Miguel de Salinas,"Campo Mpal. Montesico Blanco F-11 S. Miguel de Salinas, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Montesico Blanco F-8 Campo 1 San Miguel de Salinas,"Campo Mpal. Montesico Blanco F-8 Campo 1 San Miguel de Salinas, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Nou Pla F-11 Villajoyosa,"Campo Mpal. Nou Pla F-11 Villajoyosa, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Nuevo Frumentaria F-11 Formentera del Segura,"Campo Mpal. Nuevo Frumentaria F-11 Formentera del Segura, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Nuevo Frumentaria F-8 Campo 1 Formentera del Segura,"Campo Mpal. Nuevo Frumentaria F-8 Campo 1 Formentera del Segura, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Olimpic F-11 Onda,"Campo Mpal. Olimpic F-11 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Olimpic F-8 Campo 1 Onda,"Campo Mpal. Olimpic F-8 Campo 1 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Olimpic F-8 Campo 2 Onda,"Campo Mpal. Olimpic F-8 Campo 2 Onda, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Paquito Coloma F-11 Xátiva,"Campo Mpal. Paquito Coloma F-11 Xátiva, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Paquito Coloma F-8 Campo 1 Xátiva,"Campo Mpal. Paquito Coloma F-8 Campo 1 Xátiva, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Paquito Coloma F-8 Campo 2 Xátiva,"Campo Mpal. Paquito Coloma F-8 Campo 2 Xátiva, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Paquito Coloma F-8 Campo 3 Xátiva,"Campo Mpal. Paquito Coloma F-8 Campo 3 Xátiva, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Perpetuo Socorro F-11 Castellón,"Campo Mpal. Perpetuo Socorro F-11 Castellón, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Perpetuo Socorro F-8 Campo 1 Castellon de la Plana,"Campo Mpal. Perpetuo Socorro F-8 Campo 1 Castellon de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Perpetuo Socorro F-8 Campo 2 Castellon de la Plana,"Campo Mpal. Perpetuo Socorro F-8 Campo 2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Pla de Mig Ull F-11 Cinctorres,"Campo Mpal. Pla de Mig Ull F-11 Cinctorres, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Pla de Mig Ull F-8 Campo 1 Cinctorres,"Campo Mpal. Pla de Mig Ull F-8 Campo 1 Cinctorres, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Polígono Rafalafena F-11 Castellón,"Campo Mpal. Polígono Rafalafena F-11 Castellón, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Polígono Rafalafena F-8 Campo 1 Castellon de la Plana,"Campo Mpal. Polígono Rafalafena F-8 Campo 1 Castellon de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Polígono Rafalafena F-8 Campo 2 Castellon de la Plana,"Campo Mpal. Polígono Rafalafena F-8 Campo 2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Pont de Fusta F-11,"Campo Mpal. Pont de Fusta F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Pont de Fusta F-8 Campo 1,"Campo Mpal. Pont de Fusta F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Pont de Fusta F-8 Campo 2,"Campo Mpal. Pont de Fusta F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rois de Corella F-11 Gandia Campo 1,"Campo Mpal. Rois de Corella F-11 Gandia Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rois de Corella F-11 Gandia Campo 2,"Campo Mpal. Rois de Corella F-11 Gandia Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rois de Corella F-5 Campo 2B,"Campo Mpal. Rois de Corella F-5 Campo 2B, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rois de Corella F-8 Campo 1A Gandia,"Campo Mpal. Rois de Corella F-8 Campo 1A Gandia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rois de Corella F-8 Campo 1B Gandia,"Campo Mpal. Rois de Corella F-8 Campo 1B Gandia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rois de Corella F-8 Campo 2A Gandia,"Campo Mpal. Rois de Corella F-8 Campo 2A Gandia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rois de Corella F-8 Campo 2B Gandia,"Campo Mpal. Rois de Corella F-8 Campo 2B Gandia, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rubén Ferrer Boj F-11 El Pinós,"Campo Mpal. Rubén Ferrer Boj F-11 El Pinós, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Rubén Ferrer Boj F-8 Campo 1 El Pinos,"Campo Mpal. Rubén Ferrer Boj F-8 Campo 1 El Pinos, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Agustín F-8 Castellón Castellon de la Plana,"Campo Mpal. San Agustín F-8 Castellón Castellon de la Plana, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Anton F-11 Ayora,"Campo Mpal. San Anton F-11 Ayora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Anton F-8 Campo 1 Ayora,"Campo Mpal. San Anton F-8 Campo 1 Ayora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Anton F-8 Campo 2 Ayora,"Campo Mpal. San Anton F-8 Campo 2 Ayora, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Fernando F-11 Alcala de Xivert,"Campo Mpal. San Fernando F-11 Alcala de Xivert, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Fernando F-11 Cox,"Campo Mpal. San Fernando F-11 Cox, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Fernando F-8 Alcalá de Xivert Campo 1,"Campo Mpal. San Fernando F-8 Alcalá de Xivert Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Fernando F-8 Alcalá de Xivert Campo 2,"Campo Mpal. San Fernando F-8 Alcalá de Xivert Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Fernando F-8 Campo 1 Cox,"Campo Mpal. San Fernando F-8 Campo 1 Cox, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Isidro F-11 Alicante,"Campo Mpal. San Isidro F-11 Alicante, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Sebastian F-11 Jijona,"Campo Mpal. San Sebastian F-11 Jijona, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. San Sebastian F-8 Campo 1 Jijona,"Campo Mpal. San Sebastian F-8 Campo 1 Jijona, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Santa Ana F-11 Catí,"Campo Mpal. Santa Ana F-11 Catí, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Sebastia Puig F-11 Polinya del Xúquer,"Campo Mpal. Sebastia Puig F-11 Polinya del Xúquer, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Tombola F-11 Alicante,"Campo Mpal. Tombola F-11 Alicante, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Tombola F-8 Campo 1,"Campo Mpal. Tombola F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Tombola F-8 Campo 2,"Campo Mpal. Tombola F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Torre San Vicente F-11 Benicasim,"Campo Mpal. Torre San Vicente F-11 Benicasim, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Torre San Vicente F-8 Campo 1 Benicasim,"Campo Mpal. Torre San Vicente F-8 Campo 1 Benicasim, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Torre San Vicente F-8 Campo 2 Benicasim,"Campo Mpal. Torre San Vicente F-8 Campo 2 Benicasim, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Torrefiel F-5,"Campo Mpal. Torrefiel F-5, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Torrefiel F-8,"Campo Mpal. Torrefiel F-8, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Valor F-11 Banyeres de Mariola,"Campo Mpal. Valor F-11 Banyeres de Mariola, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Valor F-8 Campo 1 Banyeres,"Campo Mpal. Valor F-8 Campo 1 Banyeres, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Valor F-8 Campo 2 Banyeres,"Campo Mpal. Valor F-8 Campo 2 Banyeres, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Venecia F-11 Alzira,"Campo Mpal. Venecia F-11 Alzira, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Venecia F-5 Campo nº 1 - A,"Campo Mpal. Venecia F-5 Campo nº 1 - A, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Venecia F-8 Campo 1 Alzira,"Campo Mpal. Venecia F-8 Campo 1 Alzira, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Venecia F-8 Campo 2 Alzira,"Campo Mpal. Venecia F-8 Campo 2 Alzira, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Venecia F-8 Campo 3 Nacho Barberá,"Campo Mpal. Venecia F-8 Campo 3 Nacho Barberá, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Via Parque F-11 Alicante,"Campo Mpal. Via Parque F-11 Alicante, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Via Parque F-8 Campo 1,"Campo Mpal. Via Parque F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. Via Parque F-8 Campo 2,"Campo Mpal. Via Parque F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Alfafar F-11,"Campo Mpal. de Alfafar F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Alfafar F-8 Campo 1,"Campo Mpal. de Alfafar F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Alfafar F-8 Campo 2,"Campo Mpal. de Alfafar F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Benejuzar F-11,"Campo Mpal. de Benejuzar F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Benejuzar F-8 Campo 2,"Campo Mpal. de Benejuzar F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Beniarjo F-8,"Campo Mpal. de Beniarjo F-8, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Benijofar F-11,"Campo Mpal. de Benijofar F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Benijofar F-8 Campo 1,"Campo Mpal. de Benijofar F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Benirredra F-11,"Campo Mpal. de Benirredra F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Benirredra F-8 Campo 1,"Campo Mpal. de Benirredra F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Benirredra F-8 Campo 2,"Campo Mpal. de Benirredra F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Calpe F-11,"Campo Mpal. de Calpe F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Calpe F-8 Campo 1,"Campo Mpal. de Calpe F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Calpe F-8 Campo 2,"Campo Mpal. de Calpe F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Castalla F-11,"Campo Mpal. de Castalla F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Castalla F-8 Campo 1,"Campo Mpal. de Castalla F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Castalla F-8 Campo 2,"Campo Mpal. de Castalla F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Castellón de Rugat F-11,"Campo Mpal. de Castellón de Rugat F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Castellón de Rugat F-8 Campo 1,"Campo Mpal. de Castellón de Rugat F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Castellón de Rugat F-8 Campo 2,"Campo Mpal. de Castellón de Rugat F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Catadau F-11,"Campo Mpal. de Catadau F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Catadau F-8 Campo 1,"Campo Mpal. de Catadau F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Catadau F-8 Campo 2,"Campo Mpal. de Catadau F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Catral F-11,"Campo Mpal. de Catral F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Catral F-8 Campo 1,"Campo Mpal. de Catral F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Catral F-8 Campo 2,"Campo Mpal. de Catral F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fuente La Higuera F-8 Campo 1,"Campo Mpal. de Fuente La Higuera F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Futbol Quart de Poblet F-8 Campo 2,"Campo Mpal. de Futbol Quart de Poblet F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol Barrio Biensa F-11 Sagunto Puerto,"Campo Mpal. de Fútbol Barrio Biensa F-11 Sagunto Puerto, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol Barrio Biensa F-8 Campo 1,"Campo Mpal. de Fútbol Barrio Biensa F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol Barrio Biensa F-8 Campo 2,"Campo Mpal. de Fútbol Barrio Biensa F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol Quart de Poblet F-11,"Campo Mpal. de Fútbol Quart de Poblet F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol Quart de Poblet F-8 Campo 1,"Campo Mpal. de Fútbol Quart de Poblet F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol de Beniganim F-11,"Campo Mpal. de Fútbol de Beniganim F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol de Beniganim F-8 Campo 1,"Campo Mpal. de Fútbol de Beniganim F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Fútbol de Beniganim F-8 Campo 2,"Campo Mpal. de Fútbol de Beniganim F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Godella F-11,"Campo Mpal. de Godella F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Godella F-8 Campo 1,"Campo Mpal. de Godella F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Godella F-8 Campo 2,"Campo Mpal. de Godella F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Guadasuar F-11,"Campo Mpal. de Guadasuar F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Guadasuar F-8 Campo 1,"Campo Mpal. de Guadasuar F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Guadasuar F-8 Campo 2,"Campo Mpal. de Guadasuar F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Guadasuar F-8 Campo 3,"Campo Mpal. de Guadasuar F-8 Campo 3, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Jacarilla F-11,"Campo Mpal. de Jacarilla F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Jacarilla F-8 Campo 1,"Campo Mpal. de Jacarilla F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Los Montesinos F-11,"Campo Mpal. de Los Montesinos F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Los Montesinos F-8 Campo 1,"Campo Mpal. de Los Montesinos F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Masamagrell F-11 Campo 1,"Campo Mpal. de Masamagrell F-11 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Masamagrell F-8 Campo 1 A,"Campo Mpal. de Masamagrell F-8 Campo 1 A, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Massamagrell F-11 Campo 2,"Campo Mpal. de Massamagrell F-11 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Massamagrell F-8 Campo 2 A,"Campo Mpal. de Massamagrell F-8 Campo 2 A, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Massamagrell F-8 Campo 2 B,"Campo Mpal. de Massamagrell F-8 Campo 2 B, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Monforte F-11,"Campo Mpal. de Monforte F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Monforte F-8 Campo 1,"Campo Mpal. de Monforte F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Monforte F-8 Campo 2,"Campo Mpal. de Monforte F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Naquera F-11,"Campo Mpal. de Naquera F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Naquera F-8 Campo 1,"Campo Mpal. de Naquera F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Oropesa F-11 Oropesa Del Mar,"Campo Mpal. de Oropesa F-11 Oropesa Del Mar, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Oropesa F-8 Campo 2 Oropesa del Mar,"Campo Mpal. de Oropesa F-8 Campo 2 Oropesa del Mar, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Oropesa F-8 Campo Oropesa del Mar 1,"Campo Mpal. de Oropesa F-8 Campo Oropesa del Mar 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Randurias F-11 Jerica,"Campo Mpal. de Randurias F-11 Jerica, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Randurias F-8 Campo 1 Jérica,"Campo Mpal. de Randurias F-8 Campo 1 Jérica, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Randurias F-8 Campo 2 Jérica,"Campo Mpal. de Randurias F-8 Campo 2 Jérica, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Rojales F-11,"Campo Mpal. de Rojales F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Rojales F-11 Anexo,"Campo Mpal. de Rojales F-11 Anexo, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Rojales F-8 Campo 1,"Campo Mpal. de Rojales F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Rotova F-11,"Campo Mpal. de Rotova F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Rotova F-8 Campo 1,"Campo Mpal. de Rotova F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Terramelar F-8,"Campo Mpal. de Terramelar F-8, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Torrellano F-11,"Campo Mpal. de Torrellano F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Torrellano F-11 Campo Anexo,"Campo Mpal. de Torrellano F-11 Campo Anexo, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Torrellano F-8 Campo 1,"Campo Mpal. de Torrellano F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Torrellano F-8 Campo 2,"Campo Mpal. de Torrellano F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Torrellano F-8 Campo Anexo 1,"Campo Mpal. de Torrellano F-8 Campo Anexo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Torrellano F-8 Campo Anexo 2,"Campo Mpal. de Torrellano F-8 Campo Anexo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Tous F-11,"Campo Mpal. de Tous F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Tous F-8 Campo 1,"Campo Mpal. de Tous F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Vallada F-8 Campo 1,"Campo Mpal. de Vallada F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de Vallada F-8 Campo 2,"Campo Mpal. de Vallada F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de la Patacona F-11,"Campo Mpal. de la Patacona F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de la Patacona F-5,"Campo Mpal. de la Patacona F-5, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de la Patacona F-8 Campo 1,"Campo Mpal. de la Patacona F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de la Patacona F-8 Campo 2,"Campo Mpal. de la Patacona F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de la Patacona F-8 Campo 3,"Campo Mpal. de la Patacona F-8 Campo 3, Comunitat Valenciana, España",,,,,,no
+Campo Mpal. de la Pobla Tornesa F-11,"Campo Mpal. de la Pobla Tornesa F-11, Comunitat Valenciana, España",,,,,,no
+Campo Mundial 82 F-11 Catarroja,"Campo Mundial 82 F-11 Catarroja, Comunitat Valenciana, España",,,,,,no
+Campo Mundial 82 F-8 Campo 1 Catarroja,"Campo Mundial 82 F-8 Campo 1 Catarroja, Comunitat Valenciana, España",,,,,,no
+Campo Mundial 82 F-8 Campo 2 Catarroja,"Campo Mundial 82 F-8 Campo 2 Catarroja, Comunitat Valenciana, España",,,,,,no
+Campo Salesianos Don Bosco F-11 Valencia,"Campo Salesianos Don Bosco F-11 Valencia, Comunitat Valenciana, España",,,,,,no
+Campo Salesianos Don Bosco F-8 Campo 1 Valencia,"Campo Salesianos Don Bosco F-8 Campo 1 Valencia, Comunitat Valenciana, España",,,,,,no
+Campo Salesianos Don Bosco F-8 Campo 2 Valencia,"Campo Salesianos Don Bosco F-8 Campo 2 Valencia, Comunitat Valenciana, España",,,,,,no
+Campo San Francisco de Borja F-8 Sagunto Puerto,"Campo San Francisco de Borja F-8 Sagunto Puerto, Comunitat Valenciana, España",,,,,,no
+Campo Torre Levante-Orriols F-11,"Campo Torre Levante-Orriols F-11, Comunitat Valenciana, España",,,,,,no
+Campo Torre Levante-Orriols F-8 Campo 1,"Campo Torre Levante-Orriols F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Torre Levante-Orriols F-8 Campo 2,"Campo Torre Levante-Orriols F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Tramo II Parque del Turia F-11,"Campo Tramo II Parque del Turia F-11, Comunitat Valenciana, España",,,,,,no
+Campo Tramo II Parque del Turia F-5 Campo 1 A,"Campo Tramo II Parque del Turia F-5 Campo 1 A, Comunitat Valenciana, España",,,,,,no
+Campo Tramo II Parque del Turia F-7 Campo 1,"Campo Tramo II Parque del Turia F-7 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo Tramo II Parque del Turia F-7 Campo 2,"Campo Tramo II Parque del Turia F-7 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo Tramo III del Turia F-5,"Campo Tramo III del Turia F-5, Comunitat Valenciana, España",,,,,,no
+Campo Tramo III del Turia F-8,"Campo Tramo III del Turia F-8, Comunitat Valenciana, España",,,,,,no
+Campo Vicente Aliaga F-11 Alberic,"Campo Vicente Aliaga F-11 Alberic, Comunitat Valenciana, España",,,,,,no
+Campo Vicente Aliaga F-8 Campo 1 Alberic,"Campo Vicente Aliaga F-8 Campo 1 Alberic, Comunitat Valenciana, España",,,,,,no
+Campo Vicente Aliaga F-8 Campo 2 Alberic,"Campo Vicente Aliaga F-8 Campo 2 Alberic, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Andres Baile Medina Monsa F-8 Campo 1 Santa Pola,"Campo de Futbol Andres Baile Medina Monsa F-8 Campo 1 Santa Pola, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Andres Baile Medina Monsa F-8 Campo 2 Santa Pola,"Campo de Futbol Andres Baile Medina Monsa F-8 Campo 2 Santa Pola, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Fernando Tomas F-11 Campo 3,"Campo de Futbol Fernando Tomas F-11 Campo 3, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Fernando Tomás F-8 Campo 1 Elda,"Campo de Futbol Fernando Tomás F-8 Campo 1 Elda, Comunitat Valenciana, España",,,,,,no
+"Campo de Futbol Jose Gilberto de Oliveira ""Sousa"" F-11 L`Alfàs del Pi","Campo de Futbol Jose Gilberto de Oliveira ""Sousa"" F-11 L`Alfàs del Pi, Comunitat Valenciana, España",,,,,,no
+"Campo de Futbol Jose Gilberto de Oliveira ""Sousa"" F-8 Campo 1 L`Alfàs del Pi","Campo de Futbol Jose Gilberto de Oliveira ""Sousa"" F-8 Campo 1 L`Alfàs del Pi, Comunitat Valenciana, España",,,,,,no
+"Campo de Futbol Jose Gilberto de Oliveira ""Sousa"" F-8 Campo 2 L`Alfàs del Pi","Campo de Futbol Jose Gilberto de Oliveira ""Sousa"" F-8 Campo 2 L`Alfàs del Pi, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol La Reva F-8 Riba-roja del Turia,"Campo de Futbol La Reva F-8 Riba-roja del Turia, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Las Encrucijadas F-11 Aldaia,"Campo de Futbol Las Encrucijadas F-11 Aldaia, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Las Encrucijadas F-5,"Campo de Futbol Las Encrucijadas F-5, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Las Encrucijadas F-8 Campo 1 Aldaia,"Campo de Futbol Las Encrucijadas F-8 Campo 1 Aldaia, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Las Encrucijadas F-8 Campo 2 Aldaia,"Campo de Futbol Las Encrucijadas F-8 Campo 2 Aldaia, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Los Silos F-11 Burjassot,"Campo de Futbol Los Silos F-11 Burjassot, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Los Silos F-8 Campo 1 Burjassot,"Campo de Futbol Los Silos F-8 Campo 1 Burjassot, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Los Silos F-8 Campo 2 Burjassot,"Campo de Futbol Los Silos F-8 Campo 2 Burjassot, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. La Foieta F-11 Genoves,"Campo de Futbol Mpal. La Foieta F-11 Genoves, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. La Maimona F-11 Marines,"Campo de Futbol Mpal. La Maimona F-11 Marines, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. La Maimona F-8 Campo 1 Marines,"Campo de Futbol Mpal. La Maimona F-8 Campo 1 Marines, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. La Maimona F-8 Campo 2 Marines,"Campo de Futbol Mpal. La Maimona F-8 Campo 2 Marines, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. Malilla F-11,"Campo de Futbol Mpal. Malilla F-11, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. Malilla F-5 Campo nº 1 - A,"Campo de Futbol Mpal. Malilla F-5 Campo nº 1 - A, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. Malilla F-5 Campo nº 1 - B,"Campo de Futbol Mpal. Malilla F-5 Campo nº 1 - B, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. Malilla F-8 Campo 1,"Campo de Futbol Mpal. Malilla F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. Malilla F-8 Campo 2,"Campo de Futbol Mpal. Malilla F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. Malilla F-8 Campo nº 3 Anexo,"Campo de Futbol Mpal. Malilla F-8 Campo nº 3 Anexo, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. San Gregorio F-11 Campo A,"Campo de Futbol Mpal. San Gregorio F-11 Campo A, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. San Gregorio F-11 Campo B,"Campo de Futbol Mpal. San Gregorio F-11 Campo B, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. San Gregorio F-8 Campo A1 Torrent,"Campo de Futbol Mpal. San Gregorio F-8 Campo A1 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. San Gregorio F-8 Campo A2 Torrent,"Campo de Futbol Mpal. San Gregorio F-8 Campo A2 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. San Gregorio F-8 Campo B1 Torrent,"Campo de Futbol Mpal. San Gregorio F-8 Campo B1 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. San Gregorio F-8 Campo B2 Torrent,"Campo de Futbol Mpal. San Gregorio F-8 Campo B2 Torrent, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. de Pinedo F-8 Campo 1,"Campo de Futbol Mpal. de Pinedo F-8 Campo 1, Comunitat Valenciana, España",,,,,,no
+Campo de Futbol Mpal. de Pinedo F-8 Campo 2,"Campo de Futbol Mpal. de Pinedo F-8 Campo 2, Comunitat Valenciana, España",,,,,,no
+"Campo de Fútbol Andres Baile Medina "" El Monsa"" F-11 Santa Pola","Campo de Fútbol Andres Baile Medina "" El Monsa"" F-11 Santa Pola, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Colegio Aleman F-8,"Campo de Fútbol Colegio Aleman F-8, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Fundació Flors F-11 Villarreal,"Campo de Fútbol Fundació Flors F-11 Villarreal, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Fundació Flors F-8 Campo 1 Vila-real,"Campo de Fútbol Fundació Flors F-8 Campo 1 Vila-real, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Fundació Flors F-8 Campo 2 Vila-real,"Campo de Fútbol Fundació Flors F-8 Campo 2 Vila-real, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Mpal. Betxi F-11,"Campo de Fútbol Mpal. Betxi F-11, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Mpal. Betxi F-8 Campo 1 Betxi,"Campo de Fútbol Mpal. Betxi F-8 Campo 1 Betxi, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Mpal. Betxi F-8 Campo 2 Betxi,"Campo de Fútbol Mpal. Betxi F-8 Campo 2 Betxi, Comunitat Valenciana, España",,,,,,no
+Campo de Fútbol Mpal. El Terrer F-11 Paiporta,"Campo de Fútbol Mpal. El Terrer F-11 Paiporta, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. El Terrer F-5 Campo 1A,"Campo de Fútbol Mpal. El Terrer F-5 Campo 1A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. El Terrer F-8 Campo 1 Paiporta,"Campo de Fútbol Mpal. El Terrer F-8 Campo 1 Paiporta, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. El Terrer F-8 Campo 2 Paiporta,"Campo de Fútbol Mpal. El Terrer F-8 Campo 2 Paiporta, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. La Carrerassa Benicasim F-11,"Campo de Fútbol Mpal. La Carrerassa Benicasim F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. La Carrerassa F-8 Campo 1 Benicassim,"Campo de Fútbol Mpal. La Carrerassa F-8 Campo 1 Benicassim, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. La Carrerassa F-8 Campo 2 Benicassim,"Campo de Fútbol Mpal. La Carrerassa F-8 Campo 2 Benicassim, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. San Ant. de Benageber I F-11,"Campo de Fútbol Mpal. San Ant. de Benageber I F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. San Ant. de Benageber I F-8 Campo 1,"Campo de Fútbol Mpal. San Ant. de Benageber I F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. San Ant. de Benageber I F-8 Campo 2,"Campo de Fútbol Mpal. San Ant. de Benageber I F-8 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. de Beniferri F-11,"Campo de Fútbol Mpal. de Beniferri F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. de Beniferri F-5,"Campo de Fútbol Mpal. de Beniferri F-5, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. de Beniferri F-8 Campo 1,"Campo de Fútbol Mpal. de Beniferri F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. de Beniferri F-8 Campo 2,"Campo de Fútbol Mpal. de Beniferri F-8 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de Fútbol Mpal. de Pinedo F-11,"Campo de Fútbol Mpal. de Pinedo F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de La Via Cocentaina F-11,"Campo de La Via Cocentaina F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de La Via F-8 Campo 1 Cocentaina,"Campo de La Via F-8 Campo 1 Cocentaina, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campo de La Via F-8 Campo 2 Cocentaina,"Campo de La Via F-8 Campo 2 Cocentaina, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Gaeta Huguet Castellón F-11 Campo A,"Campos Gaeta Huguet Castellón F-11 Campo A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Gaeta Huguet Castellón F-11 Campo B,"Campos Gaeta Huguet Castellón F-11 Campo B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Gaeta Huguet F-8 Campo A-1Castellon de la Plana,"Campos Gaeta Huguet F-8 Campo A-1Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Gaeta Huguet F-8 Campo A-2Castellon de la Plana,"Campos Gaeta Huguet F-8 Campo A-2Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Gaeta Huguet F-8 Campo B-1 Castellon de la Plana,"Campos Gaeta Huguet F-8 Campo B-1 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Gaeta Huguet F-8 Campo B-2 Castellon de la Plana,"Campos Gaeta Huguet F-8 Campo B-2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Mpales. La Moleta F-11 Vall d`Uxó Campo A,"Campos Mpales. La Moleta F-11 Vall d`Uxó Campo A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Mpales. La Moleta F-11 Vall d`Uxó Campo B,"Campos Mpales. La Moleta F-11 Vall d`Uxó Campo B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Mpales. La Moleta F-8 Campo A-1 Vall D´Uxó,"Campos Mpales. La Moleta F-8 Campo A-1 Vall D´Uxó, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Mpales. La Moleta F-8 Campo A-2 Vall D´Uxó,"Campos Mpales. La Moleta F-8 Campo A-2 Vall D´Uxó, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Mpales. La Moleta F-8 Campo B-1 Vall D´Uxó,"Campos Mpales. La Moleta F-8 Campo B-1 Vall D´Uxó, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Mpales. La Moleta F-8 Campo B-2n Vall D´Uxó,"Campos Mpales. La Moleta F-8 Campo B-2n Vall D´Uxó, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Sismat de Elda F-11 Campo 1,"Campos Sismat de Elda F-11 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Sismat de Elda F-11 Campo 2,"Campos Sismat de Elda F-11 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Sismat de Elda F-8 Campo 1 A,"Campos Sismat de Elda F-8 Campo 1 A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Sismat de Elda F-8 Campo 2 A,"Campos Sismat de Elda F-8 Campo 2 A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campos Sismat de Elda F-8 Campo 2 B,"Campos Sismat de Elda F-8 Campo 2 B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps Del Serpis Nº 1 F-11 Alcoy,"Camps Del Serpis Nº 1 F-11 Alcoy, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps Del Serpis Nº 1 F-8 Campo 1-A Alcoy,"Camps Del Serpis Nº 1 F-8 Campo 1-A Alcoy, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps Del Serpis Nº 1 F-8 Campo 1-B Alcoy,"Camps Del Serpis Nº 1 F-8 Campo 1-B Alcoy, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps Del Serpis Nº 2 F-11 Alcoy,"Camps Del Serpis Nº 2 F-11 Alcoy, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps Del Serpis Nº 2 F-8 Campo 2-A Alcoy,"Camps Del Serpis Nº 2 F-8 Campo 2-A Alcoy, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps Del Serpis Nº 2 F-8 Campo 2-B Alcoy,"Camps Del Serpis Nº 2 F-8 Campo 2-B Alcoy, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps de Xulla F-11 Sagunto,"Camps de Xulla F-11 Sagunto, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps de Xulla F-8 Campo 1 Sagunto,"Camps de Xulla F-8 Campo 1 Sagunto, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Camps de Xulla F-8 Campo 2 Sagunto,"Camps de Xulla F-8 Campo 2 Sagunto, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Campus Universidad de Alicante F-11,"Campus Universidad de Alicante F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Centre Esportiu les Taules F-11 L`Eliana,"Centre Esportiu les Taules F-11 L`Eliana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Centre esportiu les Taules F-8 Campo 1 L`Eliana,"Centre esportiu les Taules F-8 Campo 1 L`Eliana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Centro Deportivo Samuel Llorca F-11,"Centro Deportivo Samuel Llorca F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Centro Deportivo Samuel Llorca F-8 Campo 1 Busot,"Centro Deportivo Samuel Llorca F-8 Campo 1 Busot, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Centro Deportivo Samuel Llorca F-8 Campo 2 Busot,"Centro Deportivo Samuel Llorca F-8 Campo 2 Busot, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Deportiva 40-15 F-8 Mutxamel,"Ciudad Deportiva 40-15 F-8 Mutxamel, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Deportiva Antonio Valls F-11 Alicante,"Ciudad Deportiva Antonio Valls F-11 Alicante, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. ""Guillermo Amor"" F-11 Benidorm Campo Futbol Juan Martinez Munuera","Ciudad Dptva. ""Guillermo Amor"" F-11 Benidorm Campo Futbol Juan Martinez Munuera, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. ""Guillermo Amor"" F-11 Benidorm Campo Futbol Miguel Martinez Munuera","Ciudad Dptva. ""Guillermo Amor"" F-11 Benidorm Campo Futbol Miguel Martinez Munuera, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Juan Martinez Munuera Campo 1 Benidorm","Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Juan Martinez Munuera Campo 1 Benidorm, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Juan Martinez Munuera Campo 2 Benidorm","Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Juan Martinez Munuera Campo 2 Benidorm, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Miguel Martinez Munuera Campo 1 Benidorm","Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Miguel Martinez Munuera Campo 1 Benidorm, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Miguel Martinez Munuera Campo 2 Benidorm","Ciudad Dptva. ""Guillermo Amor"" F-8 Campo Futbol Miguel Martinez Munuera Campo 2 Benidorm, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho Campo A F-11 Castellón,"Ciudad Dptva. Chencho Campo A F-11 Castellón, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho Campo B F-11 Castellón,"Ciudad Dptva. Chencho Campo B F-11 Castellón, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho Campo C F-11 Castellón,"Ciudad Dptva. Chencho Campo C F-11 Castellón, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho Campo D F-11 Castellón,"Ciudad Dptva. Chencho Campo D F-11 Castellón, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho Campo E F-11 Castellón,"Ciudad Dptva. Chencho Campo E F-11 Castellón, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo A1 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo A1 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo A2 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo A2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo B1 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo B1 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo B2 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo B2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo C1 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo C1 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo C2 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo C2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo D1Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo D1Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo D2 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo D2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo E1 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo E1 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Chencho F-8 Campo E2 Castellon de la Plana,"Ciudad Dptva. Chencho F-8 Campo E2 Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. El Sisterre F-11 Segorbe Campo A,"Ciudad Dptva. El Sisterre F-11 Segorbe Campo A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. El Sisterre F-11 Segorbe Campo B,"Ciudad Dptva. El Sisterre F-11 Segorbe Campo B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. El Sisterre F-8 Campo A-1 Segorbe,"Ciudad Dptva. El Sisterre F-8 Campo A-1 Segorbe, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. El Sisterre F-8 Campo A-2 Segorbe,"Ciudad Dptva. El Sisterre F-8 Campo A-2 Segorbe, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. El Sisterre F-8 Campo B-1 Segorbe,"Ciudad Dptva. El Sisterre F-8 Campo B-1 Segorbe, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche Campo 1 José Pastor F-11,"Ciudad Dptva. Elche Campo 1 José Pastor F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche Campo 5 Palmeral D'Elx F-11,"Ciudad Dptva. Elche Campo 5 Palmeral D'Elx F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. Elche Campo 6 José Ant. Morante ""Lico"" F-11","Ciudad Dptva. Elche Campo 6 José Ant. Morante ""Lico"" F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche F-8 Campo 1 A José Pastor,"Ciudad Dptva. Elche F-8 Campo 1 A José Pastor, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche F-8 Campo 2 Fco. José Garcia,"Ciudad Dptva. Elche F-8 Campo 2 Fco. José Garcia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche F-8 Campo 3 Vicente Calsita,"Ciudad Dptva. Elche F-8 Campo 3 Vicente Calsita, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche F-8 Campo 5 A Palmeral D'Elx,"Ciudad Dptva. Elche F-8 Campo 5 A Palmeral D'Elx, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+"Ciudad Dptva. Elche F-8 Campo 6 A José Ant. Morante ""Lico""","Ciudad Dptva. Elche F-8 Campo 6 A José Ant. Morante ""Lico"", Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche F-8 Campo 8 Nit de l'Albá,"Ciudad Dptva. Elche F-8 Campo 8 Nit de l'Albá, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Elche F-8 Campo 9 Serafín Sevilla,"Ciudad Dptva. Elche F-8 Campo 9 Serafín Sevilla, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa Castellòn F-11 Campo 3,"Ciudad Dptva. Facsa Castellòn F-11 Campo 3, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa Castellón F-11 Campo 1,"Ciudad Dptva. Facsa Castellón F-11 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa Castellón F-11 Campo 2,"Ciudad Dptva. Facsa Castellón F-11 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa Castellón F-11 Campo 4,"Ciudad Dptva. Facsa Castellón F-11 Campo 4, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa F-8 Campo 1A Castellon de la Plana,"Ciudad Dptva. Facsa F-8 Campo 1A Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa F-8 Campo 1B C Castellon de la Plana,"Ciudad Dptva. Facsa F-8 Campo 1B C Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa F-8 Campo 2A C Castellon de la Plana,"Ciudad Dptva. Facsa F-8 Campo 2A C Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa F-8 Campo 2B Castellon de la Plana,"Ciudad Dptva. Facsa F-8 Campo 2B Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa F-8 Campo 3A Castellon de la Plana,"Ciudad Dptva. Facsa F-8 Campo 3A Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Facsa F-8 Campo 3B Castellon de la Plana,"Ciudad Dptva. Facsa F-8 Campo 3B Castellon de la Plana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jorge Martinez (Aspar) F-11 Alzira Campo 2,"Ciudad Dptva. Jorge Martinez (Aspar) F-11 Alzira Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jorge Martinez (Aspar) F-11 Alzira Campo Fernando Sierra Fuster,"Ciudad Dptva. Jorge Martinez (Aspar) F-11 Alzira Campo Fernando Sierra Fuster, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jorge Martinez (Aspar) F-5 Campo 1A - A,"Ciudad Dptva. Jorge Martinez (Aspar) F-5 Campo 1A - A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jorge Martinez (Aspar) F-8 Alzira Campo 1A Fernando Sierra Fuster,"Ciudad Dptva. Jorge Martinez (Aspar) F-8 Alzira Campo 1A Fernando Sierra Fuster, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jorge Martinez (Aspar) F-8 Alzira Campo 1B Fernando Sierra Fuster,"Ciudad Dptva. Jorge Martinez (Aspar) F-8 Alzira Campo 1B Fernando Sierra Fuster, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jorge Martinez (Aspar) F-8 Campo 2A Alzira,"Ciudad Dptva. Jorge Martinez (Aspar) F-8 Campo 2A Alzira, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jorge Martinez (Aspar) F-8 Campo 2B Alzira,"Ciudad Dptva. Jorge Martinez (Aspar) F-8 Campo 2B Alzira, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Jose Manuel Llaneza F-11 Vila-real Mini Estadi,"Ciudad Dptva. Jose Manuel Llaneza F-11 Vila-real Mini Estadi, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-11 Vila-real Campo 4,"Ciudad Dptva. José Manuel Llaneza F-11 Vila-real Campo 4, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-11 Vila-real Campo 5,"Ciudad Dptva. José Manuel Llaneza F-11 Vila-real Campo 5, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-11 Vila-real Campo 9,"Ciudad Dptva. José Manuel Llaneza F-11 Vila-real Campo 9, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-8 Campo 4-A Villarreal,"Ciudad Dptva. José Manuel Llaneza F-8 Campo 4-A Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-8 Campo 4-B Villarreal,"Ciudad Dptva. José Manuel Llaneza F-8 Campo 4-B Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-8 Campo 6 Villarreal,"Ciudad Dptva. José Manuel Llaneza F-8 Campo 6 Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-8 Campo 7 Villarreal,"Ciudad Dptva. José Manuel Llaneza F-8 Campo 7 Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. José Manuel Llaneza F-8 Campo 8 Villarreal,"Ciudad Dptva. José Manuel Llaneza F-8 Campo 8 Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Lloret Calsita F-11 Villajoyosa,"Ciudad Dptva. Lloret Calsita F-11 Villajoyosa, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Lloret Calsita F-8 Campo 1 Villajoyosa,"Ciudad Dptva. Lloret Calsita F-8 Campo 1 Villajoyosa, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Lloret Calsita F-8 Campo 2 Villajoyosa,"Ciudad Dptva. Lloret Calsita F-8 Campo 2 Villajoyosa, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Lloret Calsita F-8 Campo 3 Villajoyosa,"Ciudad Dptva. Lloret Calsita F-8 Campo 3 Villajoyosa, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Mpal. Viña del Andaluz F-11 Paterna Campo 1,"Ciudad Dptva. Mpal. Viña del Andaluz F-11 Paterna Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Mpal. Viña del Andaluz F-11 Paterna Campo 2,"Ciudad Dptva. Mpal. Viña del Andaluz F-11 Paterna Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 1A Paterna,"Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 1A Paterna, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 1B Paterna,"Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 1B Paterna, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 2A Paterna,"Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 2A Paterna, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 2B Paterna,"Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 2B Paterna, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 3 Paterna,"Ciudad Dptva. Mpal. Viña del Andaluz F-8 Campo 3 Paterna, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Nord F-11 Crevillent,"Ciudad Dptva. Nord F-11 Crevillent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Nord F-8 Campo 1 Crevillent,"Ciudad Dptva. Nord F-8 Campo 1 Crevillent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. San Vicente de Raspeig F-11 Anexo,"Ciudad Dptva. San Vicente de Raspeig F-11 Anexo, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. San Vicente de Raspeig F-8 Anexo Campo 1,"Ciudad Dptva. San Vicente de Raspeig F-8 Anexo Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. San Vicente de Raspeig F-8 Anexo Campo 2,"Ciudad Dptva. San Vicente de Raspeig F-8 Anexo Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. San Vicente del Raspeig F-11,"Ciudad Dptva. San Vicente del Raspeig F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. San Vicente del Raspeig F-5 Campo 1 - A,"Ciudad Dptva. San Vicente del Raspeig F-5 Campo 1 - A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. San Vicente del Raspeig F-8 Campo 1,"Ciudad Dptva. San Vicente del Raspeig F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. San Vicente del Raspeig F-8 Campo 2,"Ciudad Dptva. San Vicente del Raspeig F-8 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-11 Campo 1,"Ciudad Dptva. Valencia CF F-11 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-11 Campo 2,"Ciudad Dptva. Valencia CF F-11 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-11 Campo 3,"Ciudad Dptva. Valencia CF F-11 Campo 3, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-11 Campo 4,"Ciudad Dptva. Valencia CF F-11 Campo 4, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-11 Estadio Antonio Puchades,"Ciudad Dptva. Valencia CF F-11 Estadio Antonio Puchades, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-5 Campo 1 A,"Ciudad Dptva. Valencia CF F-5 Campo 1 A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-8 Campo 1,"Ciudad Dptva. Valencia CF F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-8 Campo 2,"Ciudad Dptva. Valencia CF F-8 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-8 Campo 2A,"Ciudad Dptva. Valencia CF F-8 Campo 2A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. Valencia CF F-8 Campo 3,"Ciudad Dptva. Valencia CF F-8 Campo 3, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. de Alicante F-11,"Ciudad Dptva. de Alicante F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. de Alicante F-8 Campo 1,"Ciudad Dptva. de Alicante F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. de Alicante F-8 Campo 2,"Ciudad Dptva. de Alicante F-8 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-11,"Ciudad Dptva. del Levante U.D. F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-11 Campo 1,"Ciudad Dptva. del Levante U.D. F-11 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-11 Campo 3,"Ciudad Dptva. del Levante U.D. F-11 Campo 3, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-11 Campo 4,"Ciudad Dptva. del Levante U.D. F-11 Campo 4, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-11 Mini Estadi,"Ciudad Dptva. del Levante U.D. F-11 Mini Estadi, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-8 Campo 1 A,"Ciudad Dptva. del Levante U.D. F-8 Campo 1 A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-8 Campo 1 B,"Ciudad Dptva. del Levante U.D. F-8 Campo 1 B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-8 Campo 2 A,"Ciudad Dptva. del Levante U.D. F-8 Campo 2 A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad Dptva. del Levante U.D. F-8 Campo 2 B,"Ciudad Dptva. del Levante U.D. F-8 Campo 2 B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad del Ocio y del Deporte de Manises F-11,"Ciudad del Ocio y del Deporte de Manises F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad del Ocio y del Deporte de Manises F-5 Campo 3 - A,"Ciudad del Ocio y del Deporte de Manises F-5 Campo 3 - A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad del Ocio y del Deporte de Manises F-8 Campo A,"Ciudad del Ocio y del Deporte de Manises F-8 Campo A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad del Ocio y del Deporte de Manises F-8 Campo B,"Ciudad del Ocio y del Deporte de Manises F-8 Campo B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciudad del Ocio y del Deporte de Manises F-8 Campo C,"Ciudad del Ocio y del Deporte de Manises F-8 Campo C, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Camilo Cano F-11 Estadi Olimpic La Nucia,"Ciutat Esptva. Camilo Cano F-11 Estadi Olimpic La Nucia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Camilo Cano F-11 La Nucia,"Ciutat Esptva. Camilo Cano F-11 La Nucia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Camilo Cano F-11 La Nucia Anexo,"Ciutat Esptva. Camilo Cano F-11 La Nucia Anexo, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Camilo Cano F-8 Campo 1 La Nucia,"Ciutat Esptva. Camilo Cano F-8 Campo 1 La Nucia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Camilo Cano F-8 Campo 2 La Nucia,"Ciutat Esptva. Camilo Cano F-8 Campo 2 La Nucia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Camilo Cano F-8 Campo 3 Anexo La Nucia,"Ciutat Esptva. Camilo Cano F-8 Campo 3 Anexo La Nucia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Mpal. (CEM) F-11 Vila-real Campo A Oeste,"Ciutat Esptva. Mpal. (CEM) F-11 Vila-real Campo A Oeste, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Mpal. (CEM) F-11 Vila-real Campo B Este,"Ciutat Esptva. Mpal. (CEM) F-11 Vila-real Campo B Este, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Mpal. (CEM) F-8 Campo A Oeste 1 Villarreal,"Ciutat Esptva. Mpal. (CEM) F-8 Campo A Oeste 1 Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Mpal. (CEM) F-8 Campo B Este 1 Villarreal,"Ciutat Esptva. Mpal. (CEM) F-8 Campo B Este 1 Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Mpal. (CEM) F-8 Campo B Este 2 Villarreal,"Ciutat Esptva. Mpal. (CEM) F-8 Campo B Este 2 Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-11 Vila-real Campo 1,"Ciutat Esptva. Pamesa Ceramica F-11 Vila-real Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-11 Vila-real Campo 2,"Ciutat Esptva. Pamesa Ceramica F-11 Vila-real Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-11 Vila-real Campo 3,"Ciutat Esptva. Pamesa Ceramica F-11 Vila-real Campo 3, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-8 Campo 1 A Villarreal,"Ciutat Esptva. Pamesa Ceramica F-8 Campo 1 A Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-8 Campo 1 B Villarreal,"Ciutat Esptva. Pamesa Ceramica F-8 Campo 1 B Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-8 Campo 2 A Villarreal,"Ciutat Esptva. Pamesa Ceramica F-8 Campo 2 A Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-8 Campo 2 B Villarreal,"Ciutat Esptva. Pamesa Ceramica F-8 Campo 2 B Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Pamesa Ceramica F-8 Campo 4 Villarreal,"Ciutat Esptva. Pamesa Ceramica F-8 Campo 4 Villarreal, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Vinaros F-11,"Ciutat Esptva. Vinaros F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Vinaros F-8 Campo 1 Vinaroz,"Ciutat Esptva. Vinaros F-8 Campo 1 Vinaroz, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Vinaros F-8 Campo 2 Vinaroz,"Ciutat Esptva. Vinaros F-8 Campo 2 Vinaroz, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat Esptva. Vinaros F-8 Campo 3 Vinaroz,"Ciutat Esptva. Vinaros F-8 Campo 3 Vinaroz, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport Parc Central F-11 Torrent Campo 1,"Ciutat de L`Esport Parc Central F-11 Torrent Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport Parc Central F-11 Torrent Campo 2,"Ciutat de L`Esport Parc Central F-11 Torrent Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport Parc Central F-8 Campo 1A,"Ciutat de L`Esport Parc Central F-8 Campo 1A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport Parc Central F-8 Campo 1B,"Ciutat de L`Esport Parc Central F-8 Campo 1B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport Parc Central F-8 Campo 2A,"Ciutat de L`Esport Parc Central F-8 Campo 2A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport Parc Central F-8 Campo 2B,"Ciutat de L`Esport Parc Central F-8 Campo 2B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport de Xativa F-11 Campo 1,"Ciutat de L`Esport de Xativa F-11 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport de Xativa F-11 Campo 2,"Ciutat de L`Esport de Xativa F-11 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport de Xativa F-8 Campo 1-A,"Ciutat de L`Esport de Xativa F-8 Campo 1-A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport de Xativa F-8 Campo 1-B,"Ciutat de L`Esport de Xativa F-8 Campo 1-B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport de Xativa F-8 Campo 2-A,"Ciutat de L`Esport de Xativa F-8 Campo 2-A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat de L`Esport de Xativa F-8 Campo 2-B,"Ciutat de L`Esport de Xativa F-8 Campo 2-B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat del Futbol Juanfran Torres F-11 Campo Enrique Miralles,"Ciutat del Futbol Juanfran Torres F-11 Campo Enrique Miralles, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat del Futbol Juanfran Torres F-11 Crevillent Campo 4,"Ciutat del Futbol Juanfran Torres F-11 Crevillent Campo 4, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat del Futbol Juanfran Torres F-8 Campo 1 Crevillent,"Ciutat del Futbol Juanfran Torres F-8 Campo 1 Crevillent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat del Futbol Juanfran Torres F-8 Campo 2 Crevillent,"Ciutat del Futbol Juanfran Torres F-8 Campo 2 Crevillent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Ciutat del Futbol Juanfran Torres F-8 Campo 3A Crevillent,"Ciutat del Futbol Juanfran Torres F-8 Campo 3A Crevillent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Clausurado por sanción federativa,"Clausurado por sanción federativa, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Club Atletico Montemar F-11 Alicante,"Club Atletico Montemar F-11 Alicante, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Club Atletico Montemar F-8 Campo 1,"Club Atletico Montemar F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Club de Tenis Oliva F-8 Campo 1,"Club de Tenis Oliva F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Club de Tenis Oliva F-8 Campo 2,"Club de Tenis Oliva F-8 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Col. Escuela San José Jesuitas Pista 2,"Col. Escuela San José Jesuitas Pista 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Col. Nrta Sra. Socorro Benetusser Pista Exterior,"Col. Nrta Sra. Socorro Benetusser Pista Exterior, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Agustinos Pista 2,"Colegio Agustinos Pista 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Agustinos Pista 3,"Colegio Agustinos Pista 3, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Ave María Peñarrocha,"Colegio Ave María Peñarrocha, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Benimaclet Pista 1,"Colegio Benimaclet Pista 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio C.E. La Anunciacion,"Colegio C.E. La Anunciacion, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Concha Espina,"Colegio Concha Espina, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Cumbres ( Moncada ) Pista 1,"Colegio Cumbres ( Moncada ) Pista 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Cumbres ( Moncada ) Pista 2,"Colegio Cumbres ( Moncada ) Pista 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Cumbres ( Moncada ) Pista 3,"Colegio Cumbres ( Moncada ) Pista 3, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Diocesano San Juan Bosco,"Colegio Diocesano San Juan Bosco, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Diocesano Santiago Apóstol,"Colegio Diocesano Santiago Apóstol, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Dominicos,"Colegio Dominicos, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Edelweiss School,"Colegio Edelweiss School, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio El Armelar Paterna Pista 1,"Colegio El Armelar Paterna Pista 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio El Pilar Valencia P. Polideportiva,"Colegio El Pilar Valencia P. Polideportiva, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio El Vedat Mestallón F-11,"Colegio El Vedat Mestallón F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio El Vedat Mestallón F-8 Campo 1 Torrent,"Colegio El Vedat Mestallón F-8 Campo 1 Torrent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio El Vedat Mestallón F-8 Campo 2 Torrent,"Colegio El Vedat Mestallón F-8 Campo 2 Torrent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio El Vedat Torrent,"Colegio El Vedat Torrent, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Engeba Pista A,"Colegio Engeba Pista A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Esclavas Sdo Corazón Pista A,"Colegio Esclavas Sdo Corazón Pista A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Esclavas Sdo. Corazón Pista B,"Colegio Esclavas Sdo. Corazón Pista B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Esclavas de Maria Pista A,"Colegio Esclavas de Maria Pista A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Escuela 2,"Colegio Escuela 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Escuela Profesional La Salle,"Colegio Escuela Profesional La Salle, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Escuelas Pias Malvarrosa,"Colegio Escuelas Pias Malvarrosa, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Evaristo Calatayud Montserrat,"Colegio Evaristo Calatayud Montserrat, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Hogar Nuestra Sra. Rosario,"Colegio Hogar Nuestra Sra. Rosario, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Inmaculado Corazón de María A,"Colegio Inmaculado Corazón de María A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Internacional Lope de Vega,"Colegio Internacional Lope de Vega, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Jesús María Fdo. Católico Exterior,"Colegio Jesús María Fdo. Católico Exterior, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Jesús María Fdo. Católico Semicubierta,"Colegio Jesús María Fdo. Católico Semicubierta, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Maria Auxiliadora-Salesianos Villena Pista Cubierta,"Colegio Maria Auxiliadora-Salesianos Villena Pista Cubierta, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Maristas Cullera,"Colegio Maristas Cullera, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Maristas Valencia,"Colegio Maristas Valencia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Niño Jesús,"Colegio Niño Jesús, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Nrta. Sra. de Monte-Sión,"Colegio Nrta. Sra. de Monte-Sión, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Ntra. Sra. Fátima,"Colegio Ntra. Sra. Fátima, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Nuestra Señora Loreto,"Colegio Nuestra Señora Loreto, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Nuestra Señora Loreto Pabellón Cubierto,"Colegio Nuestra Señora Loreto Pabellón Cubierto, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Paidos Denia,"Colegio Paidos Denia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Parroquial Don José Lluch,"Colegio Parroquial Don José Lluch, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Pio XII,"Colegio Pio XII, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico Angelina Carnicer,"Colegio Publico Angelina Carnicer, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico Ayora (Valencia),"Colegio Publico Ayora (Valencia), Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico Cervantes,"Colegio Publico Cervantes, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico Juan Comenius,"Colegio Publico Juan Comenius, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico La Paz,"Colegio Publico La Paz, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico Pablo Neruda,"Colegio Publico Pablo Neruda, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico Raquel Paya,"Colegio Publico Raquel Paya, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Publico Serreria,"Colegio Publico Serreria, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Pureza de Maria - Grao,"Colegio Pureza de Maria - Grao, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrada Familia,"Colegio Sagrada Familia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrada Familia F-8 Campo 1,"Colegio Sagrada Familia F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrada Familia P.J.O. - Pista 1 -,"Colegio Sagrada Familia P.J.O. - Pista 1 -, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrada Familia P.J.O. - Pista 2 -,"Colegio Sagrada Familia P.J.O. - Pista 2 -, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrada Familia P.J.O. - Pista Cubierta -,"Colegio Sagrada Familia P.J.O. - Pista Cubierta -, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrado Corazon Maristas F-11,"Colegio Sagrado Corazon Maristas F-11, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrado Corazón Maristas F-8 Campo 1,"Colegio Sagrado Corazón Maristas F-8 Campo 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrado Corazón Maristas F-8 Campo 2,"Colegio Sagrado Corazón Maristas F-8 Campo 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Sagrado Corazón de Godella,"Colegio Sagrado Corazón de Godella, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Salesianos San Antonio Abad Pista 1,"Colegio Salesianos San Antonio Abad Pista 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Salesianos San Antonio Abad Pista 2,"Colegio Salesianos San Antonio Abad Pista 2, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Salesianos San Juan Bosco,"Colegio Salesianos San Juan Bosco, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio San Jose Jesuitas,"Colegio San Jose Jesuitas, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio San Jose de Calasanz-Escolapios,"Colegio San Jose de Calasanz-Escolapios, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio San Juan Bosco-Salesianos Campo F-8 Burriana,"Colegio San Juan Bosco-Salesianos Campo F-8 Burriana, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio San Pedro Pascual Pista A,"Colegio San Pedro Pascual Pista A, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio San Pedro Pascual Pista B,"Colegio San Pedro Pascual Pista B, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio San Vte. Paul,"Colegio San Vte. Paul, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Santa Ana Algemesí Pista 1,"Colegio Santa Ana Algemesí Pista 1, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Santa Ana Valencia,"Colegio Santa Ana Valencia, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests
+Colegio Santa Maria,"Colegio Santa Maria, Comunitat Valenciana, España",,,,,,error:HTTP Error 429: Too many requests

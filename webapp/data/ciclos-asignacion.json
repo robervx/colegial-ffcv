@@ -1,0 +1,378 @@
+[
+  {
+    "id": "c1",
+    "etiqueta": "Fin de semana 26-27 jul 2026 (arranque, jornada 1 de 2)",
+    "finDeSemana": "26-27 jul 2026",
+    "n": 10,
+    "partidos": [
+      {
+        "id": "c1_p1",
+        "equipoLocal": "CD Buñol",
+        "equipoVisitante": "U.D. Canals",
+        "localidad": "Gandia",
+        "categoriaMinima": "Segona FFCV",
+        "catNivelMinimo": 1,
+        "fecha": "Dom 26-27 · 10:00",
+        "sensible": true,
+        "motivoSensible": "Derbi local — mismos aficionados, historial de tensión en la grada"
+      },
+      {
+        "id": "c1_p2",
+        "equipoLocal": "C.D. Rafelguaraf",
+        "equipoVisitante": "Olympyakos Alcàsser",
+        "localidad": "Paterna",
+        "categoriaMinima": "Segona FFCV",
+        "catNivelMinimo": 1,
+        "fecha": "Sáb 26-27 · 10:00",
+        "sensible": true,
+        "motivoSensible": "Play-off / partido con mucho en juego para ambos equipos"
+      },
+      {
+        "id": "c1_p3",
+        "equipoLocal": "Patacona C.F. \"A\"",
+        "equipoVisitante": "C.D. Burriana \"A\"",
+        "localidad": "Vila-real",
+        "categoriaMinima": "Lliga Comunitat",
+        "catNivelMinimo": 3,
+        "fecha": "Dom 26-27 · 10:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c1_p4",
+        "equipoLocal": "U.E. Vall Dels Alcalans \"A\"",
+        "equipoVisitante": "C.F. Llutxent",
+        "localidad": "Mislata",
+        "categoriaMinima": "Primera FFCV",
+        "catNivelMinimo": 2,
+        "fecha": "Sáb 26-27 · 19:00",
+        "sensible": true,
+        "motivoSensible": "Historial de tarjetas elevado entre estos dos equipos"
+      },
+      {
+        "id": "c1_p5",
+        "equipoLocal": "U.D. Rayo Ibense \"A\"",
+        "equipoVisitante": "F.B. Redován C.F. \"A\"",
+        "localidad": "Valencia",
+        "categoriaMinima": "Lliga Comunitat",
+        "catNivelMinimo": 3,
+        "fecha": "Dom 26-27 · 19:00",
+        "sensible": true,
+        "motivoSensible": "Derbi local — mismos aficionados, historial de tensión en la grada"
+      },
+      {
+        "id": "c1_p6",
+        "equipoLocal": "C.E. Pedreguer",
+        "equipoVisitante": "Tómbola A.C. \"A\"",
+        "localidad": "Benicalap",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 26-27 · 11:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c1_p7",
+        "equipoLocal": "La Vilavella C.F. \"A\"",
+        "equipoVisitante": "C.F. Mare Nostrum Pto. Sagunto \"A\"",
+        "localidad": "Almassora",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 26-27 · 11:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c1_p8",
+        "equipoLocal": "C.F. Moro \"A\"",
+        "equipoVisitante": "Vinaròs C.F \"B\"",
+        "localidad": "Castellón de la Plana",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 26-27 · 18:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c1_p9",
+        "equipoLocal": "E.F. Benicató",
+        "equipoVisitante": "Xcrypt F.C. \"A\"",
+        "localidad": "Almassora",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 26-27 · 16:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c1_p10",
+        "equipoLocal": "C.D. Apolo \"B\"",
+        "equipoVisitante": "U.D. Balompié Alfafar \"A\"",
+        "localidad": "Catarroja",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 26-27 · 17:00",
+        "sensible": false,
+        "motivoSensible": null
+      }
+    ]
+  },
+  {
+    "id": "c2",
+    "etiqueta": "Fin de semana 2-3 ago 2026 (arranque, jornada 2 de 2)",
+    "finDeSemana": "2-3 ago 2026",
+    "n": 10,
+    "partidos": [
+      {
+        "id": "c2_p1",
+        "equipoLocal": "CD Buñol",
+        "equipoVisitante": "Beniparrell C.F. \"A\"",
+        "localidad": "Dénia",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 2-3 · 11:00",
+        "sensible": true,
+        "motivoSensible": "Play-off / partido con mucho en juego para ambos equipos"
+      },
+      {
+        "id": "c2_p2",
+        "equipoLocal": "Deutsche Schule Valencia F.C. \"A\"",
+        "equipoVisitante": "San Antonio de Benagéber C.F. \"A\"",
+        "localidad": "Vinaròs",
+        "categoriaMinima": "Primera FFCV",
+        "catNivelMinimo": 2,
+        "fecha": "Sáb 2-3 · 19:30",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p3",
+        "equipoLocal": "E.F. Benicató",
+        "equipoVisitante": "Xcrypt F.C. \"A\"",
+        "localidad": "Xàtiva",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 2-3 · 18:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p4",
+        "equipoLocal": "U.D. Balompié Alfafar \"A\"",
+        "equipoVisitante": "Los Silos C.F. - Promises Valencia \"A\"",
+        "localidad": "Russafa",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 2-3 · 11:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p5",
+        "equipoLocal": "C.D. Bugarra",
+        "equipoVisitante": "C.F. At. Moncadense \"B\"",
+        "localidad": "Carcaixent",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 2-3 · 10:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p6",
+        "equipoLocal": "U.D. Canals",
+        "equipoVisitante": "C.D. Benifaió \"A\"",
+        "localidad": "Patraix",
+        "categoriaMinima": "Segona FFCV",
+        "catNivelMinimo": 1,
+        "fecha": "Dom 2-3 · 17:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p7",
+        "equipoLocal": "C.D. El Rumbo \"A\"",
+        "equipoVisitante": "Deutsche Schule Valencia F.C. \"B\"",
+        "localidad": "Borriana",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 2-3 · 19:30",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p8",
+        "equipoLocal": "C.F. Joventut Almassora \"A\"",
+        "equipoVisitante": "Castell Vell C.F.",
+        "localidad": "Castellón de la Plana",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 2-3 · 16:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p9",
+        "equipoLocal": "Villena C.F. \"A\"",
+        "equipoVisitante": "Catral-Castrum C.F.",
+        "localidad": "Catarroja",
+        "categoriaMinima": "Primera FFCV",
+        "catNivelMinimo": 2,
+        "fecha": "Dom 2-3 · 19:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c2_p10",
+        "equipoLocal": "At. Villar C.F. \"A\"",
+        "equipoVisitante": "Vilamarxant C.F.",
+        "localidad": "Ontinyent",
+        "categoriaMinima": "Segona FFCV",
+        "catNivelMinimo": 1,
+        "fecha": "Dom 2-3 · 19:00",
+        "sensible": false,
+        "motivoSensible": null
+      }
+    ]
+  },
+  {
+    "id": "c3",
+    "etiqueta": "Fin de semana 9-10 ago 2026 (asignado el lunes 3 ago, régimen normal)",
+    "finDeSemana": "9-10 ago 2026",
+    "n": 12,
+    "partidos": [
+      {
+        "id": "c3_p1",
+        "equipoLocal": "CD Buñol",
+        "equipoVisitante": "Racing Rafelcofer C.F.",
+        "localidad": "Xàbia",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 9-10 · 19:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p2",
+        "equipoLocal": "C.F. Benlloch \"B\"",
+        "equipoVisitante": "C.D. La Pobla Tornesa",
+        "localidad": "Xirivella",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 9-10 · 12:00",
+        "sensible": true,
+        "motivoSensible": "Historial de tarjetas elevado entre estos dos equipos"
+      },
+      {
+        "id": "c3_p3",
+        "equipoLocal": "C.F. At. Bº La Luz",
+        "equipoVisitante": "Xirivella \"A\" - C.D. Turís \"A\"",
+        "localidad": "Mislata",
+        "categoriaMinima": "Primera FFCV",
+        "catNivelMinimo": 2,
+        "fecha": "Sáb 9-10 · 19:30",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p4",
+        "equipoLocal": "C.D. Betxí",
+        "equipoVisitante": "C.D. Roda \"B\"",
+        "localidad": "Elda",
+        "categoriaMinima": "Primera FFCV",
+        "catNivelMinimo": 2,
+        "fecha": "Sáb 9-10 · 12:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p5",
+        "equipoLocal": "C.D. Eldense \"C\"",
+        "equipoVisitante": "Algueña C.F.",
+        "localidad": "Patraix",
+        "categoriaMinima": "Segona FFCV",
+        "catNivelMinimo": 1,
+        "fecha": "Dom 9-10 · 12:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p6",
+        "equipoLocal": "C.D. Buñol \"B\"",
+        "equipoVisitante": "Aljaba C.F.",
+        "localidad": "Campanar",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 9-10 · 19:30",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p7",
+        "equipoLocal": "Canals Promeses C.F.",
+        "equipoVisitante": "U.D. Montaverner",
+        "localidad": "Marxalenes",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 9-10 · 19:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p8",
+        "equipoLocal": "Novelda Unión C.F. Cableworld \"A\"",
+        "equipoVisitante": "C.E. Alberic Sucemart",
+        "localidad": "Nou Moles",
+        "categoriaMinima": "Lliga Comunitat",
+        "catNivelMinimo": 3,
+        "fecha": "Dom 9-10 · 10:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p9",
+        "equipoLocal": "C.D. El Rumbo \"A\"",
+        "equipoVisitante": "Torrent C.F. \"C\"",
+        "localidad": "Dénia",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 9-10 · 11:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p10",
+        "equipoLocal": "Novelda Unión C.F. Cableworld \"A\"",
+        "equipoVisitante": "U.D. Rayo Ibense \"A\"",
+        "localidad": "Torrent",
+        "categoriaMinima": "Lliga Comunitat",
+        "catNivelMinimo": 3,
+        "fecha": "Sáb 9-10 · 11:00",
+        "sensible": false,
+        "motivoSensible": null
+      },
+      {
+        "id": "c3_p11",
+        "equipoLocal": "C.F. Sporting Picassent \"A\"",
+        "equipoVisitante": "Silla C.F. \"B\"",
+        "localidad": "Xàtiva",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Sáb 9-10 · 19:00",
+        "sensible": true,
+        "motivoSensible": "Partido con incidencias graves la última vez que se enfrentaron"
+      },
+      {
+        "id": "c3_p12",
+        "equipoLocal": "Racing de San Gabriel \"A\"",
+        "equipoVisitante": "U.E. Gimnàstic Sant Vicent C.F. \"B\"",
+        "localidad": "Malilla",
+        "categoriaMinima": "Tercera FFCV",
+        "catNivelMinimo": 0,
+        "fecha": "Dom 9-10 · 19:30",
+        "sensible": true,
+        "motivoSensible": "Play-off / partido con mucho en juego para ambos equipos"
+      }
+    ]
+  }
+]

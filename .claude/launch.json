@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "webapp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "/Users/Rober/Desktop/Referee_Management/webapp",
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}

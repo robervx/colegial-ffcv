@@ -1,0 +1,273 @@
+{
+  "Torrent": {
+    "lat": 39.436668,
+    "lon": -0.4656213,
+    "cp": "",
+    "municipio": "Torrent"
+  },
+  "Sagunto": {
+    "lat": 39.6792916,
+    "lon": -0.2786451,
+    "cp": "",
+    "municipio": "Sagunt / Sagunto"
+  },
+  "Alzira": {
+    "lat": 39.151212,
+    "lon": -0.4346556,
+    "cp": "",
+    "municipio": "Alzira"
+  },
+  "Paterna": {
+    "lat": 39.5259423,
+    "lon": -0.4733018,
+    "cp": "",
+    "municipio": "Paterna"
+  },
+  "Xàtiva": {
+    "lat": 38.988085,
+    "lon": -0.5200428,
+    "cp": "46800",
+    "municipio": "Xàtiva"
+  },
+  "Vila-real": {
+    "lat": 39.9372616,
+    "lon": -0.1004465,
+    "cp": "12540",
+    "municipio": "Vila-real"
+  },
+  "Burjassot": {
+    "lat": 39.5090599,
+    "lon": -0.4108581,
+    "cp": "46100",
+    "municipio": "Burjassot"
+  },
+  "Silla": {
+    "lat": 39.3632045,
+    "lon": -0.4112618,
+    "cp": "46460",
+    "municipio": "Silla"
+  },
+  "Valencia": {
+    "lat": 39.4697065,
+    "lon": -0.3763353,
+    "cp": "",
+    "municipio": "València"
+  },
+  "Gandia": {
+    "lat": 38.9675925,
+    "lon": -0.1803423,
+    "cp": "",
+    "municipio": "Gandia"
+  },
+  "Ontinyent": {
+    "lat": 38.8208523,
+    "lon": -0.6099929,
+    "cp": "46870",
+    "municipio": "Ontinyent"
+  },
+  "Requena": {
+    "lat": 39.4880777,
+    "lon": -1.1001643,
+    "cp": "",
+    "municipio": "Requena"
+  },
+  "Cullera": {
+    "lat": 39.1647217,
+    "lon": -0.2542313,
+    "cp": "",
+    "municipio": "Cullera"
+  },
+  "Alaquàs": {
+    "lat": 39.4572928,
+    "lon": -0.46098,
+    "cp": "46970",
+    "municipio": "Alaquàs"
+  },
+  "Mislata": {
+    "lat": 39.4751444,
+    "lon": -0.4179125,
+    "cp": "46920",
+    "municipio": "Mislata"
+  },
+  "Catarroja": {
+    "lat": 39.4033747,
+    "lon": -0.4028759,
+    "cp": "",
+    "municipio": "Catarroja"
+  },
+  "Manises": {
+    "lat": 39.492989,
+    "lon": -0.4621429,
+    "cp": "46940",
+    "municipio": "Manises"
+  },
+  "Alcoi": {
+    "lat": 38.6982348,
+    "lon": -0.4747619,
+    "cp": "",
+    "municipio": "Alcoi / Alcoy"
+  },
+  "Elda": {
+    "lat": 38.4789671,
+    "lon": -0.7956759,
+    "cp": "03600",
+    "municipio": "Elda"
+  },
+  "Villena": {
+    "lat": 38.6360967,
+    "lon": -0.8659745,
+    "cp": "",
+    "municipio": "Villena"
+  },
+  "Orihuela": {
+    "lat": 38.0275575,
+    "lon": -0.9130957,
+    "cp": "",
+    "municipio": "Orihuela"
+  },
+  "Vinaròs": {
+    "lat": 40.4703992,
+    "lon": 0.4746076,
+    "cp": "12500",
+    "municipio": "Vinaròs"
+  },
+  "Borriana": {
+    "lat": 39.8876912,
+    "lon": -0.0846321,
+    "cp": "12530",
+    "municipio": "Borriana / Burriana"
+  },
+  "Almassora": {
+    "lat": 39.9435743,
+    "lon": -0.0634783,
+    "cp": "12550",
+    "municipio": "Almassora"
+  },
+  "Xirivella": {
+    "lat": 39.4655723,
+    "lon": -0.4307834,
+    "cp": "46950",
+    "municipio": "Xirivella"
+  },
+  "Picassent": {
+    "lat": 39.363519,
+    "lon": -0.4611789,
+    "cp": "",
+    "municipio": "Picassent"
+  },
+  "Aldaia": {
+    "lat": 39.4600981,
+    "lon": -0.4805803,
+    "cp": "46960",
+    "municipio": "Aldaia"
+  },
+  "Xàbia": {
+    "lat": 38.7893804,
+    "lon": 0.1634168,
+    "cp": "",
+    "municipio": "Xàbia / Jávea"
+  },
+  "Dénia": {
+    "lat": 38.8408382,
+    "lon": 0.1061105,
+    "cp": "",
+    "municipio": "Dénia"
+  },
+  "Sueca": {
+    "lat": 39.2025604,
+    "lon": -0.3111645,
+    "cp": "",
+    "municipio": "Sueca"
+  },
+  "Carcaixent": {
+    "lat": 39.1209651,
+    "lon": -0.4472814,
+    "cp": "46740",
+    "municipio": "Carcaixent"
+  },
+  "Castellón de la Plana": {
+    "lat": 39.9860347,
+    "lon": -0.0377354,
+    "cp": "",
+    "municipio": "Castelló de la Plana / Castellón de la Plana"
+  },
+  "Alicante": {
+    "lat": 38.3436365,
+    "lon": -0.4881708,
+    "cp": "",
+    "municipio": "Alacant / Alicante"
+  },
+  "Elche": {
+    "lat": 38.2653307,
+    "lon": -0.6988391,
+    "cp": "",
+    "municipio": "Elx / Elche"
+  },
+  "Torrefiel": {
+    "lat": 39.495464,
+    "lon": -0.3763676,
+    "cp": "46019",
+    "municipio": "València"
+  },
+  "Benicalap": {
+    "lat": 39.4950176,
+    "lon": -0.3921382,
+    "cp": "",
+    "municipio": "València"
+  },
+  "Patraix": {
+    "lat": 39.4590529,
+    "lon": -0.4008047,
+    "cp": "46014",
+    "municipio": "València"
+  },
+  "Russafa": {
+    "lat": 39.462278,
+    "lon": -0.3720713,
+    "cp": "46006",
+    "municipio": "València"
+  },
+  "Malilla": {
+    "lat": 39.4467655,
+    "lon": -0.3767109,
+    "cp": "46026",
+    "municipio": "València"
+  },
+  "Campanar": {
+    "lat": 39.4814422,
+    "lon": -0.3946974,
+    "cp": "",
+    "municipio": "València"
+  },
+  "Nou Moles": {
+    "lat": 39.4711509,
+    "lon": -0.3987919,
+    "cp": "",
+    "municipio": "València"
+  },
+  "Algiros": {
+    "lat": 39.4762717,
+    "lon": -0.3436533,
+    "cp": "46022",
+    "municipio": "València"
+  },
+  "Poblats Maritims": {
+    "lat": 39.4643605,
+    "lon": -0.332079,
+    "cp": "46011",
+    "municipio": "València"
+  },
+  "Marxalenes": {
+    "lat": 39.4854203,
+    "lon": -0.3821623,
+    "cp": "46009",
+    "municipio": "València"
+  },
+  "Orriols": {
+    "lat": 39.4931495,
+    "lon": -0.3675178,
+    "cp": "46019",
+    "municipio": "València"
+  },
+  "_nota": "lat/lon y municipio vienen de Nominatim. `municipio` es el término municipal real resuelto (relevante para la regla de dieta de tarifas.md), puede diferir del nombre buscado si es un barrio (ej. Torrefiel -> municipio Valencia)."
+}
