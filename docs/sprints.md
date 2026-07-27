@@ -33,7 +33,7 @@ Hoy Designación inteligente muestra alternativas pero no hay ningún botón que
 
 Antes de inventar más capas sintéticas, aprovechar los scrapers que ya existen y están a medio terminar.
 
-- Terminar/acelerar `scrape_ffcv_public.py` (tarjetas, goles, árbitros por acta) — hoy solo ~60 de 96.385 partidos procesados. Da B.5 real (disciplina descriptiva) y siembra la granularidad que hace falta para B.3 más adelante.
+- ~~Terminar/acelerar `scrape_ffcv_public.py` (tarjetas, goles, árbitros por acta)~~ **Hecho (23 jul 2026)**: 25.256 partidos procesados (todas las categorías adultas), con tarjetas y árbitros reales ya integrados en `generar_dataset_arbitros.py`. Da B.5 real (disciplina descriptiva). Pendiente suelto: solo cubre temporada 2025/26 — backfill de 23/24 y 24/25 relanzando el scraper con `--season 20`/`19` si hace falta para B.3 más adelante.
 - Ejecutar `scrape_directorio_equipos.py` (nunca corrido) para direcciones reales de club — sustituye el enfoque de geolocalizar por nombre de instalación, que tuvo rendimiento bajo (`geocode_campos.py`, mayoría sin resultado).
 - Virtualización del listado de Árbitros: 200 filas van bien, 1.800 (el volumen real del colectivo) no se ha probado y previsiblemente no aguanta sin virtualizar.
 

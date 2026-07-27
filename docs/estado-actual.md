@@ -1,6 +1,8 @@
-# Estado actual del proyecto — 22 jul 2026
+# Estado actual del proyecto — 23 jul 2026
 
 Fotografía de lo construido hasta hoy. Si vuelves a esta conversación más tarde, o alguien nuevo se incorpora, empieza por aquí — es más fiable que reconstruir la historia leyendo el chat.
+
+**Punto exacto en el que se dejó esta sesión (23 jul 2026):** se cerró el apartado de datos/producto tras completar el scraping público (`ffcv_public_data/`, 25.256 partidos con árbitro, tarjetas y goles reales) y volcarlo al dataset de trabajo. Los 5 pendientes que se pidieron en esta sesión (tarjetas reales + ID estable, capa sintética ampliada, contacto + plantillas de email, KPIs por categoría/ventana, logo real) están todos hechos y verificados en el navegador. Lo siguiente, si se retoma aquí, es Sprint 1 de `sprints.md` (backend/persistencia) — ver §6 de este documento para el detalle de qué cambió hoy.
 
 ## 1. Qué es Colegial hoy, en una frase
 
@@ -21,33 +23,42 @@ Una app Next.js real (no un mockup suelto) que corre en `webapp/`, con un dashbo
 
 | Dato | Estado | Fuente |
 |---|---|---|
-| Identidad de árbitro (nombre) | **Real** | `partidos_2025_2026.csv` (1.946 árbitros únicos con designación pública) |
-| Carga de partidos 25/26 | **Real** | idem |
-| Categoría principal | **Real** (competición más frecuente) | idem |
+| Identidad de árbitro (nombre) + **ID estable (`cod_arbitro`)** | **Real** | `ffcv_public_data/` (web pública `ffcv.es/competiciones`, sin login) — sustituye el cruce por nombre en texto de `partidos_2025_2026.csv` |
+| Carga de partidos 25/26 (categorías adultas) | **Real** | idem |
+| Categoría principal | **Real** (competición más frecuente, ladder fútbol-11 masculino) | idem |
 | Historial de últimos 15 partidos (fecha/rivales/resultado) | **Real** | idem |
-| Equipos, campos, calendario, resultados | **Real** | idem + `ffcv_public_data/` (scraping en curso) |
+| **Tarjetas amarillas/rojas mostradas, temporada 25/26** | **Real** (B.5, kpis.md) | `ffcv_public_data/tarjetas_partido.csv` — 105.045 tarjetas en 25.256 partidos. Temporadas 23/24 y 24/25 siguen estimadas (se podrían hacer reales relanzando el scraper con `--season 20`/`19`) |
+| Goles por partido (jugador, minuto) | **Real**, no usado todavía en la UI | idem, `goles_partido.csv` |
+| Equipos, campos, calendario, resultados | **Real** | `ffcv_public_data/` (25.256 partidos, categorías adultas — la web pública no incluye fútbol base) |
 | Localidades geocodificadas (lat/lon/término municipal) | **Real** (45 de ellas) | Nominatim/OSM |
 | Tarifas, dietas, kilometraje, reglas de término municipal | **Real** | Circulares oficiales FFCV (`tarifas.md`) |
 | Licencia, localidad de residencia, edad, temporadas | Sintético | generado, no existe públicamente |
-| Informes/notas/evaluaciones, forma, físico, técnica | Sintético | no existe en ningún sitio hasta tener export del comité |
+| **Contacto (teléfono, email)** | Sintético | generado — patrón `nombre.apellido@arbitrosffcv.es` |
+| **Altura (fija), peso (por convocatoria)** | Sintético | generado |
+| **Pruebas físicas y examen teórico (2/temporada, nota+comentario)** | Sintético | generado |
+| Informes de observador (`forma[]`), físico/técnica/gestión del radar | Sintético | no existe en ningún sitio hasta tener export del comité |
+| Anotaciones de seguimiento (comité) y de informadores | Sintético | generado, con etiqueta positiva/mejora/seguimiento/disciplinaria |
 | Vetos, disponibilidad declarada, `disponibleCategoriasInferiores` | Sintético | idem |
-| Tarjetas/goles por partido (B.5, granularidad fina) | Parcial/real pero muy incompleto | `scrape_ffcv_public.py` procesó ~60 de 96.385 partidos, sigue corriendo bajo demanda |
 
 ## 4. Arquitectura técnica
 
 ```
 Referee_Management/
-├── partidos_2025_2026.csv          # 96.385 partidos, fuente real principal
-├── ffcv_public_data/                # scraping granular por partido (en curso, incompleto)
-├── generar_dataset_arbitros.py      # produce webapp/data/arbitros-*.json
+├── partidos_2025_2026.csv          # 96.385 partidos (intranet, incl. fútbol base) — ya no es la fuente principal del dataset de árbitros
+├── ffcv_public_data/                # scraping público completo: 25.256 partidos, arbitros_partido.csv, tarjetas_partido.csv, goles_partido.csv
+├── scrape_ffcv_public.py            # genera ffcv_public_data/ (rate-limited, reanudable)
+├── generar_dataset_arbitros.py      # produce webapp/data/arbitros-*.json — ahora desde ffcv_public_data/
+├── generar_agregados.py             # produce webapp/data/agregados-reales.json (nuevo, 23 jul)
 ├── generar_jornadas.py              # produce webapp/data/ciclos-asignacion.json
 ├── geocode_localidades.py           # produce webapp/data/localidades-geo.json
 ├── geocode_campos.py                # geolocalización de campos por nombre — bajo rendimiento, ver §5
 ├── docs/                            # toda la documentación de producto
+│   └── assets/logo.png              # logo real FFCV -> copiado a webapp/public/logo-ffcv.png
 └── webapp/                          # la app real
-    ├── components/CRMExpedientes.jsx  # 990 líneas, todas las páginas
+    ├── components/CRMExpedientes.jsx  # ~1080 líneas, todas las páginas
     ├── lib/motorAsignacion.js         # filtro duro, score B.1, coste (200 líneas)
     ├── lib/asignarJornada.js          # motor de lote por jornada (104 líneas)
+    ├── public/logo-ffcv.png           # logo real, usado por el componente Escudo
     └── data/*.json                    # todo el dato de trabajo, generado por los scripts .py
 ```
 
@@ -62,12 +73,28 @@ Referee_Management/
 - **`consistencia()` en el score es una heurística propia**, no una fórmula acordada con el comité.
 - **Ambigüedad sin resolver en `kpis.md`**: la penalización por "incidencias" de B.1 vs. el principio de gobernanza de B.5 (disciplina no puntúa) — probablemente hablan de cosas distintas pero el documento no lo distingue con claridad.
 - **Geolocalización de campos por nombre de instalación tiene rendimiento bajo** (`geocode_campos.py`, ~982/1.679 procesados, mayoría "no encontrado") — la alternativa mejor (`scrape_directorio_equipos.py`, direcciones reales de club) existe pero no se ha ejecutado.
+- **Domicilio del árbitro sigue siendo sintético a propósito** — decisión explícita del 23 jul: no se toca hasta tener el roster real del comité (localidad elegida al azar entre las 45 geocodificadas).
+- **Contacto (teléfono/email), altura/peso, pruebas físicas/teóricas y plantillas de email son sintéticos** (añadidos 23 jul) — ver `decisiones-producto.md` §13. El `mailto:` nunca envía automáticamente, siempre lo revisa y lo lanza una persona.
+- **Tarjetas reales solo cubren la temporada 2025/26** — 2023/24 y 2024/25 siguen estimadas; backfill posible relanzando `scrape_ffcv_public.py --season 20`/`19`, no hecho todavía.
 - **Sin estados vacío/carga/error** — pendiente desde la guía de frontend original, sección 4.
 - **Bug de responsive** entre ~550-900px de ancho — sidebar y grid de KPIs se desbordan.
 - **Sin virtualización de listas** — 200 filas van bien, 1.800 (el volumen real de la FFCV) no se ha probado.
 - **Nombre del producto ("Colegial")** sigue siendo un placeholder, no una decisión cerrada.
 
+## 6. Qué cambió el 23 jul 2026 (sesión de scraping + ficha de árbitro)
+
+Resumen ejecutivo — detalle completo en `decisiones-producto.md` §12-14:
+
+1. **Scraping público terminado**: `ffcv_public_data/` pasó de ~60 partidos (dato parcial mencionado en la foto del 22 jul) a **25.256 partidos completos** de todas las categorías adultas, con árbitro (ID + nombre), tarjetas y goles reales. Esto era el primer punto del Sprint 3 de `sprints.md` — **ya hecho**, no pendiente.
+2. **`generar_dataset_arbitros.py` migrado** a esa fuente: tarjetas 25/26 reales (antes inventadas), `cod_arbitro` como ID estable.
+3. **`generar_agregados.py` (nuevo)**: el Dashboard ya no depende de un cálculo hecho a mano, hay script reproducible.
+4. **Ficha de árbitro ampliada**: contacto visible + plantillas de email (mailto, revisión humana obligatoria), pruebas físicas/teóricas sintéticas con nota+comentario, altura/peso, anotaciones de informadores distinguibles de las del comité, ventana de últimos 5/10/todos los partidos con resumen de disciplina real.
+5. **Logo real de la FFCV** integrado (sustituye el placeholder de siglas).
+6. Verificado visualmente en el navegador (servidor de desarrollo en `:3001`) sin errores de consola.
+
+**No se tocó**: backend/persistencia (sigue sin existir, Sprint 1 sigue siendo el siguiente paso estructural), motor de asignación (sigue igual que el 22 jul), geolocalización de árbitros (sigue sintética, a propósito).
+
 ## Ver también
-- [decisiones-producto.md](./decisiones-producto.md) — el detalle y el porqué de cada decisión, en orden cronológico (11 secciones)
+- [decisiones-producto.md](./decisiones-producto.md) — el detalle y el porqué de cada decisión, en orden cronológico (14 secciones)
 - [sprints.md](./sprints.md) — plan de trabajo a partir de aquí
 - [data-model.md](./data-model.md), [kpis.md](./kpis.md), [tarifas.md](./tarifas.md)

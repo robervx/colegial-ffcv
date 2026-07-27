@@ -37,7 +37,7 @@ with open("webapp/data/localidades-geo.json", encoding="utf-8") as _f:
     _geo = json.load(_f)
 LOCALIDADES = [k for k in _geo.keys() if not k.startswith("_")]
 
-APELLIDOS_EMAIL = str.maketrans({" ": "", "'": "", ".": ""})
+APELLIDOS_EMAIL = str.maketrans({" ": "", "'": ""})
 
 
 def strip_accents(s):
@@ -193,10 +193,14 @@ def main():
 
         temporadas_con_pruebas = min(temporadas, 3)
         pruebas_fisicas, examenes_teoricos = [], []
-        meses_convocatoria = [("09", "Pretemporada"), ("02", "Mitad de temporada")]
+        # Pretemporada cae en el año de inicio de la temporada (set), mitad de
+        # temporada en el año siguiente (feb) -- p.ej. temporada 2025/26:
+        # pretemporada sep-2025, mitad-temporada feb-2026.
+        meses_convocatoria = [("09", "Pretemporada", 1), ("02", "Mitad de temporada", 0)]
         for j in range(temporadas_con_pruebas):
-            anyo = 2026 - j
-            for mes, etiqueta in meses_convocatoria:
+            anyo_fin_temporada = 2026 - j
+            for mes, etiqueta, offset_anyo_inicio in meses_convocatoria:
+                anyo = anyo_fin_temporada - offset_anyo_inicio
                 nota_fis = round(rng.uniform(5.5, 9.5), 1)
                 peso_conv = round(peso_base + rng.uniform(-1.5, 1.5), 1)
                 pruebas_fisicas.append({

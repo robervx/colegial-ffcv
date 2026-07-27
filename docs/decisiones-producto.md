@@ -93,6 +93,31 @@ Reemplaza la vista de "un partido a la vez" por el flujo operativo real acordado
 - **Revisión humana**: cada partido sale "auto-confirmable" o "revisar" con motivo (partido sensible/derbi, score ajustado entre los dos primeros, o sin candidatos). El humano siempre puede ver las alternativas (top 4) sin recalcular nada.
 - **Pendiente explícito**: la asignación es *greedy* por categoría (procesa de mayor a menor nivel), no una optimización global sobre toda la jornada — con 10-15 partidos es correcto, pero no es el óptimo teórico. Ver recomendación de algoritmo húngaro / asignación bipartita si el volumen crece.
 
+## 12. Tarjetas reales + ID estable de árbitro (23 jul 2026)
+
+**Cambio de fuente**: `generar_dataset_arbitros.py` deja de usar `partidos_2025_2026.csv` (scraping de la intranet, por nombre de árbitro en texto) y pasa a usar `ffcv_public_data/` (scraping de la web pública `ffcv.es/competiciones`, sin login, generado por `scrape_ffcv_public.py`). Motivo: esa web pública trae `cod_arbitro` — un ID numérico estable — y las tarjetas amarillas/rojas reales por partido, ninguna de las dos cosas estaba disponible en la intranet a este nivel de detalle.
+
+- **`am`/`ro` de la temporada 2025/26 son ahora reales** (antes `int(part * random.uniform(1.6, 3.6))`, 100% inventado). Las temporadas anteriores (2023/24, 2024/25) siguen siendo estimadas — se podrían hacer reales relanzando `scrape_ffcv_public.py --season 20` / `--season 19`, no se ha hecho todavía.
+- **`cod_arbitro` añadido como campo real** en los tres ficheros de salida — sustituye progresivamente el cruce por nombre en texto, que arrastraba el riesgo de inconsistencia ya visto en el scraping (variantes de formato del mismo nombre).
+- **Alcance**: la web pública solo publica categorías adultas (no fútbol base/juvenil) — encaja exacto con el `LADDER` de fútbol-11 masculino que ya usaba este generador, así que no se pierde cobertura.
+- **`webapp/data/agregados-reales.json`** pasa a generarse con un script nuevo, `generar_agregados.py` (antes no existía como script, se había hecho a mano) — misma fuente pública, mismo esquema de campos.
+
+## 13. Capa sintética ampliada: contacto, ficha física, plantillas de email (23 jul 2026)
+
+Todo lo añadido aquí es **sintético**, explícitamente marcado como tal en la UI (`Origen de los datos` en la ficha) — no hay ningún dato de contacto real de ningún colegiado en este repo.
+
+- **Contacto**: `telefono` y `email` sintéticos (email con patrón `nombre.apellido@arbitrosffcv.es`), visibles en la cabecera de la ficha y en un panel dedicado "Contactar".
+- **Ficha física**: `altura` (fija, cm) y `peso` — el peso se registra **por convocatoria de prueba física**, no como campo único (ver `data-model.md`, ya lo especificaba).
+- **Pruebas físicas y examen teórico**: 2 convocatorias por temporada activa (Pretemporada en septiembre, Mitad de temporada en febrero), cada una con nota + comentario. Hasta 3 temporadas de histórico.
+- **Anotaciones de informadores**: además de las notas de seguimiento del comité ya existentes, ahora también se generan notas atribuidas a "Observador X" con etiqueta (`positiva`/`mejora`), distinguibles visualmente de las del comité.
+- **Plantillas de email** (`PLANTILLAS_EMAIL` en el componente): "Comentar informe", "Felicitar", "Pedir puntos de mejora". Generan un `mailto:` con asunto y cuerpo prellenados — **nunca se envía nada automáticamente**, el comité revisa en su propio cliente de correo y pulsa enviar él. Al añadir una nota de seguimiento con etiqueta "Positiva" o "A mejorar" aparece una sugerencia con el borrador correspondiente ya listo (banner descartable, no intrusivo).
+- **Ventana de partidos (kpis.md C.2)**: el historial de partidos de la ficha ahora tiene selector Últimos 5 / Últimos 10 / Todos, combinable con el filtro de categoría ya existente, con un resumen de amarillas/rojas reales dentro de esa ventana. No se ha vinculado nota de informe por partido (eso exigiría inventar una precisión que no existe — el informe sigue siendo por temporada, no por partido concreto).
+- **Domicilio**: sigue siendo sintético a propósito (decisión explícita — no cambia hasta tener el roster real del comité, ver también §9 más arriba sobre `localidades-geo.json`).
+
+## 14. Logo real de la FFCV (23 jul 2026)
+
+`docs/assets/logo.png` → `webapp/public/logo-ffcv.png`. El componente `Escudo` ahora renderiza el logo real sobre fondo blanco en vez del placeholder de siglas — se mantiene la opción de placeholder (`logoSrc` a `null`) por si en el futuro hay un tenant sin logo subido, aunque hoy es FFCV único (§1).
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)

@@ -9,7 +9,7 @@ import {
   Users, Search, ChevronRight, TrendingUp, TrendingDown, Minus,
   FileText, Calendar, AlertCircle, Lock, Sparkles,
   MessageSquarePlus, Gavel, Wallet, Bot, Check, Ban, AlertTriangle, Send,
-  LayoutDashboard, Route, Scale, Info,
+  LayoutDashboard, Route, Scale, Info, Phone, Mail, Mailbox, Ruler, Dumbbell, BookOpen,
 } from "lucide-react";
 import agregadosReales from "../data/agregados-reales.json";
 import localidadesGeo from "../data/localidades-geo.json";
@@ -94,6 +94,35 @@ function radarSkills(a) {
 
 const nf = (x) => x.toLocaleString("es-ES");
 
+/* --------- plantillas de email (mailto: — nunca envío automático real, ver docs/decisiones-producto.md) ---------
+   El comité revisa y pulsa enviar desde su propio cliente de correo; aquí solo se compone el borrador. */
+const PLANTILLAS_EMAIL = {
+  comentarioInforme: {
+    etiqueta: "Comentar informe",
+    asunto: (a) => `Comentario sobre tu último informe · ${a.n.split(",")[0]}`,
+    cuerpo: (a) => `Hola ${a.n.split(",")[1]?.trim() || a.n},\n\nQueríamos comentarte algo sobre tu última evaluación (media actual: ${a.hist[a.hist.length - 1].media.toFixed(1)}).\n\n[Escribe aquí el comentario concreto]\n\nUn saludo,\nComité Técnico de Árbitros`,
+  },
+  felicitacion: {
+    etiqueta: "Felicitar",
+    asunto: (a) => `Enhorabuena por tu progresión esta temporada · ${a.n.split(",")[0]}`,
+    cuerpo: (a) => `Hola ${a.n.split(",")[1]?.trim() || a.n},\n\nQueríamos felicitarte por tu buen rendimiento esta temporada (media actual: ${a.hist[a.hist.length - 1].media.toFixed(1)}, ${a.partidosTemporadaReal} partidos dirigidos). Sigue así.\n\nUn saludo,\nComité Técnico de Árbitros`,
+  },
+  puntosDeMejora: {
+    etiqueta: "Pedir puntos de mejora",
+    asunto: (a) => `Puntos a trabajar de cara a los próximos partidos · ${a.n.split(",")[0]}`,
+    cuerpo: (a) => `Hola ${a.n.split(",")[1]?.trim() || a.n},\n\nRevisando tus últimos informes nos gustaría comentarte algunos puntos de mejora:\n\n[Escribe aquí los puntos concretos]\n\nQuedamos a tu disposición para hablarlo con más calma.\n\nUn saludo,\nComité Técnico de Árbitros`,
+  },
+};
+function mailtoHref(email, asunto, cuerpo) {
+  return `mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+}
+const ETIQUETA_NOTA = {
+  seguimiento: { label: "Seguimiento", bg: N.paper, fg: N.ink40 },
+  positiva: { label: "Positiva", bg: N.verdeT, fg: N.verde },
+  mejora: { label: "A mejorar", bg: N.ambarT, fg: N.ambar },
+  disciplinaria: { label: "Disciplinaria", bg: N.rojoT, fg: N.rojo },
+};
+
 /* ------------------------------- piezas ------------------------------- */
 function Eyebrow({ children }) {
   return <div className="text-[10px] uppercase tracking-[0.16em] font-semibold" style={{ color: N.ink40 }}>{children}</div>;
@@ -133,7 +162,18 @@ function Avatar({ txt, T, size = 40 }) {
       style={{ width: size, height: size, background: T.tint, color: T.primary, fontSize: size * 0.36 }}>{txt}</div>
   );
 }
-function Escudo({ T, size = 38 }) {
+/* Logo real de la FFCV (docs/assets/logo.png -> public/logo-ffcv.png). Fallback a
+   siglas sobre accent si algun dia hay mas de un tenant sin logo subido (single-tenant
+   FFCV hoy, ver docs/decisiones-producto.md §1). */
+function Escudo({ T, size = 38, logoSrc = "/logo-ffcv.png" }) {
+  if (logoSrc) {
+    return (
+      <div className="rounded flex items-center justify-center shrink-0 overflow-hidden bg-white"
+        style={{ width: size, height: size, padding: size * 0.08 }}>
+        <img src={logoSrc} alt={`Escudo ${T.corto}`} className="w-full h-full object-contain" />
+      </div>
+    );
+  }
   return (
     <div className="rounded flex items-center justify-center font-bold shrink-0"
       style={{ width: size, height: size, background: T.accent, color: T.deep, fontSize: size * 0.26 }}>{T.siglas}</div>
@@ -390,27 +430,63 @@ function Listado({ T, onPick }) {
   );
 }
 
-/* --------- historial real de partidos dirigidos (partidos_2025_2026.csv) --------- */
+const VENTANAS = [
+  { id: 5, label: "Últimos 5" },
+  { id: 10, label: "Últimos 10" },
+  { id: null, label: "Todos" },
+];
+
+/* --------- historial real de partidos dirigidos (ffcv_public_data/) ---------
+   Filtro por categoria pitada + ventana movil de partidos (kpis.md C.2): el
+   historial ya viene ordenado de mas reciente a mas antiguo, asi que "ultimos
+   N" es simplemente slice(0, N) sobre el filtrado por categoria. */
 function HistorialPartidos({ a, T }) {
   const [soloCategoria, setSoloCategoria] = useState(true);
+  const [ventana, setVentana] = useState(10);
   const [verTodos, setVerTodos] = useState(false);
   const historial = a.historialReal || [];
   const filtrado = soloCategoria ? historial.filter((h) => h.esCategoriaPrincipal) : historial;
-  const mostrados = verTodos ? filtrado : filtrado.slice(0, 6);
+  const enVentana = ventana ? filtrado.slice(0, ventana) : filtrado;
+  const mostrados = verTodos ? enVentana : enVentana.slice(0, 6);
+
+  const resumen = enVentana.reduce((acc, h) => ({ am: acc.am + (h.amarillas || 0), ro: acc.ro + (h.rojas || 0) }), { am: 0, ro: 0 });
+  const taPj = enVentana.length ? (resumen.am / enVentana.length).toFixed(1) : "—";
 
   return (
-    <Panel title={`Historial de partidos · ${filtrado.length}`}
+    <Panel title={`Historial de partidos · ${filtrado.length} · ${a.cat}`}
       right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ambar }}><Info size={11} /> real</span>}>
-      <div className="flex items-center gap-2 mb-3">
-        <button onClick={() => setSoloCategoria(true)} className="text-[11px] rounded px-2.5 py-1 font-medium"
-          style={{ background: soloCategoria ? T.tint : "transparent", color: soloCategoria ? T.primary : N.ink40, border: `1px solid ${soloCategoria ? T.primary : N.rule}` }}>
-          Solo {a.cat}
-        </button>
-        <button onClick={() => setSoloCategoria(false)} className="text-[11px] rounded px-2.5 py-1 font-medium"
-          style={{ background: !soloCategoria ? T.tint : "transparent", color: !soloCategoria ? T.primary : N.ink40, border: `1px solid ${!soloCategoria ? T.primary : N.rule}` }}>
-          Todas las categorías
-        </button>
+      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={() => setSoloCategoria(true)} className="text-[11px] rounded px-2.5 py-1 font-medium"
+            style={{ background: soloCategoria ? T.tint : "transparent", color: soloCategoria ? T.primary : N.ink40, border: `1px solid ${soloCategoria ? T.primary : N.rule}` }}>
+            Solo {a.cat}
+          </button>
+          <button onClick={() => setSoloCategoria(false)} className="text-[11px] rounded px-2.5 py-1 font-medium"
+            style={{ background: !soloCategoria ? T.tint : "transparent", color: !soloCategoria ? T.primary : N.ink40, border: `1px solid ${!soloCategoria ? T.primary : N.rule}` }}>
+            Todas las categorías
+          </button>
+        </div>
+        <div className="flex items-center gap-1">
+          {VENTANAS.map((v) => (
+            <button key={v.label} onClick={() => setVentana(v.id)} className="text-[11px] rounded px-2.5 py-1 font-medium"
+              style={{ background: ventana === v.id ? T.primary : "transparent", color: ventana === v.id ? "#FFF" : N.ink40, border: `1px solid ${ventana === v.id ? T.primary : N.rule}` }}>
+              {v.label}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {enVentana.length > 0 && (
+        <div className="grid grid-cols-3 gap-3 mb-4 rounded p-3" style={{ background: N.paper }}>
+          {[["Partidos en ventana", enVentana.length, N.ink], ["Amarillas", resumen.am, "#B08D14"], ["Rojas", resumen.ro, N.rojo]].map(([l, v, col]) => (
+            <div key={l}>
+              <div className="text-[9px] uppercase tracking-[0.1em] mb-0.5" style={{ color: N.ink40 }}>{l}</div>
+              <div className="font-mono text-lg font-semibold tabular-nums" style={{ color: col }}>{v}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {mostrados.length === 0 ? (
         <p className="text-xs" style={{ color: N.ink40 }}>Sin partidos registrados con este filtro.</p>
       ) : (
@@ -423,20 +499,26 @@ function HistorialPartidos({ a, T }) {
               </div>
               <div className="flex items-center gap-3 shrink-0">
                 {!h.esCategoriaPrincipal && <span className="text-[10px] rounded px-1.5 py-0.5" style={{ background: N.paper, color: N.ink40 }}>{h.competicion}</span>}
+                {(h.amarillas > 0 || h.rojas > 0) && (
+                  <span className="font-mono text-[11px] flex items-center gap-1.5">
+                    {h.amarillas > 0 && <span style={{ color: "#B08D14" }}>{h.amarillas}TA</span>}
+                    {h.rojas > 0 && <span style={{ color: N.rojo }}>{h.rojas}TR</span>}
+                  </span>
+                )}
                 <span className="font-mono text-xs" style={{ color: N.ink70 }}>{h.resultado}</span>
               </div>
             </div>
           ))}
         </div>
       )}
-      {filtrado.length > 6 && (
+      {enVentana.length > 6 && (
         <button onClick={() => setVerTodos(!verTodos)} className="text-xs font-medium mt-3" style={{ color: T.primary }}>
-          {verTodos ? "Ver menos" : `Ver los ${filtrado.length}`}
+          {verTodos ? "Ver menos" : `Ver los ${enVentana.length}`}
         </button>
       )}
       <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
-        Designaciones públicas reales de la FFCV (partidos_2025_2026.csv), hasta los últimos 15 registrados. No incluye nota
-        del informe — ese dato sigue sin existir hasta tener export real del comité.
+        Designaciones y tarjetas públicas reales de la FFCV (temporada 2025/26). TA/PJ en la ventana actual: {taPj}. No incluye
+        nota del informe — ese dato sigue sin existir hasta tener export real del comité.
       </p>
     </Panel>
   );
@@ -455,10 +537,16 @@ function Ficha({ T, a, back }) {
 
   const [notas, setNotas] = useState(a.notas);
   const [nueva, setNueva] = useState("");
+  const [etiquetaNueva, setEtiquetaNueva] = useState("seguimiento");
+  const [sugerenciaEmail, setSugerenciaEmail] = useState(null); // plantilla sugerida tras añadir nota positiva/mejora
   const addNota = () => {
     if (!nueva.trim()) return;
-    setNotas([{ fecha: new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" }), autor: "Tú", texto: nueva.trim() }, ...notas]);
+    setNotas([{ fecha: new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" }), autor: "Tú", etiqueta: etiquetaNueva, texto: nueva.trim() }, ...notas]);
     setNueva("");
+    // sugerencia automatica de plantilla de email al registrar una nota positiva o de mejora
+    if (etiquetaNueva === "positiva") setSugerenciaEmail("felicitacion");
+    else if (etiquetaNueva === "mejora") setSugerenciaEmail("puntosDeMejora");
+    else setSugerenciaEmail(null);
   };
 
   return (
@@ -474,7 +562,15 @@ function Ficha({ T, a, back }) {
             <div>
               <div className="font-mono text-[11px] tracking-[0.2em] mb-1" style={{ color: T.accent }}>LICENCIA {a.lic}</div>
               <h2 className="text-2xl font-semibold text-white leading-tight">{a.n}</h2>
-              <div className="text-xs mt-1.5" style={{ color: "#B7CBDD" }}>{a.cat} · {a.loc} · {a.edad} años · {a.temp} temporadas</div>
+              <div className="text-xs mt-1.5" style={{ color: "#B7CBDD" }}>{a.cat} · {a.loc} · {a.edad} años · {a.temp} temporadas · {a.altura} cm</div>
+              <div className="flex items-center gap-4 mt-2 text-xs flex-wrap">
+                <a href={`tel:${a.telefono.replace(/\s/g, "")}`} className="flex items-center gap-1.5 hover:underline" style={{ color: "#FFF" }}>
+                  <Phone size={12} style={{ color: T.accent }} /> {a.telefono}
+                </a>
+                <a href={`mailto:${a.email}`} className="flex items-center gap-1.5 hover:underline" style={{ color: "#FFF" }}>
+                  <Mail size={12} style={{ color: T.accent }} /> {a.email}
+                </a>
+              </div>
             </div>
           </div>
           <div style={{ background: "#FFFFFF", borderRadius: 8, padding: "12px 18px" }}>
@@ -550,36 +646,85 @@ function Ficha({ T, a, back }) {
 
           <HistorialPartidos a={a} T={T} />
 
-          {/* comentarios internos */}
+          {/* comentarios internos: seguimiento del comité + anotaciones de informadores/superiores, ver docs/data-model.md Anotacion */}
           <Panel title="Seguimiento interno"
             right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ink40 }}><Lock size={11} /> visible solo para el comité</span>}>
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-2 flex-wrap">
               <input value={nueva} onChange={(e) => setNueva(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addNota()}
                 placeholder="Añadir nota de seguimiento (llamadas, conversaciones, contexto)…"
-                className="flex-1 text-sm rounded border px-3 py-2 outline-none" style={{ borderColor: N.rule, color: N.ink }} />
+                className="flex-1 text-sm rounded border px-3 py-2 outline-none min-w-[200px]" style={{ borderColor: N.rule, color: N.ink }} />
+              <select value={etiquetaNueva} onChange={(e) => setEtiquetaNueva(e.target.value)}
+                className="text-xs rounded border px-2 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
+                {Object.entries(ETIQUETA_NOTA).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+              </select>
               <button onClick={addNota} className="text-xs rounded px-3 py-2 text-white font-medium flex items-center gap-1.5" style={{ background: T.primary }}>
                 <MessageSquarePlus size={14} /> Guardar
               </button>
             </div>
+
+            {sugerenciaEmail && (
+              <div className="rounded p-3 mb-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: T.accentTint }}>
+                <div className="text-xs" style={{ color: "#7A5A10" }}>
+                  <span className="font-semibold">Sugerencia: </span>
+                  {sugerenciaEmail === "felicitacion" ? "esta nota es positiva — ¿le envías un email de felicitación?" : "esta nota es de mejora — ¿le envías puntos de mejora por email?"}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <a href={mailtoHref(a.email, PLANTILLAS_EMAIL[sugerenciaEmail].asunto(a), PLANTILLAS_EMAIL[sugerenciaEmail].cuerpo(a))}
+                    className="text-xs rounded px-2.5 py-1 font-medium text-white flex items-center gap-1" style={{ background: T.primary }}>
+                    <Send size={11} /> Redactar email
+                  </a>
+                  <button onClick={() => setSugerenciaEmail(null)} className="text-xs" style={{ color: "#7A5A10" }}>Descartar</button>
+                </div>
+              </div>
+            )}
+
             {notas.length === 0 ? (
               <p className="text-xs" style={{ color: N.ink40 }}>Sin notas de seguimiento. Las notas quedan registradas con autor y fecha (audit log).</p>
             ) : (
               <div className="space-y-2.5">
-                {notas.map((nt, i) => (
-                  <div key={i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.autor === "Tú" ? T.tint : "#FFF" }}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold" style={{ color: T.primary }}>{nt.autor}</span>
-                      <span className="text-[11px] font-mono" style={{ color: N.ink40 }}>{nt.fecha}</span>
+                {notas.map((nt, i) => {
+                  const et = ETIQUETA_NOTA[nt.etiqueta] || ETIQUETA_NOTA.seguimiento;
+                  return (
+                    <div key={i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.autor === "Tú" ? T.tint : "#FFF" }}>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-xs font-semibold" style={{ color: T.primary }}>{nt.autor}</span>
+                        <span className="text-[11px] font-mono" style={{ color: N.ink40 }}>{nt.fecha}</span>
+                        <span className="text-[10px] rounded px-1.5 py-0.5 font-medium" style={{ background: et.bg, color: et.fg }}>{et.label}</span>
+                      </div>
+                      <p className="text-sm" style={{ color: N.ink70 }}>{nt.texto}</p>
                     </div>
-                    <p className="text-sm" style={{ color: N.ink70 }}>{nt.texto}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </Panel>
         </div>
 
         <div className="space-y-5">
+          {/* contacto + plantillas de email — ver docs/decisiones-producto.md */}
+          <Panel title="Contactar">
+            <div className="space-y-2 mb-4">
+              <a href={`tel:${a.telefono.replace(/\s/g, "")}`} className="flex items-center gap-2 text-sm hover:underline" style={{ color: N.ink }}>
+                <Phone size={13} style={{ color: N.ink40 }} /> {a.telefono}
+              </a>
+              <a href={`mailto:${a.email}`} className="flex items-center gap-2 text-sm hover:underline" style={{ color: N.ink }}>
+                <Mail size={13} style={{ color: N.ink40 }} /> {a.email}
+              </a>
+            </div>
+            <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2" style={{ color: N.ink40 }}>Plantillas rápidas</div>
+            <div className="flex flex-col gap-1.5">
+              {Object.entries(PLANTILLAS_EMAIL).map(([k, p]) => (
+                <a key={k} href={mailtoHref(a.email, p.asunto(a), p.cuerpo(a))}
+                  className="text-xs rounded border px-3 py-2 flex items-center gap-2 hover:bg-slate-50 transition-colors" style={{ borderColor: N.rule, color: N.ink }}>
+                  <Send size={12} style={{ color: T.primary }} /> {p.etiqueta}
+                </a>
+              ))}
+            </div>
+            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+              Abre tu cliente de correo con el email ya redactado — revisas y envías tú, nunca se manda automáticamente.
+            </p>
+          </Panel>
+
           {/* radar de habilidades */}
           <Panel title="Perfil de habilidades">
             <ResponsiveContainer width="100%" height={230}>
@@ -611,6 +756,39 @@ function Ficha({ T, a, back }) {
             </div>
           </Panel>
 
+          {/* pruebas fisicas y examen teorico: 2 convocatorias/temporada, ver docs/decisiones-producto.md */}
+          <Panel title="Pruebas físicas y teóricas"
+            right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ambar }}><Info size={11} /> sintético</span>}>
+            <div className="space-y-3">
+              {a.pruebasFisicas.slice(0, 2).map((p, i) => (
+                <div key={`fis-${i}`} className="rounded border p-2.5" style={{ borderColor: N.rule }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium flex items-center gap-1.5" style={{ color: N.ink }}><Dumbbell size={12} style={{ color: N.ink40 }} /> Prueba física · {p.convocatoria}</span>
+                    <span className="font-mono text-xs" style={{ color: N.ink40 }}>{p.fecha}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs mb-1" style={{ color: N.ink70 }}>
+                    <span className="font-mono font-semibold" style={{ color: p.nota >= 7.5 ? N.verde : N.ambar }}>{p.nota.toFixed(1)}</span>
+                    <span>{p.peso} kg</span>
+                  </div>
+                  <p className="text-xs" style={{ color: N.ink70 }}>{p.comentario}</p>
+                </div>
+              ))}
+              {a.examenesTeoricos.slice(0, 2).map((ex, i) => (
+                <div key={`teo-${i}`} className="rounded border p-2.5" style={{ borderColor: N.rule }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium flex items-center gap-1.5" style={{ color: N.ink }}><BookOpen size={12} style={{ color: N.ink40 }} /> Examen teórico · {ex.convocatoria}</span>
+                    <span className="font-mono text-xs" style={{ color: N.ink40 }}>{ex.fecha}</span>
+                  </div>
+                  <div className="text-xs mb-1 font-mono font-semibold" style={{ color: ex.nota >= 7.5 ? N.verde : N.ambar }}>{ex.nota.toFixed(1)}</div>
+                  <p className="text-xs" style={{ color: N.ink70 }}>{ex.comentario}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+              Altura: {a.altura} cm (fija). El peso se registra por convocatoria, no como dato fijo — ver data-model.md.
+            </p>
+          </Panel>
+
           <Panel title="Disponibilidad">
             <div className="flex items-end gap-3">
               <div className="font-mono text-3xl tabular-nums" style={{ color: a.indisp >= 5 ? N.ambar : T.primary }}>{a.indisp}</div>
@@ -623,12 +801,12 @@ function Ficha({ T, a, back }) {
 
           <Panel title="Origen de los datos">
             <div className="space-y-2.5">
-              {[["Actas y tarjetas", "Excel FFCV 23-26"], ["Informes técnicos", "PDF cargados"], ["Pruebas físicas", "Excel pretemporada"]].map(([l, src]) => (
-                <div key={l} className="flex items-center justify-between text-xs">
+              {[["Partidos, designaciones y tarjetas", "ffcv.es/competiciones (público, real)"], ["Informes técnicos", "Aún no existen — pendiente de export del comité"], ["Pruebas físicas y teóricas", "Sintético (a la espera del dato real)"], ["Domicilio del árbitro", "Sintético (a la espera del roster del comité)"]].map(([l, src]) => (
+                <div key={l} className="flex items-center justify-between text-xs gap-3">
                   <span className="flex items-center gap-2" style={{ color: N.ink70 }}>
                     <FileText size={13} style={{ color: N.ink40 }} />{l}
                   </span>
-                  <span className="font-mono" style={{ color: N.ink40 }}>{src}</span>
+                  <span className="font-mono text-right" style={{ color: N.ink40 }}>{src}</span>
                 </div>
               ))}
             </div>
