@@ -10,10 +10,11 @@ Tres tablas nuevas en Supabase (esquema `public`), todas de solo-añadir (append
 | `arbitro_id` | `integer` | referencia lógica a `arbitros-200.json[].id` |
 | `etiqueta` | `text` | `check (etiqueta in ('seguimiento','positiva','mejora','disciplinaria'))` — mismos valores que `ETIQUETA_NOTA` en `CRMExpedientes.jsx:107` |
 | `texto` | `text` | `not null`, `check (length(trim(texto)) > 0)` |
-| `autor_rol` | `text` | `check (autor_rol in ('arbitro','comite'))` — rol activo al guardar |
+| `autor` | `text` | `not null` — texto libre, no enum: las notas sintéticas ya existentes traen su propio autor (`"Comité"`, informadores...) tal cual del JSON; las notas nuevas guardadas desde la UI fijan `"Comité"` (mismo criterio que ya usa el panel "Seguimiento interno", sin autenticación real todavía) |
+| `fuente` | `text` | `not null`, `check (fuente in ('real','sintetico'))`, sin default — obligatorio decidirlo en cada insert. Las notas cargadas como seed desde `arbitros-200.json[].notas` son `'sintetico'`; toda nota guardada desde la UI a partir de ahora es `'real'` (es una acción genuina de una persona) |
 | `creado_en` | `timestamptz` | `not null default now()` |
 
-Sin concepto de "vigente" — todas las notas se muestran como histórico (FR-001, FR-008 de `spec.md`).
+Sin concepto de "vigente" — todas las notas se muestran como histórico (FR-001, FR-008 de `spec.md`). `fuente` es lo que responde al edge case de `spec.md` sobre el histórico sintético existente, y a FR-006.
 
 ## `designaciones`
 
