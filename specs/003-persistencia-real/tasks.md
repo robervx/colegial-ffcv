@@ -14,11 +14,11 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Añadir `@supabase/supabase-js` a `webapp/package.json` (`npm install`)
-- [ ] T002 Crear `webapp/lib/supabaseClient.js`: único punto de creación del cliente, usando `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` de `.env.local` (research.md §1)
-- [ ] T003 [P] Escribir `supabase/migrations/0001_anotaciones.sql`: tabla `anotaciones` completa (`data-model.md`), RLS activado + política permisiva para `anon` (research.md §3)
-- [ ] T004 [P] Escribir `supabase/migrations/0002_designaciones.sql`: tabla `designaciones` completa, con el `check` de motivo obligatorio cuando `es_sugerido = false`, índice `(partido_id, decidido_en desc)`, RLS + política permisiva
-- [ ] T005 [P] Escribir `supabase/migrations/0003_declaraciones_disponibilidad.sql`: tabla `declaraciones_disponibilidad` completa (mismos campos que `specs/002-disponibilidad-arbitro/data-model.md`), RLS + política permisiva
+- [x] T001 Añadir `@supabase/supabase-js` a `webapp/package.json` (`npm install`)
+- [x] T002 Crear `webapp/lib/supabaseClient.js`: único punto de creación del cliente, usando `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` de `.env.local` (research.md §1)
+- [x] T003 [P] Escribir `supabase/migrations/0001_anotaciones.sql`: tabla `anotaciones` completa (`data-model.md`), RLS activado + política permisiva para `anon` (research.md §3)
+- [x] T004 [P] Escribir `supabase/migrations/0002_designaciones.sql`: tabla `designaciones` completa, con el `check` de motivo obligatorio cuando `es_sugerido = false`, índice `(partido_id, decidido_en desc)`, RLS + política permisiva
+- [x] T005 [P] Escribir `supabase/migrations/0003_declaraciones_disponibilidad.sql`: tabla `declaraciones_disponibilidad` completa (mismos campos que `specs/002-disponibilidad-arbitro/data-model.md`), RLS + política permisiva
 - [ ] T006 **Acción de Roberto**: aplicar las tres migraciones al proyecto Supabase "RefData" — confirmar que la integración GitHub↔Supabase las aplicó automáticamente al hacer push, o ejecutarlas a mano en el SQL Editor si no. Verificar en Table Editor que las 3 tablas existen con sus columnas.
 
 **Checkpoint**: `npx vitest run` sigue en verde (nada roto todavía), y las 3 tablas existen en Supabase.
