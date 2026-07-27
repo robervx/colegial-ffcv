@@ -167,6 +167,8 @@ Pendiente antes de especificar: quién marca la disponibilidad (¿el árbitro se
 - El resto del trabajo (esquema, migraciones, integración con la app) puede diseñarse en paralelo mientras se crea el proyecto, siguiendo el mismo patrón de repositorio ya usado en `contracts/disponibilidad-repo.md` (002) — cuando el proyecto exista, es "rellenar el contrato", no rediseñar nada.
 - Esto es Sprint 1 de `sprints.md`, ahora con la tecnología decidida (dejaba de estar "por confirmar").
 
+**Ejecutado (27 jul 2026)**: Roberto creó el proyecto de Supabase (lo llamó "RefData", no "colegial-ffcv" que era la sugerencia — pendiente de unificar naming entre Supabase/GitHub/producto cuando el nombre definitivo esté cerrado, no bloqueante), credenciales en `webapp/.env.local`. Repo subido a GitHub como `robervx/colegial-ffcv` (privado), con integración GitHub↔Supabase conectada para sincronizar `supabase/migrations/`.
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)
