@@ -33,9 +33,9 @@ MOTIVOS_SENSIBLE = [
 ]
 
 CICLOS = [
-    {"id": "c1", "etiqueta": "Fin de semana 26-27 jul 2026 (arranque, jornada 1 de 2)", "finDeSemana": "26-27 jul 2026", "n": 10},
-    {"id": "c2", "etiqueta": "Fin de semana 2-3 ago 2026 (arranque, jornada 2 de 2)", "finDeSemana": "2-3 ago 2026", "n": 10},
-    {"id": "c3", "etiqueta": "Fin de semana 9-10 ago 2026 (asignado el lunes 3 ago, régimen normal)", "finDeSemana": "9-10 ago 2026", "n": 12},
+    {"id": "c1", "etiqueta": "Fin de semana 26-27 jul 2026 (arranque, jornada 1 de 2)", "finDeSemana": "26-27 jul 2026", "fechaInicioISO": "2026-07-26", "n": 10},
+    {"id": "c2", "etiqueta": "Fin de semana 2-3 ago 2026 (arranque, jornada 2 de 2)", "finDeSemana": "2-3 ago 2026", "fechaInicioISO": "2026-08-02", "n": 10},
+    {"id": "c3", "etiqueta": "Fin de semana 9-10 ago 2026 (asignado el lunes 3 ago, régimen normal)", "finDeSemana": "9-10 ago 2026", "fechaInicioISO": "2026-08-09", "n": 12},
 ]
 
 HORAS = ["10:00", "11:00", "12:00", "16:00", "17:00", "18:00", "19:00", "19:30"]
