@@ -12,23 +12,15 @@ Conseguir del comité una primera exportación de informes/evaluaciones, aunque 
 
 ---
 
-## Sprint 1 — Cimentar lo real: backend y persistencia
+## Sprint 1 + Sprint 2 (fusionados) — `specs/003-persistencia-real/`
 
-Hoy no hay backend. Todo el dato vive en JSON estáticos generados por scripts de Python; nada de lo que se hace en la app (notas, confirmaciones de designación) sobrevive a un refresco de página. Antes de seguir añadiendo funcionalidad encima de una base que no persiste nada, hay que resolver esto.
+**Absorbidos en una sola spec (27 jul 2026, decisión explícita de Roberto)**: backend/persistencia (Sprint 1) y el flujo real de Confirmar/Cambiar candidato de designación (parte de Sprint 2) se especifican y construyen juntos en `specs/003-persistencia-real/`, en vez de en dos pasos separados — el objetivo es que el prototipo funcione de principio a fin cuanto antes para que otras personas puedan probarlo (árbitro en móvil, gestión en escritorio, informadores en móvil).
 
-**Tecnología decidida (27 jul 2026, `decisiones-producto.md` §18): Supabase, desde el principio.** Se descartó empezar con SQLite local — el prototipo se probará desplegado en Vercel desde varios dispositivos (árbitro en móvil, gestión en escritorio, informadores en móvil), y un fichero SQLite local no sobrevive de forma fiable en un despliegue sin estado como Vercel. Pendiente de que Roberto cree el proyecto en Supabase (no automatizable, requiere sus credenciales) — el diseño de esquema/migraciones puede avanzar en paralelo.
+**Tecnología decidida (`decisiones-producto.md` §18): Supabase, desde el principio.** Se descartó empezar con SQLite local — el prototipo se probará desplegado en Vercel desde varios dispositivos, y un fichero SQLite local no sobrevive de forma fiable en un despliegue sin estado como Vercel. Pendiente de que Roberto cree el proyecto en Supabase (no automatizable, requiere sus credenciales) — el diseño de esquema/migraciones avanza en paralelo, ver `specs/003-persistencia-real/spec.md`.
 
-- Roberto crea el proyecto en Supabase.
-- Migrar `data-model.md` (y las entidades ya diseñadas en `specs/002-disponibilidad-arbitro/data-model.md`) a tablas reales.
-- Cargar el dato real (árbitros/carga/historial de `partidos_2025_2026.csv`) como seed real; la capa sintética como seed claramente etiquetado, sustituible entidad por entidad conforme llegue dato real del comité.
-- Persistencia de `Anotacion` (notas de seguimiento) y `Designacion` (estado, override, motivo) — sin esto, el "Guardar nota" de la ficha sigue siendo teatro.
-- Desbloquea la implementación completa de `002-disponibilidad-arbitro` (UI de declaración, selector de rol, integración con el Dashboard de 001).
+Contenido movido a la spec: esquema de `Anotacion`, `Designacion`, `DeclaracionDisponibilidad`; seed del dato real existente con la capa sintética etiquetada; persistencia real de "Guardar nota"; acciones reales "Confirmar"/"Cambiar a este candidato" con motivo obligatorio; desbloqueo completo de `002-disponibilidad-arbitro`.
 
-## Sprint 2 — El flujo de decisión humana, de verdad
-
-Hoy Designación inteligente muestra alternativas pero no hay ningún botón que persista una decisión. Este sprint construye el "el técnico decide, el sistema informa" que es el principio nº1 de la guía de producto, no solo lo enseña.
-
-- Acciones reales: "Confirmar" / "Cambiar a este candidato" (con motivo obligatorio si se cambia) — persistido en `Designacion`, alimentando la futura tasa de override (A.2, kpis.md) como dato de calibración.
+**Lo que NO se absorbió de Sprint 2 (sigue pendiente, sin spec todavía)**:
 - Estados vacío/carga/error en todas las pantallas (pendiente desde la guía de frontend original, sección 4 — nunca se llegó a construir).
 - Arreglar el bug de responsive entre ~550-900px detectado al montar el scaffold.
 
