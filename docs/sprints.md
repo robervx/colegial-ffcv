@@ -52,6 +52,10 @@ No tiene fecha porque depende del workstream paralelo, no de nosotros. Cuando ll
 - B.3 (idoneidad situacional) con datos reales de conflictividad por partido, una vez el scraping del Sprint 3 tenga cobertura suficiente (mínimo 3 partidos similares por árbitro, según la propia regla de `kpis.md`).
 - A.5 (fiabilidad operativa) — probablemente exige que el comité empiece a registrar cancelaciones/incidencias en algún sitio; hoy puede que ni siquiera exista ese dato internamente.
 
+## En cola para especificar (SDD) — Disponibilidad de árbitro
+
+Idea capturada el 27 jul 2026 (`decisiones-producto.md` §15): selector de disponibilidad por árbitro (lesión/baja justificada/urgencia, "solo mi categoría", festivo con 15 días de antelación) con log de registro, doble propósito (ratio operativo de cobertura + señal evaluativa de implicación, visible solo a comité/evaluadores). Roberto decidió (27 jul 2026) terminar primero `/speckit-plan` + `/speckit-tasks` de `001-dashboard-operativo` antes de especificar esto con `/speckit-specify`. Introduce por primera vez la necesidad de un modelo de roles/permisos en la UI.
+
 ## Aparcado, no bloqueante
 
 - **Nombre del producto** ("Colegial" sigue siendo placeholder) — se trata cuando haya hueco, no condiciona ningún sprint.

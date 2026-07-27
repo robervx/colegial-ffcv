@@ -16,6 +16,9 @@ import localidadesGeo from "../data/localidades-geo.json";
 import arbitros200 from "../data/arbitros-200.json";
 import ciclosAsignacion from "../data/ciclos-asignacion.json";
 import { asignarJornada } from "../lib/asignarJornada";
+import { CATEGORIAS } from "../lib/categorias";
+import { conDisponibilidad } from "../lib/disponibilidad";
+import { coberturaPorCategoria } from "../lib/coberturaCategoria";
 
 /* ================================================================
    COLEGIAL · CRM de expedientes arbitrales — versión 1 ampliada
@@ -45,21 +48,6 @@ const N = {
    real del comité. Ver docs/decisiones-producto.md §6 y generar_dataset_arbitros.py.
    gest = gestión de partido, radar; indisp = fines de semana no disponibles. */
 const ARBITROS = arbitros200;
-
-/* Taxonomía real FFCV fútbol 11 masculino (no la inventada del prototipo original) */
-const CATEGORIAS = ["Todas", "Tercera Federación", "Lliga Comunitat", "Primera FFCV", "Segona FFCV", "Tercera FFCV"];
-const NIVEL_CATEGORIA = { "Tercera FFCV": 0, "Segona FFCV": 1, "Primera FFCV": 2, "Lliga Comunitat": 3, "Tercera Federación": 4 };
-
-/* --------- extras para la demo del motor de designación (sintético, ver Designación inteligente) ---------
-   vetos ya vienen del dataset; indisponibleEsteFinde es una simplificación deliberada
-   (indisp alto esta temporada -> más probable que esté indisponible este fin de semana concreto),
-   no disponibilidad real por fecha (eso necesita el dato real de Novanet, ver tarifas.md). */
-function conExtras(a) {
-  // id 1 lleva un veto de ejemplo fijo contra "CD Buñol" para que el filtro duro
-  // sea comprobable en la demo de Designación inteligente sin depender del azar.
-  const vetos = a.id === 1 ? [...a.vetos, { equipo: "CD Buñol", motivo: "Incidente en banquillo · jornada 9 (dato de ejemplo)" }] : a.vetos;
-  return { ...a, vetos, catNivel: NIVEL_CATEGORIA[a.cat] ?? 0, indisponibleEsteFinde: a.indisp >= 6 && a.id % 5 === 0 };
-}
 
 /* --------- semáforo: media móvil 5 + tendencia --------- */
 function estadoForma(forma, { ventana = 5, alto = 8.0, bajo = 7.0 } = {}) {
@@ -156,6 +144,24 @@ function Semaforo({ estado, size = "sm" }) {
     </span>
   );
 }
+/* estados de CoberturaCategoria (lib/coberturaCategoria.js) — mismo patrón visual que coloresForma/Semaforo */
+function coloresCobertura(estado) {
+  return {
+    riesgo: { bg: N.rojoT, fg: N.rojo, dot: N.rojo, label: "En riesgo" },
+    ajustado: { bg: N.ambarT, fg: N.ambar, dot: N.ambar, label: "Ajustado, sin margen" },
+    holgada: { bg: N.verdeT, fg: N.verde, dot: N.verde, label: "Cobertura holgada" },
+    sin_partidos: { bg: "#F1F3F5", fg: N.ink40, dot: N.ink40, label: "Sin partidos este finde" },
+  }[estado];
+}
+function BadgeCobertura({ estado }) {
+  const c = coloresCobertura(estado);
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2 py-0.5 shrink-0" style={{ background: c.bg, color: c.fg }}>
+      <span className="rounded-full" style={{ width: 7, height: 7, background: c.dot }} />
+      {c.label}
+    </span>
+  );
+}
 function Avatar({ txt, T, size = 40 }) {
   return (
     <div className="rounded-full flex items-center justify-center font-semibold shrink-0"
@@ -217,6 +223,17 @@ function Dashboard({ T, irArbitros }) {
   const cvTono = cv >= 0.8 ? "bad" : cv >= 0.5 ? "warn" : "ok";
   const cvTexto = cv >= 0.8 ? "muy desigual" : cv >= 0.5 ? "desigual" : "equilibrada";
 
+  const cicloActivo = ciclosAsignacion[0];
+  const cobertura = useMemo(() => coberturaPorCategoria(ARBITROS, cicloActivo), [cicloActivo]);
+  const categoriasConPartidos = cobertura.porCategoria.filter((c) => c.partidosADesignar > 0);
+  const categoriasEnRiesgo = categoriasConPartidos.filter((c) => c.estado === "riesgo");
+
+  const [catVolumen, setCatVolumen] = useState("Todas");
+  const partidosVolumen = useMemo(
+    () => cicloActivo.partidos.filter((p) => catVolumen === "Todas" || p.categoriaMinima === catVolumen),
+    [cicloActivo, catVolumen]
+  );
+
   const alertasForma = useMemo(() => {
     const todas = ARBITROS.map((a) => ({ a, est: estadoForma(a.forma) })).filter((x) => x.est.color !== "verde");
     const peso = { rojo: 0, ambar: 1 };
@@ -240,6 +257,64 @@ function Dashboard({ T, irArbitros }) {
           eyebrow="Partidos sin árbitro" valor={nf(agregadosReales.partidos_sin_arbitro_asignado)}
           sub="pendientes de asignar — dato real" />
       </div>
+
+      <Panel
+        title={`Cobertura por categoría · ${cicloActivo.finDeSemana}`}
+        right={
+          categoriasEnRiesgo.length > 0 ? (
+            <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: N.rojo }}>
+              <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
+            </span>
+          ) : (
+            <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: N.verde }}>
+              <Check size={12} /> sin alertas de cobertura
+            </span>
+          )
+        }
+      >
+        {cobertura.datasetDisponibilidadVacio && (
+          <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: N.rojo, borderColor: N.rojoT, background: N.rojoT }}>
+            No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
+          </p>
+        )}
+        {categoriasConPartidos.length === 0 ? (
+          <p className="text-xs" style={{ color: N.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
+        ) : (
+          <div className="space-y-2.5">
+            {categoriasConPartidos.map((c) => (
+              <div key={c.categoria} className="flex items-center justify-between gap-3 rounded border p-3 flex-wrap" style={{ borderColor: N.rule }}>
+                <div>
+                  <div className="text-sm font-medium" style={{ color: N.ink }}>{c.categoria}</div>
+                  <div className="text-xs mt-0.5 font-mono tabular-nums" style={{ color: N.ink70 }}>
+                    {c.partidosADesignar} {c.partidosADesignar === 1 ? "partido" : "partidos"} a designar <span style={{ color: N.ink40 }}>· real</span>
+                    {" — "}
+                    {c.disponiblesCategoriaPropia} de categoría propia + {c.disponiblesCategoriaInferior} de categoría inferior = {c.totalDisponibles} {c.totalDisponibles === 1 ? "disponible" : "disponibles"} <span style={{ color: N.ambar }}>· sintético</span>
+                  </div>
+                </div>
+                <BadgeCobertura estado={c.estado} />
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+          “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
+        </p>
+      </Panel>
+
+      <Panel
+        title={`Partidos del fin de semana · ${cicloActivo.finDeSemana}`}
+        right={
+          <select value={catVolumen} onChange={(e) => setCatVolumen(e.target.value)}
+            className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
+            {CATEGORIAS.map((c) => <option key={c}>{c}</option>)}
+          </select>
+        }
+      >
+        <div className="font-mono text-2xl" style={{ color: T.primary }}>{partidosVolumen.length}</div>
+        <div className="text-xs mt-1" style={{ color: N.ink70 }}>
+          {catVolumen === "Todas" ? "partidos a designar, todas las categorías" : `partidos a designar en ${catVolumen}`} <span style={{ color: N.ink40 }}>· real</span>
+        </div>
+      </Panel>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 space-y-5">
@@ -899,7 +974,7 @@ function DesignacionInteligente({ T }) {
   const ciclo = ciclosAsignacion.find((c) => c.id === cicloId);
 
   const resultados = useMemo(() => {
-    const arbitrosConExtras = ARBITROS.map(conExtras);
+    const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
     return asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
   }, [ciclo]);
 
