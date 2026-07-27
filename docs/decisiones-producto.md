@@ -118,6 +118,35 @@ Todo lo añadido aquí es **sintético**, explícitamente marcado como tal en la
 
 `docs/assets/logo.png` → `webapp/public/logo-ffcv.png`. El componente `Escudo` ahora renderiza el logo real sobre fondo blanco en vez del placeholder de siglas — se mantiene la opción de placeholder (`logoSrc` a `null`) por si en el futuro hay un tenant sin logo subido, aunque hoy es FFCV único (§1).
 
+## 15. Idea capturada: disponibilidad de árbitro con log de motivos (27 jul 2026)
+
+**No es una decisión cerrada ni una spec todavía** — se documenta aquí para no perder el detalle mientras se termina 001-dashboard-operativo (ver `sprints.md`, se especifica después con `/speckit-specify`).
+
+Roberto planteó añadir a la ficha de cada árbitro un selector de disponibilidad en tiempo real, con log de registro (quién marcó qué, cuándo, por qué). Ideas recogidas tal cual, a falta de especificar formalmente:
+
+- **Motivos de no disponibilidad**: lesión, baja (debe ir justificada), urgencia. Un motivo no justificado o que sugiera "no cuidarse" debe poder afectar negativamente a la valoración del árbitro.
+- **Disponibilidad parcial**: opción de "solo pito mi categoría" (no acepta extras de categoría inferior/superior).
+- **Festivo solicitado**: petición de fin de semana libre, con antelación mínima de 15 días. Si se abusa de esta opción, debe quedar constancia — es una señal (negativa) de interés/implicación real en el arbitraje, a diferenciar de una petición puntual razonable.
+- **Doble propósito del dato**:
+  1. Operativo: saber el ratio de árbitros disponibles por jornada/finde (alimenta el motor de designación y el dashboard de cobertura de 001).
+  2. Evaluativo: registro de implicación/disposición real del árbitro, como señal para comité/evaluadores — **nunca visible para el propio árbitro**, solo para roles de mando/evaluación.
+- **Visibilidad por rol**: esto introduce por primera vez la necesidad de un modelo de roles/permisos explícito en la UI (árbitro vs. comité/evaluador) — hoy la app no distingue quién la está viendo.
+
+Pendiente antes de especificar: quién marca la disponibilidad (¿el árbitro se autodeclara, o el comité la registra sobre lo que comunica el árbitro por otro canal?), y cómo se traduce "constancia de abuso" en una regla concreta (¿umbral de festivos por temporada? ¿solo queda anotado para lectura humana, sin automatismo?).
+
+## 16. Dashboard operativo del Comité implementado (spec 001, 27 jul 2026)
+
+`specs/001-dashboard-operativo/` completada de principio a fin en una sola sesión: spec → plan → tasks → implementación. Resumen de lo entregado:
+
+- **Panel "Cobertura por categoría"** en el Dashboard: para cada categoría con partidos el próximo fin de semana (ciclo activo = primer elemento de `ciclos-asignacion.json`), muestra partidos a designar (real) frente a árbitros disponibles (sintético), desglosados en categoría propia vs. categoría inferior activada, con estado visual (en riesgo / ajustado / holgada / sin partidos) y desglose siempre visible junto al número (nunca un color aislado).
+- **Panel "Partidos del fin de semana"** con filtro por categoría (US3): recuento que cambia en una interacción.
+- **Equidad de carga (US2)**: ya estaba prácticamente completo en el Dashboard existente (KpiCard con explicación en lenguaje llano + panel Insights con máx./mín.) — esta spec solo lo verificó contra los Acceptance Scenarios, sin cambios de cálculo.
+- **`lib/coberturaCategoria.js` y `lib/disponibilidad.js`** (nuevos, con tests Vitest — primer test runner del proyecto, 13 tests en verde): `conExtras()` se extrajo del componente de Designación a `lib/disponibilidad.js` para que Dashboard y Designación compartan un único concepto de "árbitro disponible este fin de semana", en vez de duplicarlo.
+- **`lib/categorias.js`** (nuevo): `CATEGORIAS`/`NIVEL_CATEGORIA` movidos fuera del componente para que la lógica de `lib/` los pueda usar de forma testeable.
+- Verificado en navegador (servidor de desarrollo en `:3001`): sin errores de consola, filtro de categoría funcional, estado no persiste tras refrescar (correcto, es una vista de consulta — FR-009).
+
+**No se tocó**: motor de designación, ficha de árbitro, persistencia (sigue sin existir — Sprint 1 del plan sigue siendo el siguiente paso estructural si se decide abordarlo).
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)
