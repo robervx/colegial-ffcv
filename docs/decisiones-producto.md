@@ -147,6 +147,26 @@ Pendiente antes de especificar: quién marca la disponibilidad (¿el árbitro se
 
 **No se tocó**: motor de designación, ficha de árbitro, persistencia (sigue sin existir — Sprint 1 del plan sigue siendo el siguiente paso estructural si se decide abordarlo).
 
+## 17. Disponibilidad de árbitro: spec, plan y lógica pura (spec 002, 27 jul 2026)
+
+`specs/002-disponibilidad-arbitro/` especificada y planificada de principio a fin; parte de la lógica ya construida. Resumen:
+
+- **spec.md**: selector de disponibilidad por ciclo (lesión/baja justificada/urgencia/solo categoría propia/festivo con 15 días de antelación) con log de registro. Doble propósito: operativo (sustituye la disponibilidad sintética de 001) y evaluativo (patrón de implicación visible solo para comité/evaluador, nunca para el árbitro, nunca como entrada de `scoreB1` — Principio IV). Dos decisiones resueltas al especificar: visibilidad por rol con un selector "ver como: árbitro/comité" sin login real (FR-012); implementación de la UI bloqueada hasta que exista persistencia real (FR-013, Principio VII).
+- **plan.md/research.md/data-model.md/contracts/**: contrato de repositorio agnóstico a la tecnología de persistencia — la UI habla con funciones (`obtenerLog`, `declararDisponibilidad`, `calcularPatronImplicacion`), nunca con la base directamente.
+- **Ya construido y testeado** (27/27 tests Vitest): `lib/reglaFestivo.js` (regla de los 15 días), `lib/patronImplicacion.js` (cálculo puro, sin campo score/nivel), `lib/disponibilidadRepo.js` (stub que lanza `NoImplementadoError` en vez de simular persistencia falsa), `fechaInicioISO` añadido a `ciclos-asignacion.json`.
+- **Bloqueado**: toda la UI (selector en la ficha, selector de rol, integración real con el Dashboard de 001) — espera a que exista el backend real, ver §18.
+
+## 18. Backend real: Supabase desde el principio, no SQLite temporal (27 jul 2026)
+
+**Decisión**: se descarta la opción inicial de empezar con SQLite local y migrar a Supabase "más adelante". Se va directo a Supabase.
+
+**Por qué**: Roberto quiere poder probar el prototipo desplegado (Vercel, con contraseña) desde varios dispositivos a la vez para validar usabilidad real — el árbitro usará sobre todo la versión móvil, gestión usará escritorio, informadores/evaluadores usarán móvil para dejar comentarios y consultar fichas antes de evaluar. Un despliegue en Vercel es "sin estado" entre peticiones: un fichero SQLite local no persiste de forma fiable ahí. Como la necesidad de probar en remoto y multi-dispositivo es inmediata (no un "algún día"), adelantar Supabase evita migrar dos veces.
+
+**Qué implica**:
+- Roberto crea la cuenta y el proyecto en Supabase (no es algo que se pueda automatizar desde aquí — requiere sus credenciales).
+- El resto del trabajo (esquema, migraciones, integración con la app) puede diseñarse en paralelo mientras se crea el proyecto, siguiendo el mismo patrón de repositorio ya usado en `contracts/disponibilidad-repo.md` (002) — cuando el proyecto exista, es "rellenar el contrato", no rediseñar nada.
+- Esto es Sprint 1 de `sprints.md`, ahora con la tecnología decidida (dejaba de estar "por confirmar").
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)

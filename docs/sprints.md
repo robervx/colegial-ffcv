@@ -16,10 +16,13 @@ Conseguir del comité una primera exportación de informes/evaluaciones, aunque 
 
 Hoy no hay backend. Todo el dato vive en JSON estáticos generados por scripts de Python; nada de lo que se hace en la app (notas, confirmaciones de designación) sobrevive a un refresco de página. Antes de seguir añadiendo funcionalidad encima de una base que no persiste nada, hay que resolver esto.
 
-- Confirmar si existe ya un proyecto Supabase en algún sitio (pendiente desde el Sprint 0 original, nunca se verificó).
-- Migrar `data-model.md` a tablas reales.
+**Tecnología decidida (27 jul 2026, `decisiones-producto.md` §18): Supabase, desde el principio.** Se descartó empezar con SQLite local — el prototipo se probará desplegado en Vercel desde varios dispositivos (árbitro en móvil, gestión en escritorio, informadores en móvil), y un fichero SQLite local no sobrevive de forma fiable en un despliegue sin estado como Vercel. Pendiente de que Roberto cree el proyecto en Supabase (no automatizable, requiere sus credenciales) — el diseño de esquema/migraciones puede avanzar en paralelo.
+
+- Roberto crea el proyecto en Supabase.
+- Migrar `data-model.md` (y las entidades ya diseñadas en `specs/002-disponibilidad-arbitro/data-model.md`) a tablas reales.
 - Cargar el dato real (árbitros/carga/historial de `partidos_2025_2026.csv`) como seed real; la capa sintética como seed claramente etiquetado, sustituible entidad por entidad conforme llegue dato real del comité.
 - Persistencia de `Anotacion` (notas de seguimiento) y `Designacion` (estado, override, motivo) — sin esto, el "Guardar nota" de la ficha sigue siendo teatro.
+- Desbloquea la implementación completa de `002-disponibilidad-arbitro` (UI de declaración, selector de rol, integración con el Dashboard de 001).
 
 ## Sprint 2 — El flujo de decisión humana, de verdad
 
