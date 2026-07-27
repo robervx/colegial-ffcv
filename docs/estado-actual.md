@@ -1,8 +1,12 @@
-# Estado actual del proyecto — 23 jul 2026
+# Estado actual del proyecto — 24 jul 2026
 
 Fotografía de lo construido hasta hoy. Si vuelves a esta conversación más tarde, o alguien nuevo se incorpora, empieza por aquí — es más fiable que reconstruir la historia leyendo el chat.
 
-**Punto exacto en el que se dejó esta sesión (23 jul 2026):** se cerró el apartado de datos/producto tras completar el scraping público (`ffcv_public_data/`, 25.256 partidos con árbitro, tarjetas y goles reales) y volcarlo al dataset de trabajo. Los 5 pendientes que se pidieron en esta sesión (tarjetas reales + ID estable, capa sintética ampliada, contacto + plantillas de email, KPIs por categoría/ventana, logo real) están todos hechos y verificados en el navegador. Lo siguiente, si se retoma aquí, es Sprint 1 de `sprints.md` (backend/persistencia) — ver §6 de este documento para el detalle de qué cambió hoy.
+**Punto exacto en el que se dejó esta sesión (24 jul 2026):** todo commiteado en `main` (`f5d4a06`), working tree limpio. Se adoptó Spec-Driven Development: constitución ratificada v1.0.0 (`.specify/memory/constitution.md`, 7 principios) y **primera spec creada y validada**: [`specs/001-dashboard-operativo/spec.md`](../specs/001-dashboard-operativo/spec.md) (dashboard ampliado para el jefe del comité — cobertura de árbitros por categoría, equidad de carga explicada, partidos del finde filtrables). Checklist de calidad en verde, sin `[NEEDS CLARIFICATION]` pendientes.
+
+**Siguiente paso si se retoma aquí**: `/speckit-plan` sobre `001-dashboard-operativo` para generar el plan técnico, y después `/speckit-tasks`. Ya se acordó el orden de los siguientes módulos a especificar tras este: Equipos → Partidos → Simulaciones → Económico (ver conversación del 24 jul; análisis de datos real ya hecho para justificar cada uno — tarjetas/goles por equipo en `ffcv_public_data/` dan señal real para "riesgo de equipo", `asignarJornada.js` ya sirve tal cual para Simulaciones sin tocar backend).
+
+**Antes de eso**: se completó el scraping público (`ffcv_public_data/`, 25.256 partidos con árbitro, tarjetas y goles reales) y se volcó al dataset de trabajo — tarjetas ya reales, ficha de árbitro ampliada (contacto, plantillas de email, pruebas físicas, ventana de KPIs), logo real. Detalle completo en §6 más abajo.
 
 ## 1. Qué es Colegial hoy, en una frase
 
