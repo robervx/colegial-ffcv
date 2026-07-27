@@ -31,12 +31,12 @@
 
 **⚠️ CRITICAL**: ninguna tarea de US1/US2/US3 puede empezar hasta que esta fase esté completa
 
-- [ ] T007 [P] Crear `webapp/lib/anotacionesRepo.js` implementando `obtenerAnotaciones` y `guardarAnotacion` según `contracts/anotaciones-repo.md` (depende de T002, T003, T006)
-- [ ] T008 [P] Crear `webapp/lib/designacionesRepo.js` implementando `obtenerVigentesPorCiclo`, `decidir` y la función pura `conDecisionVigente` según `contracts/designaciones-repo.md` (depende de T002, T004, T006)
-- [ ] T009 [P] Escribir `webapp/lib/designacionesRepo.test.js`: tests de `conDecisionVigente` (función pura — un resultado del motor sin designación vigente pasa igual; uno con designación vigente queda enriquecido con `decisionVigente`) y de la validación "motivo obligatorio si `esSugerido` es `false`" antes de llamar a Supabase
-- [ ] T010 Reescribir `webapp/lib/disponibilidadRepo.js`: sustituir el stub (`NoImplementadoError`) por la implementación real contra `declaraciones_disponibilidad`, exactamente la misma firma que ya fija `specs/002-disponibilidad-arbitro/contracts/disponibilidad-repo.md` (depende de T002, T005, T006)
-- [ ] T011 Actualizar `webapp/lib/disponibilidadRepo.test.js`: retirar los tests que comprobaban `NoImplementadoError` (ya no aplica); mantener solo lo que siga siendo lógica pura sin red, si queda alguna
-- [ ] T012 Crear script de seed (p. ej. `generar_seed_anotaciones.py` o un script Node puntual en `webapp/scripts/`) que recorre `arbitros-200.json[].notas` e inserta cada una en `anotaciones` con `fuente: 'sintetico'` y su `autor` original — ejecutarlo una vez contra el proyecto real (depende de T006, T007)
+- [x] T007 [P] Crear `webapp/lib/anotacionesRepo.js` implementando `obtenerAnotaciones` y `guardarAnotacion` según `contracts/anotaciones-repo.md` (depende de T002, T003, T006)
+- [x] T008 [P] Crear `webapp/lib/designacionesRepo.js` implementando `obtenerVigentesPorCiclo`, `decidir` y la función pura `conDecisionVigente` según `contracts/designaciones-repo.md` (depende de T002, T004, T006)
+- [x] T009 [P] Escribir `webapp/lib/designacionesRepo.test.js`: tests de `conDecisionVigente` (función pura — un resultado del motor sin designación vigente pasa igual; uno con designación vigente queda enriquecido con `decisionVigente`) y de la validación "motivo obligatorio si `esSugerido` es `false`" antes de llamar a Supabase
+- [x] T010 Reescribir `webapp/lib/disponibilidadRepo.js`: sustituir el stub (`NoImplementadoError`) por la implementación real contra `declaraciones_disponibilidad`, exactamente la misma firma que ya fija `specs/002-disponibilidad-arbitro/contracts/disponibilidad-repo.md` (depende de T002, T005, T006)
+- [x] T011 Actualizar `webapp/lib/disponibilidadRepo.test.js`: retirar los tests que comprobaban `NoImplementadoError` (ya no aplica); mantener solo lo que siga siendo lógica pura sin red, si queda alguna
+- [x] T012 Crear script de seed (p. ej. `generar_seed_anotaciones.py` o un script Node puntual en `webapp/scripts/`) que recorre `arbitros-200.json[].notas` e inserta cada una en `anotaciones` con `fuente: 'sintetico'` y su `autor` original — ejecutarlo una vez contra el proyecto real (depende de T006, T007)
 
 **Checkpoint**: `npx vitest run` en verde para los tests nuevos; `anotaciones` tiene el seed sintético cargado, verificable en el Table Editor de Supabase.
 
@@ -50,10 +50,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] En `Ficha()` (`webapp/components/CRMExpedientes.jsx:603`), sustituir `useState(a.notas)` por una carga real vía `anotacionesRepo.obtenerAnotaciones(a.id)` (`useEffect`/estado de carga)
-- [ ] T014 [US1] `addNota()` (`CRMExpedientes.jsx:617`) pasa a llamar `anotacionesRepo.guardarAnotacion(...)` de forma async; en éxito, añade la nota devuelta al estado local; en fallo, muestra el mensaje de error de forma clara junto al formulario (FR-007), sin limpiar el campo de texto para no perder lo escrito
-- [ ] T015 [US1] Añadir estado de carga (spinner o texto "Guardando…") en el botón "Guardar" mientras la petición está en curso, para que quede claro que la acción es real y no instantánea como antes
-- [ ] T016 [US1] Validar manualmente en navegador el escenario de `quickstart.md` §US1 (dos dispositivos/navegadores distintos)
+- [x] T013 [US1] En `Ficha()` (`webapp/components/CRMExpedientes.jsx:603`), sustituir `useState(a.notas)` por una carga real vía `anotacionesRepo.obtenerAnotaciones(a.id)` (`useEffect`/estado de carga)
+- [x] T014 [US1] `addNota()` (`CRMExpedientes.jsx:617`) pasa a llamar `anotacionesRepo.guardarAnotacion(...)` de forma async; en éxito, añade la nota devuelta al estado local; en fallo, muestra el mensaje de error de forma clara junto al formulario (FR-007), sin limpiar el campo de texto para no perder lo escrito
+- [x] T015 [US1] Añadir estado de carga (spinner o texto "Guardando…") en el botón "Guardar" mientras la petición está en curso, para que quede claro que la acción es real y no instantánea como antes
+- [x] T016 [US1] Validar manualmente en navegador el escenario de `quickstart.md` §US1 (dos dispositivos/navegadores distintos)
 
 **Checkpoint**: User Story 1 funcional de forma independiente — MVP entregable.
 

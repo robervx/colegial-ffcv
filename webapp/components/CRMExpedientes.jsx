@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
@@ -19,6 +19,7 @@ import { asignarJornada } from "../lib/asignarJornada";
 import { CATEGORIAS } from "../lib/categorias";
 import { conDisponibilidad } from "../lib/disponibilidad";
 import { coberturaPorCategoria } from "../lib/coberturaCategoria";
+import { obtenerAnotaciones, guardarAnotacion } from "../lib/anotacionesRepo";
 
 /* ================================================================
    COLEGIAL · CRM de expedientes arbitrales — versión 1 ampliada
@@ -610,13 +611,41 @@ function Ficha({ T, a, back }) {
   const mejor = [...skills].sort((x, y) => y.v - x.v)[0];
   const peor = [...skills].sort((x, y) => x.v - y.v)[0];
 
-  const [notas, setNotas] = useState(a.notas);
+  const [notas, setNotas] = useState([]);
+  const [notasEstado, setNotasEstado] = useState("cargando"); // cargando | listo | error
   const [nueva, setNueva] = useState("");
   const [etiquetaNueva, setEtiquetaNueva] = useState("seguimiento");
   const [sugerenciaEmail, setSugerenciaEmail] = useState(null); // plantilla sugerida tras añadir nota positiva/mejora
-  const addNota = () => {
-    if (!nueva.trim()) return;
-    setNotas([{ fecha: new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" }), autor: "Tú", etiqueta: etiquetaNueva, texto: nueva.trim() }, ...notas]);
+  const [guardandoNota, setGuardandoNota] = useState(false);
+  const [errorNota, setErrorNota] = useState(null);
+
+  useEffect(() => {
+    // key={a.id} en el punto de uso remonta Ficha al cambiar de árbitro, así
+    // que aquí no hace falta resetear notasEstado a mano — ya nace "cargando".
+    let cancelado = false;
+    obtenerAnotaciones(a.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setNotas(resultado.anotaciones);
+        setNotasEstado("listo");
+      } else {
+        setNotasEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [a.id]);
+
+  const addNota = async () => {
+    if (!nueva.trim() || guardandoNota) return;
+    setGuardandoNota(true);
+    setErrorNota(null);
+    const resultado = await guardarAnotacion({ arbitroId: a.id, etiqueta: etiquetaNueva, texto: nueva, autor: "Comité" });
+    setGuardandoNota(false);
+    if (!resultado.ok) {
+      setErrorNota(resultado.error);
+      return;
+    }
+    setNotas([resultado.anotacion, ...notas]);
     setNueva("");
     // sugerencia automatica de plantilla de email al registrar una nota positiva o de mejora
     if (etiquetaNueva === "positiva") setSugerenciaEmail("felicitacion");
@@ -732,10 +761,16 @@ function Ficha({ T, a, back }) {
                 className="text-xs rounded border px-2 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
                 {Object.entries(ETIQUETA_NOTA).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
               </select>
-              <button onClick={addNota} className="text-xs rounded px-3 py-2 text-white font-medium flex items-center gap-1.5" style={{ background: T.primary }}>
-                <MessageSquarePlus size={14} /> Guardar
+              <button onClick={addNota} disabled={guardandoNota} className="text-xs rounded px-3 py-2 text-white font-medium flex items-center gap-1.5 disabled:opacity-60" style={{ background: T.primary }}>
+                <MessageSquarePlus size={14} /> {guardandoNota ? "Guardando…" : "Guardar"}
               </button>
             </div>
+
+            {errorNota && (
+              <p className="text-xs rounded px-3 py-2 mb-4" style={{ color: N.rojo, background: N.rojoT }}>
+                No se pudo guardar: {errorNota}
+              </p>
+            )}
 
             {sugerenciaEmail && (
               <div className="rounded p-3 mb-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: T.accentTint }}>
@@ -753,18 +788,26 @@ function Ficha({ T, a, back }) {
               </div>
             )}
 
-            {notas.length === 0 ? (
+            {notasEstado === "cargando" ? (
+              <p className="text-xs" style={{ color: N.ink40 }}>Cargando notas…</p>
+            ) : notasEstado === "error" ? (
+              <p className="text-xs rounded px-3 py-2" style={{ color: N.rojo, background: N.rojoT }}>
+                No se pudieron cargar las notas. Comprueba la conexión y vuelve a abrir la ficha.
+              </p>
+            ) : notas.length === 0 ? (
               <p className="text-xs" style={{ color: N.ink40 }}>Sin notas de seguimiento. Las notas quedan registradas con autor y fecha (audit log).</p>
             ) : (
               <div className="space-y-2.5">
                 {notas.map((nt, i) => {
                   const et = ETIQUETA_NOTA[nt.etiqueta] || ETIQUETA_NOTA.seguimiento;
+                  const fecha = new Date(nt.creadoEn).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" });
                   return (
-                    <div key={i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.autor === "Tú" ? T.tint : "#FFF" }}>
+                    <div key={nt.id ?? i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.fuente === "real" ? T.tint : "#FFF" }}>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-xs font-semibold" style={{ color: T.primary }}>{nt.autor}</span>
-                        <span className="text-[11px] font-mono" style={{ color: N.ink40 }}>{nt.fecha}</span>
+                        <span className="text-[11px] font-mono" style={{ color: N.ink40 }}>{fecha}</span>
                         <span className="text-[10px] rounded px-1.5 py-0.5 font-medium" style={{ background: et.bg, color: et.fg }}>{et.label}</span>
+                        <span className="text-[10px]" style={{ color: nt.fuente === "real" ? N.verde : N.ambar }}>· {nt.fuente}</span>
                       </div>
                       <p className="text-sm" style={{ color: N.ink70 }}>{nt.texto}</p>
                     </div>
@@ -1231,7 +1274,7 @@ export default function CRMExpedientes() {
 
           {vista === "dashboard" && <Dashboard T={T} irArbitros={() => ir("arbitros")} />}
           {vista === "arbitros" && !sel && <Listado T={T} onPick={setSel} />}
-          {vista === "arbitros" && sel && <Ficha T={T} a={sel} back={() => setSel(null)} />}
+          {vista === "arbitros" && sel && <Ficha key={sel.id} T={T} a={sel} back={() => setSel(null)} />}
           {vista === "designacion" && <DesignacionInteligente T={T} />}
           {vista === "recomendaciones" && <VistaRecomendaciones T={T} />}
           {vista === "economico" && <VistaEconomica T={T} />}
