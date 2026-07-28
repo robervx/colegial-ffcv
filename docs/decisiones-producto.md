@@ -202,6 +202,22 @@ Junto a esto, dos páginas nuevas:
 
 **Aparte, sin acción por ahora**: el dataset de trabajo de árbitros (`arbitros-200.json`) sigue siendo una muestra de 200 sobre un universo real de ~1208 (KPI del Dashboard) — Roberto lo señala como pendiente de revisar más adelante, no bloqueante hoy.
 
+## 22. Corrección: 3 fases de rollout, no 2 — y nombre para el núcleo de datos (28 jul 2026)
+
+**Corrección de una confusión de la propia sesión**: en §21 se documentó un rollout de auth real en 2 fases (directiva/admin ya, luego árbitros por categoría) — Roberto corrigió: son **3 fases**, y la primera no tiene ninguna cuenta:
+
+1. **Fase 1 (ahora)**: prototipo de demo, sin login individual de nadie (se enseña con la contraseña única de Vercel, §18) a unas pocas personas de la comisión/directiva para que vean el potencial. Prioridad absoluta: nutrir de dato real todas las páginas — incluida ampliar `arbitros-200.json` a los ~1208 árbitros reales (identidad/carga ya escrapeada, capa sintética encima igual que hoy, siempre distinguible). `004-roles-permisos` (cuentas/roles/panel admin) **no se implementa en esta fase**, solo se deja especificada.
+2. **Fase 2**: si la demo convence, el comité da acceso a datos reales + ajustes — aquí arrancan las primeras cuentas reales, solo directiva/comisión y administrativos.
+3. **Fase 3**: si Fase 2 va bien, mejores datos + acceso a informadores y árbitros (estos últimos por categoría, empezando por Tercera Federación).
+
+`specs/004-roles-permisos/spec.md` corregido en consecuencia.
+
+**Ampliar árbitros a ~1208**: factible sin scraping nuevo (`generar_dataset_arbitros.py` ya recorta a 200 de un pool real completo, líneas 114-118) — pendiente de confirmar con Roberto si se lanza ya o se virtualiza antes el listado de Árbitros (riesgo de rendimiento sin probar a esa escala, ya señalado en `sprints.md`).
+
+**Nombre propuesto para el conjunto de páginas interrelacionadas** (Árbitros, Equipos, Partidos, Designaciones — Económico es una vista calculada sobre ellas, no una entidad más): **"Núcleo de competición"**. Distinto de otros dos núcleos conceptuales ya existentes: **Roles y usuarios** (`004-roles-permisos`, identidad/acceso) y **Evaluación** (informes/patrón de implicación, bloqueado hasta dato real del comité).
+
+**Vercel**: no hay proyecto enlazado desde este repo todavía. Al comprobarlo se disparó sin querer un `vercel whoami` que quedó esperando login por navegador — cancelado sin completar, es cuenta de Roberto, no se automatiza (mismo criterio ya aplicado a Supabase, §18).
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)
