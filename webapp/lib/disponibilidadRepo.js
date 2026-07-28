@@ -2,13 +2,11 @@
  * Repositorio de disponibilidad — contrato en
  * specs/002-disponibilidad-arbitro/contracts/disponibilidad-repo.md.
  *
- * Implementación real contra Supabase (specs/003-persistencia-real) —
- * mismas firmas exactas que el contrato ya fijaba cuando esto era un stub
- * que lanzaba NoImplementadoError. Por contrato: obtenerLog/obtenerVigente/
- * calcularPatronImplicacion devuelven el valor directamente y lanzan
- * excepción ante un error de infraestructura; solo declararDisponibilidad
- * usa el patrón { ok, ... } para rechazos de negocio esperados (contrato
- * §Errores).
+ * Implementación real contra Supabase (specs/003-persistencia-real).
+ * Ninguna función lanza excepción: todas devuelven { ok: true, ... } o
+ * { ok: false, error } — mismo convenio que anotacionesRepo.js y
+ * designacionesRepo.js, para que la UI no necesite dos formas distintas de
+ * manejar un fallo de red/infraestructura según el repositorio.
  */
 import { supabase } from "./supabaseClient";
 import { validarAntelacionFestivo } from "./reglaFestivo";
@@ -28,7 +26,7 @@ function filaADeclaracion(fila) {
   };
 }
 
-/** Todas las declaraciones de un árbitro, ordenadas por fecha ascendente. Lanza si falla la infraestructura. */
+/** Todas las declaraciones de un árbitro, ordenadas por fecha ascendente. */
 export async function obtenerLog(arbitroId) {
   const { data, error } = await supabase
     .from("declaraciones_disponibilidad")
@@ -36,11 +34,11 @@ export async function obtenerLog(arbitroId) {
     .eq("arbitro_id", arbitroId)
     .order("creado_en", { ascending: true });
 
-  if (error) throw new Error(`No se pudo cargar el log de disponibilidad: ${error.message}`);
-  return data.map(filaADeclaracion);
+  if (error) return { ok: false, error: `No se pudo cargar el log de disponibilidad: ${error.message}` };
+  return { ok: true, log: data.map(filaADeclaracion) };
 }
 
-/** La declaración vigente de un árbitro para un ciclo, o null si no ha declarado nada. Lanza si falla la infraestructura. */
+/** La declaración vigente de un árbitro para un ciclo (o null si no ha declarado nada). */
 export async function obtenerVigente(arbitroId, cicloId) {
   const { data, error } = await supabase
     .from("declaraciones_disponibilidad")
@@ -51,8 +49,8 @@ export async function obtenerVigente(arbitroId, cicloId) {
     .limit(1)
     .maybeSingle();
 
-  if (error) throw new Error(`No se pudo consultar la disponibilidad: ${error.message}`);
-  return data ? filaADeclaracion(data) : null;
+  if (error) return { ok: false, error: `No se pudo consultar la disponibilidad: ${error.message}` };
+  return { ok: true, declaracion: data ? filaADeclaracion(data) : null };
 }
 
 /**
@@ -93,14 +91,15 @@ export async function declararDisponibilidad(declaracion, ahora = new Date()) {
     .select()
     .single();
 
-  if (error) throw new Error(`No se pudo guardar la declaración: ${error.message}`);
+  if (error) return { ok: false, motivoRechazo: `No se pudo guardar la declaración: ${error.message}` };
   return { ok: true, declaracion: filaADeclaracion(data) };
 }
 
-/** Envoltorio sobre obtenerLog + lib/patronImplicacion.js (función pura, sin cambios). Lanza si falla la infraestructura. */
+/** Envoltorio sobre obtenerLog + lib/patronImplicacion.js (función pura, sin cambios). */
 export async function calcularPatronImplicacion(arbitroId) {
-  const log = await obtenerLog(arbitroId);
-  return calcularPatronSobreLog(log);
+  const resultado = await obtenerLog(arbitroId);
+  if (!resultado.ok) return resultado;
+  return { ok: true, patron: calcularPatronSobreLog(resultado.log) };
 }
 
 /**
@@ -110,7 +109,7 @@ export async function calcularPatronImplicacion(arbitroId) {
  * specs/003-persistencia-real/tasks.md): la cobertura por categoría necesita
  * la disponibilidad de los ~200 árbitros del ciclo activo a la vez, y hacer
  * 200 llamadas individuales a obtenerVigente no es razonable. Mismo patrón que
- * designacionesRepo.obtenerVigentesPorCiclo. Lanza si falla la infraestructura.
+ * designacionesRepo.obtenerVigentesPorCiclo.
  */
 export async function obtenerVigentesPorCiclo(cicloId) {
   const { data, error } = await supabase
@@ -119,7 +118,7 @@ export async function obtenerVigentesPorCiclo(cicloId) {
     .eq("ciclo_id", cicloId)
     .order("creado_en", { ascending: false });
 
-  if (error) throw new Error(`No se pudo cargar la disponibilidad del ciclo: ${error.message}`);
+  if (error) return { ok: false, error: `No se pudo cargar la disponibilidad del ciclo: ${error.message}` };
 
   const vigentesPorArbitro = new Map();
   for (const fila of data) {
@@ -127,5 +126,5 @@ export async function obtenerVigentesPorCiclo(cicloId) {
       vigentesPorArbitro.set(fila.arbitro_id, filaADeclaracion(fila));
     }
   }
-  return vigentesPorArbitro;
+  return { ok: true, vigentesPorArbitro };
 }

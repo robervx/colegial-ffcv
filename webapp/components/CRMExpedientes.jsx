@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
@@ -9,7 +10,7 @@ import {
   Users, Search, ChevronRight, TrendingUp, TrendingDown, Minus,
   FileText, Calendar, AlertCircle, Lock, Sparkles,
   MessageSquarePlus, Gavel, Wallet, Bot, Check, Ban, AlertTriangle, Send,
-  LayoutDashboard, Route, Scale, Info, Phone, Mail, Mailbox, Ruler, Dumbbell, BookOpen,
+  LayoutDashboard, Route, Scale, Info, Phone, Mail, Dumbbell, BookOpen,
 } from "lucide-react";
 import agregadosReales from "../data/agregados-reales.json";
 import localidadesGeo from "../data/localidades-geo.json";
@@ -198,7 +199,7 @@ function Escudo({ T, size = 38, logoSrc = "/logo-ffcv.png" }) {
     return (
       <div className="rounded flex items-center justify-center shrink-0 overflow-hidden bg-white"
         style={{ width: size, height: size, padding: size * 0.08 }}>
-        <img src={logoSrc} alt={`Escudo ${T.corto}`} className="w-full h-full object-contain" />
+        <Image src={logoSrc} alt={`Escudo ${T.corto}`} width={size} height={size} className="w-full h-full object-contain" />
       </div>
     );
   }
@@ -251,16 +252,15 @@ function Dashboard({ T, irArbitros }) {
 
   useEffect(() => {
     let cancelado = false;
-    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id)
-      .then((vigentes) => {
-        if (cancelado) return;
-        setVigentesDisponibilidad(vigentes);
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentesDisponibilidad(resultado.vigentesPorArbitro);
         setDisponibilidadEstado("listo");
-      })
-      .catch(() => {
-        if (cancelado) return;
+      } else {
         setDisponibilidadEstado("error");
-      });
+      }
+    });
     return () => { cancelado = true; };
   }, [cicloActivo.id]);
 
@@ -706,14 +706,16 @@ function Ficha({ T, a, back }) {
 
   useEffect(() => {
     let cancelado = false;
-    obtenerLogDisponibilidad(a.id)
-      .then((log) => {
-        if (cancelado) return;
-        setLogDisponibilidad(log);
-        setPatron(calcularPatronImplicacion(log));
+    obtenerLogDisponibilidad(a.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setLogDisponibilidad(resultado.log);
+        setPatron(calcularPatronImplicacion(resultado.log));
         setLogDispEstado("listo");
-      })
-      .catch(() => { if (!cancelado) setLogDispEstado("error"); });
+      } else {
+        setLogDispEstado("error");
+      }
+    });
     return () => { cancelado = true; };
   }, [a.id]);
 
