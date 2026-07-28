@@ -12,7 +12,7 @@
 
 ### User Story 1 - Consultar el perfil de un equipo (Priority: P1)
 
-Una persona con acceso a Equipos (informador, árbitro, comité/directiva/admin — ver `004-roles-permisos`) abre el perfil de un equipo concreto y ve su identidad y su historial disciplinario agregado: tarjetas totales, tarjetas por jugador, partidos jugados, en qué categoría y temporada.
+Una persona con acceso a Equipos (informador, árbitro, comité/directiva/admin — ver `004-roles-permisos`) abre el perfil de un equipo concreto y ve su identidad, su historial disciplinario agregado (tarjetas totales, tarjetas por jugador, partidos jugados, categoría y temporada) y sus goleadores (jugadores con más goles marcados dentro del equipo).
 
 **Why this priority**: es el valor mínimo de la página — sin un perfil de equipo construido, no hay nada sobre lo que generar insights después.
 
@@ -21,7 +21,7 @@ Una persona con acceso a Equipos (informador, árbitro, comité/directiva/admin 
 **Acceptance Scenarios**:
 
 1. **Given** un equipo con partidos jugados en la temporada actual, **When** se abre su perfil, **Then** se ve su nombre, categoría/competición, número de partidos, y el total de tarjetas amarillas/rojas recibidas — marcado como dato real.
-2. **Given** el mismo equipo, **When** se despliega el desglose por jugador, **Then** aparece cada jugador con sus propias tarjetas dentro de ese equipo.
+2. **Given** el mismo equipo, **When** se despliega el desglose por jugador, **Then** aparece cada jugador que ha recibido tarjeta o marcado gol, con su detalle (tarjetas propias, goles propios) dentro de ese equipo — ver Assumptions sobre por qué es solo jugadores con tarjeta/gol, no la plantilla completa.
 
 ---
 
@@ -60,13 +60,14 @@ Al ver el perfil de un equipo, aparece un insight descriptivo que ayuda a decidi
 - ¿Qué pasa con un equipo que aparece con nombres ligeramente distintos entre temporadas (cambios de patrocinador, etc.)? Se identifica por `cod_equipo` estable (ya existe en `ffcv_public_data/partidos_index.csv`), no por coincidencia de texto del nombre.
 - ¿Qué pasa si un equipo tiene muy pocos partidos en el dataset (equipo recién ascendido, categoría con pocos cruces)? El perfil se muestra igual, pero cualquier insight declara su confianza reducida (ver Historia 3, Acceptance Scenario 2) en vez de aparentar una tendencia que no está respaldada.
 - ¿Qué pasa con las "sanciones" mencionadas en la petición original? Ver Assumptions — esta spec no calcula una sanción (sería inventar una regla sin fuente oficial), solo muestra el conteo real de tarjetas que la normativa FFCV usaría para calcularla.
+- ¿Por qué el desglose por jugador no incluye a toda la plantilla, solo a quien tiene tarjeta o gol? El scraping público (`ffcv_public_data/`) no capturó alineaciones/convocatorias, solo eventos de partido (tarjetas, goles) — un jugador que no marcó ni fue amonestado es invisible en el dato actual. Se decidió explícitamente (28 jul 2026) no perseguir "titulares más frecuentes" en esta spec por esa razón — sancionados y goleadores ya aportan valor por sí solos.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: El sistema DEBE construir un perfil por equipo identificado por su `cod_equipo` estable, con nombre, categoría/competición y temporada — dato real de `ffcv_public_data/partidos_index.csv`.
-- **FR-002**: El perfil de equipo DEBE mostrar el agregado de tarjetas (amarillas y rojas) del equipo completo y desglosado por jugador, calculado sobre dato real (`ffcv_public_data/tarjetas_partido.csv`) — nunca sintético.
+- **FR-002**: El perfil de equipo DEBE mostrar el agregado de tarjetas (amarillas y rojas, distinguiendo segunda amarilla) del equipo completo y desglosado por jugador, y el agregado de goles por jugador, calculado sobre dato real (`ffcv_public_data/tarjetas_partido.csv`, `goles_partido.csv`) — nunca sintético.
 - **FR-003**: El sistema DEBE ofrecer un listado de equipos filtrable por nombre y por categoría, con el mismo criterio de "consulta filtrable, no comparación 1 a 1" que ya aplica el listado de Árbitros (Principio V de la constitución).
 - **FR-004**: El sistema DEBE generar al menos un insight descriptivo por equipo (p. ej., tarjetas por partido frente a la media general) que ayude a decidir criterio de actuación arbitral, siempre acompañado de la cifra concreta que lo sostiene — nunca una recomendación sin número visible (Principio III).
 - **FR-005**: Cuando el número de partidos de un equipo en el dataset sea insuficiente para un insight fiable, el sistema DEBE declarar explícitamente la confianza reducida en vez de mostrar la cifra como si fuera una tendencia consolidada.
@@ -78,6 +79,7 @@ Al ver el perfil de un equipo, aparece un insight descriptivo que ayuda a decidi
 
 - **Equipo**: `cod_equipo` (id estable, ya existe en el dataset), nombre, categoría/competición, temporada — no es una tabla nueva en Supabase, se deriva de `ffcv_public_data/partidos_index.csv` igual que hoy se deriva el dataset de árbitros.
 - **AgregadoDisciplinaEquipo** (derivado, no persistido como entidad propia): tarjetas totales y por jugador dentro de un equipo, partidos jugados, calculado sobre `tarjetas_partido.csv` — mismo patrón que `lib/coberturaCategoria.js` u otros agregados ya construidos con scripts Python (`generar_agregados.py`).
+- **AgregadoGoleadoresEquipo** (derivado, no persistido como entidad propia): goles por jugador dentro de un equipo, calculado sobre `goles_partido.csv` (dato real, hoy sin usar en la UI).
 - **InsightEquipo** (derivado): cifra descriptiva (p. ej. tarjetas/partido) y su comparación con la media general — nunca persistido como score ni usado en `scoreB1` del árbitro.
 
 ## Success Criteria *(mandatory)*
@@ -94,5 +96,6 @@ Al ver el perfil de un equipo, aparece un insight descriptivo que ayuda a decidi
 - Esta página reutiliza el scraping público ya completado (`ffcv_public_data/`) — no requiere scraping nuevo ni acceso a datos que hoy no existan.
 - "Sanciones" tal como se pidió originalmente requiere conocer la normativa disciplinaria oficial de la FFCV (umbral de tarjetas → partidos de suspensión), que no está documentada todavía en este repositorio — se deja fuera de alcance de esta spec hasta que exista esa investigación (mismo patrón que `docs/tarifas.md` resolvió para las tarifas económicas antes de construir el motor de coste). Mientras tanto, el conteo real de tarjetas sigue siendo útil por sí mismo.
 - No se construye un perfil de jugador individual fuera del equipo (ficha propia de jugador, histórico entre equipos, etc.) — el desglose por jugador de esta spec vive dentro del perfil de su equipo, no como entidad navegable propia. Si se quiere eso, es una spec futura.
+- **"Titulares más frecuentes" queda fuera de alcance** (decidido 28 jul 2026): dependía de tener alineaciones/convocatorias por partido, que no existen en `ffcv_public_data/` (el scraping solo capturó tarjetas y goles, no la plantilla completa de cada acta). No se persigue como aproximación etiquetada ni se investiga scraping nuevo para esto — sancionados y goleadores cubren el valor que se busca por ahora.
 - El modelo de visibilidad por rol depende de que `004-roles-permisos` esté aprobada — esta spec asume su vocabulario de roles tal como quedó redactado ahí, sin definir uno propio.
 - La comparación "media general" usada en los insights (Historia 3) se calcula sobre el mismo conjunto de datos de `ffcv_public_data/` que ya usa el resto de la app — mismo criterio de umbral de muestra mínima que ya aplica B.3 en `docs/kpis.md` (al menos 3 partidos de contexto similar antes de declarar una tendencia fiable).
