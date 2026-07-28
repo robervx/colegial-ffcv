@@ -218,6 +218,20 @@ Junto a esto, dos páginas nuevas:
 
 **Vercel**: no hay proyecto enlazado desde este repo todavía. Al comprobarlo se disparó sin querer un `vercel whoami` que quedó esperando login por navegador — cancelado sin completar, es cuenta de Roberto, no se automatiza (mismo criterio ya aplicado a Supabase, §18).
 
+## 23. Revisión de código senior (general + arquitectura Supabase) y deuda técnica diferida a propósito (28 jul 2026)
+
+Roberto pidió una valoración de profesionalidad del proyecto y, aparte, una revisión específica de la arquitectura de datos de `003-persistencia-real` — con foco explícito en no incurrir en "coste basal de exceso de software" (no montar proceso/infraestructura por encima de lo que el tamaño y la fase del proyecto justifican).
+
+**Contexto particular de esta revisión**: se hizo mientras otra ventana de chat trabajaba en paralelo sobre el mismo directorio de trabajo (sin worktrees separados), completando en vivo T007-T030 de `003-persistencia-real`. Se coordinó explícitamente para no pisar ficheros sin commitear — la revisión esperó a que esa sesión mergeara antes de tocar ficheros compartidos. Vale la pena recordarlo para la próxima vez que haya dos sesiones activas: comprobar `git status`/`git log` antes de asumir que un fichero está libre para editar, no solo antes de escribir.
+
+**Encontrado y corregido en el momento** (detalle técnico en `estado-actual.md` punto 3, commit `11c4d4c`):
+- `lib/disponibilidadRepo.js` lanzaba excepción en las lecturas mientras `anotacionesRepo`/`designacionesRepo` ya devolvían `{ ok, error }` — convenio de errores inconsistente entre los tres repositorios de la misma spec. Unificado antes de que más UI dependiera de la inconsistencia.
+- 3 warnings de lint (imports sin usar, `<img>` sin `next/image`).
+- `webapp/.env.example` que faltaba (creado por la otra ventana durante la propia revisión — coincidencia útil, confirma que compartir contexto en el mismo repo funciona incluso sin coordinación explícita en ese punto).
+- Migración `supabase/migrations/0004_endurecer_rls_solo_lectura_insercion.sql`: estrecha la política RLS permisiva (`FOR ALL`) a solo `SELECT`+`INSERT` en las tres tablas — ninguna función del repositorio usa `UPDATE`/`DELETE`, así que quitarlos reduce el alcance de la clave pública `anon` sin coste funcional. **Creada pero pendiente de aplicar** contra el proyecto Supabase real (paso manual de Roberto, igual que 0001-0003).
+
+**Diferido a propósito, con disparador explícito para cada uno** (detalle y tabla completa en `sprints.md`, sección "Deuda técnica diferida a propósito"): CI, migración a TypeScript, tests de componentes/e2e, trocear `CRMExpedientes.jsx`, RLS por rol. Ninguno es un defecto — son inversiones que hoy costarían más de lo que devuelven con 2 colaboradores y sin cliente cerrado, mismo razonamiento que el Principio I de la constitución ya aplica al multi-tenant. Quedan anotados con su condición de activación en vez de perderse o construirse antes de tiempo.
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)

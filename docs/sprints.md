@@ -58,6 +58,22 @@ Idea capturada el 27 jul 2026 (`decisiones-producto.md` §15): selector de dispo
 
 ---
 
+## Deuda técnica diferida a propósito (revisión de código, 28 jul 2026)
+
+Una revisión senior del proyecto (código general + arquitectura de datos de `003-persistencia-real`) encontró varios huecos. Los baratos y bloqueantes se arreglaron en el momento (ver `estado-actual.md` punto 3 y `decisiones-producto.md` §23). Los siguientes se difieren **a propósito**: son inversiones legítimas, pero construirlas ahora — con 2 colaboradores y sin cliente cerrado — sería pagar complejidad especulativa, el mismo razonamiento que el Principio I de la constitución ya aplica al multi-tenant. Cada uno tiene su disparador explícito para no perderlo de vista ni construirlo antes de tiempo:
+
+| Diferido | Por qué ahora sería caro sin beneficio | Disparador (cuándo sí) |
+|---|---|---|
+| CI (GitHub Actions) | Con 2 colaboradores y `main` compartida, correr `npm test`/`lint` a mano antes de cada merge cubre el mismo riesgo por menos coste | Una 3ª persona tocando el repo, o el ritmo de merges lo bastante alto para que un test roto llegue a `main` sin que nadie lo note |
+| Migrar `CRMExpedientes.jsx`/`lib/` a TypeScript | Reescribir ~1.200 líneas sin bug conocido que el tipado hubiera evitado es coste puro hoy | Cuando el motor de designación mueva dinero real (no demo) — ahí el tipado en `motorAsignacion.js` sí paga por sí solo |
+| Tests de componentes / e2e (Playwright ya instalado) | Verificación manual en navegador es suficiente mientras el equipo que prueba cada cambio es el mismo que lo construye | Alguien fuera del equipo empieza a usar la app sin que vosotros estéis mirando por encima del hombro |
+| Trocear `CRMExpedientes.jsx` en módulos | Molesto pero no bloquea nada hoy; trocearlo bien exige tiempo que hoy no compra velocidad real | Dos personas necesitando tocar partes distintas del fichero a la vez con frecuencia — puede empezar a notarse con US2/US3 de 003 ya construidas |
+| RLS por rol (más allá de la política permisiva actual) | No hay todavía modelo de roles/autenticación real sobre el que basar una política fina — se estrechó a solo lectura+inserción (`0004`), pero seguir requiere auth real | Ya tiene spec (`004-roles-permisos`) y disparador propio: cuando arranque su implementación (Fase 2/3 de §22 de `decisiones-producto.md`) |
+
+**Orden de ejecución cuando corresponda**: ninguno de estos bloquea el trabajo actual (roles/Equipos/Partidos). Se revisan solos, no en bloque, según vaya cumpliéndose cada disparador — no hay prisa por adelantarlos.
+
+---
+
 ## Revisión de este plan
 
 Contrastando lo anterior: el orden Sprint 1→2 antes que Sprint 3 es defendible porque construir más funcionalidad (scraping, virtualización) sobre una base sin persistencia real multiplicaría el trabajo de migración después. Podría discutirse invertir 2 y 3 si el workstream de dato real tarda mucho — en ese caso, ensanchar lo real (Sprint 3) mientras se espera tiene sentido como uso del tiempo muerto. Lo dejo como pregunta abierta, no como decisión cerrada: depende de cuánto tardemos en tener el primer contacto útil con el comité.
