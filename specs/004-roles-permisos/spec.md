@@ -1,136 +1,156 @@
-# Feature Specification: Modelo de roles y permisos ampliado
+# Feature Specification: Cuentas de usuario, roles y panel de administración
 
 **Feature Branch**: `004-roles-permisos`
 
-**Created**: 2026-07-28
+**Created**: 2026-07-28 (reescrita 28 jul 2026 tras pivote a autenticación real)
 
 **Status**: Draft
 
-**Input**: User description: "Modelo de roles ampliado a 5 (admin, directiva, informadores, árbitros, administrativos), sin autenticación real todavía — mismo patrón 'ver como' sin login ya usado en FR-012 de 002-disponibilidad-arbitro. Admin: acceso a todo incluida configuración. Directiva: todo salvo configuración, participa en decisiones de designación junto a administrativos. Informadores: fichas de árbitro + Equipos + Partidos, pueden comentar. Árbitros: su propia ficha + Equipos + Partidos para preparar su partido, con insights a consultar antes de dirigir. Administrativos: disponibilidad + designaciones + vista económica. Spec transversal, la necesitan Equipos y Partidos antes de especificarse. El detalle fino de permisos campo a campo queda por concretar con el comité — esta spec captura la filosofía de cada rol, no un RBAC cerrado."
+**Input**: User description (pivote sobre el draft original, que asumía un selector "ver como" sin login): "Para los roles crearemos usuarios reales, a los que se les asignará un rol — así hay registro de cada usuario y de su actividad. De momento haremos los usuarios de directiva/comisión y administración; cuando esté funcionando iremos probando por categorías. Cada árbitro tendrá su credencial para acceder y solo podrá ver su ficha y lo que hemos comentado, con su email oficial registrado en el comité, para asegurar que las comunicaciones le lleguen. El admin debe tener un panel de control específico para crear y gestionar usuarios, ver historial de uso de cada uno, crear/eliminar/modificar permisos. Preferencia de rollout: empezar por la categoría más alta (Tercera Federación) mientras el roster completo de árbitros no esté cargado; en cuanto lo esté, el criterio pasa a ser de menos a más árbitros reales por categoría."
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Elegir el rol activo y ver la interfaz ajustada (Priority: P1)
+### User Story 1 - Iniciar sesión con cuenta real y ver la interfaz del rol asignado (Priority: P1)
 
-Cualquier persona que abre la app elige, mediante un selector sin login ("ver como"), cuál de los 5 roles está simulando — igual que ya existe hoy el selector árbitro/comité en la ficha (FR-012 de `002-disponibilidad-arbitro`), pero ampliado a las 5 opciones y disponible en toda la app, no solo en la ficha. Al cambiar de rol, la interfaz muestra u oculta secciones y páginas según ese rol, de forma inmediata.
+Una persona con una cuenta creada (email + enlace de acceso por correo, sin contraseña) inicia sesión y ve la interfaz ajustada al rol que el admin le asignó — sustituye por completo el selector "ver como" sin login que definía FR-012 de `002-disponibilidad-arbitro`.
 
-**Why this priority**: es el mecanismo base — ninguna otra historia de esta spec tiene sentido sin un selector de rol funcionando primero.
+**Why this priority**: es el mecanismo base — ninguna otra historia de esta spec (ni de `005-equipos`/`006-partidos`, que dependen de este modelo de roles) tiene sentido sin cuentas reales funcionando.
 
-**Independent Test**: cambiar el selector entre los 5 roles y comprobar que el conjunto de páginas y secciones visibles cambia de forma coherente con cada uno, sin recargar la página.
+**Independent Test**: crear una cuenta con un rol concreto, iniciar sesión con el enlace recibido por email, y comprobar que la interfaz muestra exactamente lo que ese rol puede ver — nada más.
 
 **Acceptance Scenarios**:
 
-1. **Given** el selector de rol en su valor por defecto, **When** se abre la app por primera vez, **Then** se ve la interfaz correspondiente a un rol de partida razonable (a definir, ver Assumptions).
-2. **Given** el selector en cualquier rol, **When** se cambia a otro rol, **Then** las páginas/secciones que ese nuevo rol no puede ver dejan de estar disponibles inmediatamente, sin necesidad de recargar.
+1. **Given** una cuenta ya creada por el admin con un email y un rol, **When** esa persona solicita acceso con su email, **Then** recibe un enlace de un solo uso en su correo y, al pulsarlo, entra directamente a la interfaz de su rol.
+2. **Given** una sesión iniciada, **When** pasa el tiempo de expiración configurado, **Then** se pide iniciar sesión de nuevo — no hay sesión indefinida sin control.
+3. **Given** un email sin cuenta creada por el admin, **When** se intenta iniciar sesión con ese email, **Then** el sistema lo rechaza con un mensaje claro — nadie puede auto-registrarse.
 
 ---
 
-### User Story 2 - Configuración protegida frente a cambios accidentales (Priority: P1)
+### User Story 2 - Admin gestiona cuentas, roles e historial de uso (Priority: P1)
 
-La directiva tiene acceso a prácticamente todo el sistema salvo la configuración, precisamente para que no pueda desconfigurar nada sin querer. Solo el rol admin ve y puede modificar configuración.
+El admin, desde un panel de control dedicado, crea una cuenta nueva (email + rol), modifica el rol de una cuenta existente, la elimina, y consulta el historial de actividad de cualquier usuario (inicios de sesión, acciones realizadas).
 
-**Why this priority**: es una salvaguarda de seguridad operativa — antes de dar acceso amplio a directiva (US1), hay que asegurar que ese acceso amplio no incluye la capacidad de romper la configuración del sistema.
+**Why this priority**: sin esto no existe ninguna cuenta más que la del propio admin — es la puerta de entrada obligatoria para todas las demás historias.
 
-**Independent Test**: con el rol en "directiva", comprobar que ninguna pantalla o control de configuración es visible ni accesible; con el rol en "admin", comprobar que sí lo es.
+**Independent Test**: crear una cuenta nueva con un rol, comprobar que puede iniciar sesión con ese rol; cambiarle el rol y comprobar que la interfaz que ve cambia en consecuencia; eliminarla y comprobar que ya no puede acceder; abrir su historial de actividad y ver sus acciones registradas con fecha.
 
 **Acceptance Scenarios**:
 
-1. **Given** el rol activo es "directiva", **When** se navega por la app, **Then** no aparece ninguna pantalla ni control de configuración del sistema.
-2. **Given** el rol activo es "admin", **When** se navega por la app, **Then** la configuración del sistema es visible y editable.
+1. **Given** el panel de administración, **When** el admin crea una cuenta con un email y un rol, **Then** la cuenta queda lista para recibir su primer enlace de acceso.
+2. **Given** una cuenta existente, **When** el admin le cambia el rol, **Then** la próxima vez que esa persona use la app ve la interfaz del nuevo rol, no del anterior.
+3. **Given** una cuenta existente, **When** el admin la elimina, **Then** esa persona deja de poder iniciar sesión.
+4. **Given** cualquier cuenta con actividad registrada, **When** el admin abre su historial de uso, **Then** ve sus inicios de sesión y las acciones que ha realizado en la app (notas, designaciones, disponibilidad, comentarios), con fecha — mismo criterio de trazabilidad que ya exige `003-persistencia-real` (FR-008 de esa spec) para cada tabla.
 
 ---
 
-### User Story 3 - Informador consulta y comenta antes de evaluar (Priority: P2)
+### User Story 3 - Configuración protegida frente a cambios accidentales (Priority: P1)
 
-Un informador consulta la ficha de un árbitro, y las páginas Equipos y Partidos, para analizarlos antes de ir a evaluar un partido. Puede dejar comentarios/anotaciones en la ficha del árbitro, igual que ya puede hacer hoy el rol "comité" en `003-persistencia-real` (US1, notas de seguimiento).
+Directiva tiene acceso a prácticamente todo el sistema salvo la configuración (que incluye, entre otras cosas, la propia gestión de usuarios de la Historia 2), precisamente para que no pueda desconfigurar nada sin querer. Solo el rol admin ve y puede modificar configuración.
 
-**Why this priority**: es el segundo eslabón operativo más inmediato — hoy la app ya permite comentar fichas, esta historia solo amplía quién puede hacerlo y qué más puede consultar antes de evaluar.
+**Why this priority**: salvaguarda de seguridad operativa — antes de dar acceso amplio a directiva, hay que asegurar que ese acceso no incluye la capacidad de romper la configuración ni la gestión de usuarios.
 
-**Independent Test**: con el rol en "informadores", abrir una ficha de árbitro, dejar un comentario, y comprobar que persiste igual que lo hace hoy para "comité"; comprobar que Equipos y Partidos son accesibles (una vez existan esas páginas).
+**Independent Test**: con una cuenta de rol "directiva", comprobar que el panel de administración de la Historia 2 no es accesible; con una cuenta "admin", comprobar que sí.
 
 **Acceptance Scenarios**:
 
-1. **Given** el rol activo es "informadores", **When** se abre la ficha de un árbitro, **Then** se puede leer su información y dejar un comentario que queda registrado con autor y fecha.
-2. **Given** el rol activo es "informadores", **When** se navega a Equipos o Partidos, **Then** el acceso es igual de completo que el que tendría para analizarlos antes de un partido.
+1. **Given** una cuenta con rol "directiva", **When** se navega por la app, **Then** no aparece el panel de administración ni ninguna otra pantalla de configuración del sistema.
+2. **Given** una cuenta con rol "admin", **When** se navega por la app, **Then** el panel de administración y la configuración del sistema son accesibles.
 
 ---
 
-### User Story 4 - Árbitro se prepara para su próximo partido (Priority: P2)
+### User Story 4 - Árbitro entra y ve automáticamente su propia ficha (Priority: P2)
 
-Un árbitro consulta su propia ficha y las páginas Equipos y Partidos para prepararse antes de dirigir — ahí aparecen los insights relevantes sobre el partido/equipo concreto que se espera que consulte antes de pitar.
+Un árbitro inicia sesión con su email oficial (registrado en el comité) y ve directamente su propia ficha, su disponibilidad, y las páginas Equipos/Partidos para prepararse — nunca la ficha de otro árbitro.
 
-**Why this priority**: mismo nivel que la historia del informador — ambas dependen de que Equipos/Partidos existan, y ninguna bloquea a la otra.
+**Why this priority**: es la aplicación directa del modelo de cuentas al rol más numeroso — depende de que la Historia 1 y 2 (cuentas + gestión) ya existan.
 
-**Independent Test**: con el rol en "árbitros", comprobar que se ve la ficha propia (histórico, disponibilidad) y Equipos/Partidos con insights; comprobar que no aparece ninguna lectura evaluativa (patrón de implicación, informes internos) que hoy ya está restringida a comité/informadores.
+**Independent Test**: crear una cuenta de rol "árbitros" vinculada a un `arbitro_id` concreto, iniciar sesión con su email, y comprobar que la ficha mostrada es la suya y solo la suya — sin selector ni posibilidad de navegar a la ficha de otro árbitro.
 
 **Acceptance Scenarios**:
 
-1. **Given** el rol activo es "árbitros", **When** se abre la ficha, **Then** se ve el historial propio (partidos, disponibilidad) pero no el patrón de implicación ni las notas internas del comité (ya restringido hoy por FR-008/FR-009 de `002-disponibilidad-arbitro`).
-2. **Given** el rol activo es "árbitros", **When** se navega a Equipos o Partidos antes de un partido propio, **Then** se ven los insights relevantes para ese partido/equipo.
+1. **Given** una cuenta de rol "árbitros" vinculada a un árbitro concreto, **When** esa persona inicia sesión, **Then** ve su propia ficha (histórico, disponibilidad) directamente, sin listado de otros árbitros.
+2. **Given** la misma cuenta, **When** navega a Equipos o Partidos, **Then** ve los insights relevantes para prepararse, pero no ve el patrón de implicación ni las notas internas del comité (FR-008/FR-009 de `002-disponibilidad-arbitro`, heredado aquí).
 
 ---
 
-### User Story 5 - Administrativo gestiona disponibilidad, designaciones y sigue el económico (Priority: P3)
+### User Story 5 - Informador consulta y comenta antes de evaluar (Priority: P2)
 
-Un administrativo se ciñe a tareas de gestión: disponibilidad y designaciones (esto último junto a directiva), y consulta la vista económica para ver cómo evoluciona el motor de designación — sin acceso a fichas de evaluación más allá de lo estrictamente necesario para gestionar disponibilidad.
+Un informador, con su propia cuenta, consulta la ficha de cualquier árbitro y las páginas Equipos y Partidos, y deja comentarios en la ficha del árbitro — mismo mecanismo de comentarios ya construido en `003-persistencia-real` (US1), ahora con autoría de usuario real en vez del texto genérico `"Comité"`.
 
-**Why this priority**: es el rol más acotado de los cinco — su ausencia no bloquea el resto de historias, y su alcance es el que menos impacto tiene si se retrasa.
+**Why this priority**: mismo nivel que la Historia 4 — ambas dependen de que existan cuentas y roles, ninguna bloquea a la otra.
 
-**Independent Test**: con el rol en "administrativos", comprobar acceso a Disponibilidad, Designación y la vista económica; comprobar que no hay acceso a informes/evaluaciones internas de la ficha del árbitro.
+**Independent Test**: con una cuenta de rol "informadores", abrir la ficha de un árbitro, dejar un comentario, y comprobar que queda registrado con el nombre/email real de esa cuenta como autor.
 
 **Acceptance Scenarios**:
 
-1. **Given** el rol activo es "administrativos", **When** se navega a Designación, **Then** puede confirmar o cambiar un candidato igual que hoy puede hacer "comité" (US2 de `003-persistencia-real`).
-2. **Given** el rol activo es "administrativos", **When** se abre la vista económica, **Then** es accesible en modo consulta.
+1. **Given** una cuenta de rol "informadores", **When** se abre la ficha de un árbitro y se deja un comentario, **Then** queda registrado con la identidad real de esa cuenta, fecha, y visible para quien tenga acceso a esa ficha.
+
+---
+
+### User Story 6 - Administrativo gestiona disponibilidad, designaciones y sigue el económico (Priority: P3)
+
+Un administrativo, con su propia cuenta, gestiona disponibilidad y designaciones (junto a directiva) y consulta la vista económica — sin acceso a notas internas ni al patrón de implicación de ningún árbitro.
+
+**Why this priority**: el rol más acotado de los cinco — su ausencia no bloquea el resto, y es el que menos impacto tiene si se retrasa.
+
+**Independent Test**: con una cuenta de rol "administrativos", comprobar acceso a Disponibilidad, Designación y vista económica; comprobar que no hay acceso a informes/evaluaciones internas.
+
+**Acceptance Scenarios**:
+
+1. **Given** una cuenta de rol "administrativos", **When** se navega a Designación, **Then** puede confirmar o cambiar un candidato con su identidad real quedando registrada (igual que hoy hace "comité" en US2 de `003-persistencia-real`).
 
 ---
 
 ### Edge Cases
 
-- Sin autenticación real, cualquiera que abra la app puede cambiar el selector a cualquier rol, incluido admin — mismo límite ya asumido y documentado por FR-012 de `002-disponibilidad-arbitro`; esta spec no lo resuelve, solo lo hereda y lo deja igual de explícito.
-- ¿Qué pasa con el contenido hoy etiquetado "visible solo para el comité" (notas de seguimiento, patrón de implicación) al introducir 5 roles en vez de 2? Se resuelve mapeando "comité" a los roles que heredan ese nivel de acceso (ver FR-007) — no se pierde ninguna restricción ya existente.
-- ¿Qué pasa si Equipos o Partidos (specs futuras) añaden una sección que no encaja claramente en ninguno de los 5 roles descritos aquí? Esta spec no puede anticiparlo — cada spec nueva declara explícitamente a qué roles aplica cada sección, usando el vocabulario de roles fijado aquí.
+- ¿Qué pasa si alguien intenta entrar con un email que no tiene cuenta creada? Se rechaza con un mensaje claro (Historia 1, Acceptance Scenario 3) — nadie se autorregistra, todas las cuentas las crea el admin.
+- ¿Qué pasa si el admin elimina su propia única cuenta de admin? El sistema DEBE impedir quedarse sin ningún admin activo (ver FR-014) — de lo contrario nadie podría volver a gestionar usuarios.
+- ¿Qué pasa con el contenido hoy etiquetado "visible solo para el comité" (notas de seguimiento, patrón de implicación)? Se resuelve mapeando ese nivel de acceso a admin, directiva e informadores (ver FR-008) — no se pierde ninguna restricción ya existente.
+- ¿Qué pasa si un árbitro todavía no tiene email oficial verificado por el comité? Su cuenta no se crea todavía — ver Assumptions, es un bloqueante de datos, no de producto.
+- ¿Qué pasa con las acciones que ya persisten hoy en Supabase (`anotaciones.autor`, `designaciones.decidido_por_rol`, `declaraciones_disponibilidad.autor_rol`) con el texto genérico `"comite"`/`"Comité"`? Pasan a referenciar al usuario real que hizo la acción (ver FR-009) — es un cambio sobre datos ya construidos en `003-persistencia-real`, no solo sobre pantallas nuevas.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: El sistema DEBE ofrecer un selector de rol activo con 5 opciones (admin, directiva, informadores, árbitros, administrativos), sin autenticación real detrás — generaliza el mecanismo ya definido por FR-012 de `002-disponibilidad-arbitro` (estado de UI, sin sesión ni contraseña), disponible en toda la app y no solo en la ficha de árbitro.
-- **FR-002**: Únicamente el rol admin DEBE poder ver y modificar la configuración del sistema; ningún otro rol debe tener acceso a ella.
-- **FR-003**: El rol directiva DEBE tener acceso de lectura y a las acciones de gestión ya existentes (designación, disponibilidad, notas) en todas las pantallas salvo las de configuración.
-- **FR-004**: El rol informadores DEBE poder ver la ficha de cualquier árbitro y las páginas Equipos y Partidos, y DEBE poder dejar comentarios/anotaciones en la ficha del árbitro con el mismo mecanismo ya construido en `003-persistencia-real` (US1).
-- **FR-005**: El rol árbitros DEBE poder ver una ficha de árbitro (la resuelta como "la propia" según la Aclaración 1) y las páginas Equipos y Partidos, con los insights relevantes para el partido que va a dirigir.
-- **FR-006**: El rol administrativos DEBE poder ver y gestionar disponibilidad y designaciones (igual que hoy "comité" en `003-persistencia-real`), y DEBE poder ver la vista económica en modo consulta; NO DEBE tener acceso a notas internas del comité ni al patrón de implicación de ningún árbitro.
-- **FR-007**: Todo contenido hoy restringido a "comité" (notas de seguimiento internas, patrón de implicación, FR-008/FR-009 de `002-disponibilidad-arbitro`) DEBE seguir restringido bajo el nuevo modelo a admin, directiva e informadores; NUNCA visible para árbitros ni administrativos.
-- **FR-008**: El sistema NO DEBE persistir ninguna identidad de usuario real ni sesión autenticada como parte de esta spec — el rol activo sigue siendo una simulación de interfaz, mismo límite ya documentado por `002-disponibilidad-arbitro`.
-- **FR-009**: Cada spec futura que añada una pantalla nueva (Equipos, Partidos, u otra) DEBE declarar explícitamente a qué roles de los definidos aquí aplica cada una de sus secciones, en vez de inventar un modelo de acceso propio.
+- **FR-001**: El sistema DEBE autenticar usuarios reales mediante email y un enlace de acceso de un solo uso (sin contraseña) — sustituye completamente el selector "ver como" sin login de FR-012 de `002-disponibilidad-arbitro`.
+- **FR-002**: El sistema NO DEBE permitir que nadie cree su propia cuenta — toda cuenta la crea el admin desde el panel de administración (Historia 2).
+- **FR-003**: Únicamente el rol admin DEBE poder ver y modificar la configuración del sistema, incluida la gestión de usuarios; ningún otro rol debe tener acceso a ella.
+- **FR-004**: El rol directiva DEBE tener acceso de lectura y a las acciones de gestión ya existentes (designación, disponibilidad, notas) en todas las pantallas salvo las de configuración/administración de usuarios.
+- **FR-005**: El rol informadores DEBE poder ver la ficha de cualquier árbitro y las páginas Equipos y Partidos, y DEBE poder dejar comentarios/anotaciones con su identidad real como autor.
+- **FR-006**: El rol árbitros DEBE ver, automáticamente al iniciar sesión, únicamente la ficha del árbitro al que su cuenta está vinculada, más las páginas Equipos y Partidos para preparar su partido — nunca la ficha de otro árbitro, sin selector manual de por medio.
+- **FR-007**: El rol administrativos DEBE poder ver y gestionar disponibilidad y designaciones, y ver la vista económica en modo consulta; NO DEBE tener acceso a notas internas del comité ni al patrón de implicación de ningún árbitro.
+- **FR-008**: Todo contenido hoy restringido a "comité" (notas internas, patrón de implicación — FR-008/FR-009 de `002-disponibilidad-arbitro`) DEBE seguir restringido a admin, directiva e informadores; nunca visible para árbitros ni administrativos.
+- **FR-009**: Cada acción que hoy queda registrada con un texto de rol genérico (`anotaciones.autor`, `designaciones.decidido_por_rol`, `declaraciones_disponibilidad.autor_rol` de `003-persistencia-real`) DEBE pasar a registrar la identidad real del usuario autenticado que la realizó.
+- **FR-010**: El admin DEBE poder, desde un panel dedicado: crear una cuenta (email + rol, y `arbitro_id` si el rol es árbitro), modificar el rol de una cuenta existente, y eliminar una cuenta.
+- **FR-011**: El sistema DEBE registrar un historial de actividad por usuario — como mínimo inicios de sesión y las acciones ya persistidas en `anotaciones`/`designaciones`/`declaraciones_disponibilidad`/comentarios de equipo (`006-partidos`) — consultable por el admin desde el panel.
+- **FR-012**: El sistema NO DEBE crear una cuenta de árbitro sin un email oficial verificado por el comité — nunca se usa el email sintético generado hoy en `arbitros-200.json` (patrón `nombre.apellido@arbitrosffcv.es`) para enviar un enlace de acceso real.
+- **FR-013**: El alta de cuentas de árbitro DEBE hacerse de forma progresiva por categoría: mientras el roster completo de árbitros no esté cargado en el sistema, se empieza por Tercera Federación (la categoría más alta, con dato ya disponible); en cuanto el roster completo (~1208 árbitros reales) esté cargado, el criterio de orden pasa a ser de menos a más árbitros reales por categoría.
+- **FR-014**: El sistema DEBE impedir que se elimine o degrade la última cuenta con rol admin activa — siempre debe quedar al menos una.
+- **FR-015**: Cada spec futura que añada una pantalla nueva (Equipos, Partidos, u otra) DEBE declarar explícitamente a qué roles de los definidos aquí aplica cada una de sus secciones, en vez de inventar un modelo de acceso propio.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Rol**: uno de `admin | directiva | informadores | arbitros | administrativos` — no es una entidad persistida (no hay tabla `usuarios` ni `roles`), es un valor de estado de interfaz, igual que el "ver como" ya existente.
-- **Alcance de visibilidad por rol**: mapeo conceptual de qué páginas/secciones ve y qué acciones puede hacer cada rol (resumido en esta spec) — no introduce ninguna tabla ni columna nueva en Supabase; en las tablas ya existentes (`anotaciones`, `designaciones`, `declaraciones_disponibilidad`) el campo de autoría (`autor`, `decidido_por_rol`, `autor_rol`) pasa a poder tomar los 5 valores de Rol en vez de solo `arbitro`/`comite` (ver Aclaración 3).
+- **Usuario**: cuenta real — email, rol (uno de `admin | directiva | informadores | arbitros | administrativos`), `arbitro_id` (solo si el rol es árbitro, referencia lógica a `arbitros-200.json`/roster real), fecha de creación, fecha de último acceso. Vive en el sistema de autenticación (Supabase Auth) más una tabla de perfil/rol asociada — mismo patrón de repositorio ya usado en `003-persistencia-real`.
+- **HistorialUso**: registro append-only de eventos por usuario (inicio de sesión, y referencia a las acciones ya registradas en otras tablas) — mismo principio "nunca se sobrescribe" ya aplicado a `anotaciones`/`designaciones`/`declaraciones_disponibilidad`.
+- **Rol**: uno de los 5 valores — ya no es un valor de estado de interfaz sin persistencia (como en el draft anterior de esta spec), pasa a ser un atributo real de `Usuario`.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: Una persona puede cambiar entre los 5 roles y verificar en menos de 10 segundos, sin ayuda, qué páginas o secciones aparecen u desaparecen para cada uno.
-- **SC-002**: El 100% de las pantallas y acciones ya existentes (notas, designaciones, disponibilidad, económico) quedan asignadas a al menos un rol, sin ninguna zona de la app huérfana de asignación de rol.
-- **SC-003**: Ningún rol distinto de admin puede llegar a una pantalla o control de configuración del sistema en ningún punto de la navegación.
-- **SC-004**: Un árbitro que usa el rol "árbitros" no encuentra en ningún punto de la interfaz una valoración o comentario evaluativo interno sobre sí mismo (mismo criterio que SC-005 de `002-disponibilidad-arbitro`, extendido al nuevo modelo de roles).
+- **SC-001**: Una persona con cuenta creada puede iniciar sesión con su email y estar dentro de la app en menos de 1 minuto (tiempo de recibir y pulsar el enlace incluido).
+- **SC-002**: El admin puede crear una cuenta nueva, asignarle un rol y verla operativa en menos de 2 minutos desde el panel de administración.
+- **SC-003**: El 100% de las acciones que hoy quedan registradas en `anotaciones`, `designaciones` y `declaraciones_disponibilidad` referencian un usuario real identificable, no un texto de rol genérico.
+- **SC-004**: Ningún rol distinto de admin puede llegar al panel de administración ni a ninguna otra pantalla de configuración en ningún punto de la navegación.
+- **SC-005**: Un árbitro que inicia sesión no ve en ningún momento la ficha de otro árbitro, ni tiene que elegir cuál es la suya.
+- **SC-006**: Ninguna cuenta de árbitro se crea sin un email oficial verificado por el comité — el 100% de los emails usados para enlaces de acceso son reales, ninguno sintético.
 
 ## Assumptions
 
-- El detalle fino de permisos campo a campo (por ejemplo, si un informador puede editar una nota que dejó otro informador) no está cerrado con el comité todavía — esta spec fija la filosofía de cada rol descrita por Roberto, no un modelo de permisos exhaustivo; se concreta más adelante cuando haga falta.
-- El rol por defecto al abrir la app (Acceptance Scenario 1 de la Historia 1) se fija como "comité" en su acepción más amplia dentro del nuevo modelo — de forma concreta, **directiva** — porque hoy la app ya nace mostrando el punto de vista de gestión (Dashboard, Designación) y es el rol más parecido al "comité" que ya era el valor por defecto antes de esta spec.
-- Las páginas Equipos y Partidos, mencionadas aquí como destino de visibilidad para varios roles, no existen todavía — se especifican en sus propias specs (después de esta), que heredan el vocabulario de roles fijado aquí en vez de definir uno propio.
-- El registro de consultas de preparación de un árbitro (cuántas veces y con qué antelación consulta los insights de Equipos/Partidos antes de su partido) queda **fuera de alcance de esta spec** — es una idea capturada (`docs/decisiones-producto.md` §20) que se especificará dentro de la spec de Partidos, no aquí, porque depende de que Partidos exista primero.
-- "Configuración del sistema" (FR-002) es un principio preparatorio: hoy no existe ninguna pantalla de configuración construida en la app, así que esta spec no bloquea nada existente — fija la regla para cuando esa pantalla se construya (ver Aclaración 2).
-
-## Clarifications
-
-### Session 2026-07-28
-
-- Q: ¿Cómo se resuelve "el árbitro ve su propia ficha" (US4/FR-005) sin autenticación real, si cualquiera puede activar el rol "árbitros" y hoy todas las fichas son igual de accesibles desde el listado? → A: Al activar el rol "árbitros", el listado de Árbitros deja de mostrarse tal cual — se sustituye por un selector simple de "¿qué ficha eres?" (sin contraseña) que fija la ficha activa para el resto de la sesión de UI, simulando que esa es la única ficha visible para ese rol.
-- Q: ¿"Configuración del sistema" (FR-002) se refiere a alguna pantalla ya existente o es un principio preparatorio sin implementación todavía? → A: Es preparatorio — hoy no existe ninguna pantalla de configuración en la app; FR-002 fija la regla para cuando exista, no bloquea nada del alcance actual de esta spec.
-- Q: ¿"Informadores" es un rol distinto de "comité", o "comité" (ya usado en el código como `decidido_por_rol`/`autor_rol` en `003-persistencia-real`) se reparte ahora entre varios de los 5 roles nuevos? → A: "Comité" tal como existe hoy en el código se reparte: donde antes cualquier autor "comité" tenía acceso completo, ahora ese acceso se divide entre **directiva** (gestión + designación) e **informadores** (fichas + comentarios) según la acción concreta — el valor persistido en Supabase pasa a reflejar el rol específico (uno de los 5) en vez del genérico "comite".
+- **Mecanismo de acceso**: enlace de un solo uso por email (Supabase Auth, magic link), sin contraseña — decisión adoptada por defecto tras explicar la alternativa a Roberto; corregible si prefiere email+contraseña visible en la pantalla de login.
+- **Bloqueante de rollout real para árbitros**: los emails de árbitros en el dataset de trabajo (`arbitros-200.json`) son sintéticos (patrón `nombre.apellido@arbitrosffcv.es`, ver inventario de datos de `docs/estado-actual.md` §3) — no se puede dar de alta ninguna cuenta de árbitro real hasta obtener del comité su email oficial verdadero. Es la misma clase de dependencia externa que ya bloquea el "dato real de evaluaciones" (workstream paralelo de `docs/sprints.md`), no una tarea de ingeniería que se resuelva escribiendo código.
+- **Rollout en dos fases** (28 jul 2026): Fase 1, ahora — cuentas de directiva/comisión y administración (no dependen de categoría). Fase 2 — cuentas de árbitro, empezando por Tercera Federación (categoría más alta, con dato disponible en el sistema hoy) mientras el roster completo no esté cargado; en cuanto lo esté (~1208 árbitros reales), el criterio de orden cambia a "de menos a más árbitros por categoría" tal como se pidió originalmente.
+- El detalle exacto de qué puede editar cada rol campo a campo (más allá de la filosofía descrita aquí) sigue sin cerrar con el comité — se concreta más adelante.
+- El diseño exacto del panel de administración (qué columnas, qué filtros del historial de uso) se detalla en el plan técnico, no en esta spec.
+- Las páginas Equipos (`005-equipos`) y Partidos (`006-partidos`) heredan el vocabulario de roles fijado aquí, sin definir uno propio.

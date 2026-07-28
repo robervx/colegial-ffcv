@@ -1,7 +1,7 @@
-# Specification Quality Checklist: Modelo de roles y permisos ampliado
+# Specification Quality Checklist: Cuentas de usuario, roles y panel de administración
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-07-28
+**Created**: 2026-07-28 (revisada tras pivote a autenticación real)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -31,4 +31,7 @@
 
 ## Notes
 
-- Las 3 aclaraciones resueltas en `spec.md` (rol por defecto, mecanismo de "ficha propia" sin login, reparto de "comité" entre directiva/informadores) son decisiones razonadas pero no confirmadas por Roberto todavía — quedan documentadas con su porqué para que las confirme o corrija antes de pasar a `/speckit-plan`. El detalle fino de permisos campo a campo sigue explícitamente fuera de esta spec (ver Assumptions).
+- Confirmado con Roberto (28 jul 2026): usuarios reales con credencial (no simulación "ver como"), panel de admin con historial de uso, rollout en dos fases (directiva/administración primero, luego árbitros por Tercera Federación hasta cargar el roster completo, después por cantidad).
+- Mecanismo de acceso (magic link, Assumptions) explicado a Roberto y adoptado por defecto — sigue abierto a corrección si prefiere email+contraseña.
+- **Bloqueante real señalado, no de esta spec**: no hay emails oficiales verificados de árbitros todavía (`arbitros-200.json` los tiene sintéticos) — FR-012/SC-006 dejan esto explícito. El rollout de cuentas de árbitro no puede empezar de verdad hasta resolver esa dependencia con el comité.
+- El detalle fino de permisos campo a campo y el diseño exacto del panel de administración siguen fuera de esta spec (ver Assumptions) — se concretan en el plan técnico y con el comité.
