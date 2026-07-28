@@ -20,6 +20,14 @@ import { CATEGORIAS } from "../lib/categorias";
 import { conDisponibilidad } from "../lib/disponibilidad";
 import { coberturaPorCategoria } from "../lib/coberturaCategoria";
 import { obtenerAnotaciones, guardarAnotacion } from "../lib/anotacionesRepo";
+import { obtenerVigentesPorCiclo, decidir as decidirDesignacion, conDecisionVigente } from "../lib/designacionesRepo";
+import {
+  obtenerLog as obtenerLogDisponibilidad,
+  declararDisponibilidad,
+  obtenerVigentesPorCiclo as obtenerVigentesDisponibilidadPorCiclo,
+} from "../lib/disponibilidadRepo";
+import { calcularPatronImplicacion } from "../lib/patronImplicacion";
+import { validarAntelacionFestivo } from "../lib/reglaFestivo";
 
 /* ================================================================
    COLEGIAL · CRM de expedientes arbitrales — versión 1 ampliada
@@ -110,6 +118,19 @@ const ETIQUETA_NOTA = {
   positiva: { label: "Positiva", bg: N.verdeT, fg: N.verde },
   mejora: { label: "A mejorar", bg: N.ambarT, fg: N.ambar },
   disciplinaria: { label: "Disciplinaria", bg: N.rojoT, fg: N.rojo },
+};
+
+/* specs/002-disponibilidad-arbitro */
+const TIPO_DISPONIBILIDAD = {
+  disponible: { label: "Disponible" },
+  no_disponible: { label: "No disponible" },
+  solo_categoria_propia: { label: "Solo categoría propia" },
+  festivo_solicitado: { label: "Festivo solicitado" },
+};
+const MOTIVO_INDISPONIBILIDAD = {
+  lesion: { label: "Lesión" },
+  baja: { label: "Baja" },
+  urgencia: { label: "Urgencia" },
 };
 
 /* ------------------------------- piezas ------------------------------- */
@@ -225,7 +246,28 @@ function Dashboard({ T, irArbitros }) {
   const cvTexto = cv >= 0.8 ? "muy desigual" : cv >= 0.5 ? "desigual" : "equilibrada";
 
   const cicloActivo = ciclosAsignacion[0];
-  const cobertura = useMemo(() => coberturaPorCategoria(ARBITROS, cicloActivo), [cicloActivo]);
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState("cargando"); // cargando | listo | error
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id)
+      .then((vigentes) => {
+        if (cancelado) return;
+        setVigentesDisponibilidad(vigentes);
+        setDisponibilidadEstado("listo");
+      })
+      .catch(() => {
+        if (cancelado) return;
+        setDisponibilidadEstado("error");
+      });
+    return () => { cancelado = true; };
+  }, [cicloActivo.id]);
+
+  const cobertura = useMemo(
+    () => coberturaPorCategoria(ARBITROS, cicloActivo, disponibilidadEstado === "listo" ? vigentesDisponibilidad : null),
+    [cicloActivo, vigentesDisponibilidad, disponibilidadEstado]
+  );
   const categoriasConPartidos = cobertura.porCategoria.filter((c) => c.partidosADesignar > 0);
   const categoriasEnRiesgo = categoriasConPartidos.filter((c) => c.estado === "riesgo");
 
@@ -262,7 +304,11 @@ function Dashboard({ T, irArbitros }) {
       <Panel
         title={`Cobertura por categoría · ${cicloActivo.finDeSemana}`}
         right={
-          categoriasEnRiesgo.length > 0 ? (
+          disponibilidadEstado !== "listo" ? (
+            <span className="text-[11px]" style={{ color: N.ink40 }}>
+              {disponibilidadEstado === "cargando" ? "cargando disponibilidad…" : "disponibilidad no disponible"}
+            </span>
+          ) : categoriasEnRiesgo.length > 0 ? (
             <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: N.rojo }}>
               <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
             </span>
@@ -273,29 +319,39 @@ function Dashboard({ T, irArbitros }) {
           )
         }
       >
-        {cobertura.datasetDisponibilidadVacio && (
-          <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: N.rojo, borderColor: N.rojoT, background: N.rojoT }}>
-            No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
+        {disponibilidadEstado === "cargando" ? (
+          <p className="text-xs" style={{ color: N.ink40 }}>Cargando disponibilidad real del ciclo…</p>
+        ) : disponibilidadEstado === "error" ? (
+          <p className="text-xs rounded px-3 py-2" style={{ color: N.rojo, background: N.rojoT }}>
+            No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
           </p>
-        )}
-        {categoriasConPartidos.length === 0 ? (
-          <p className="text-xs" style={{ color: N.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
         ) : (
-          <div className="space-y-2.5">
-            {categoriasConPartidos.map((c) => (
-              <div key={c.categoria} className="flex items-center justify-between gap-3 rounded border p-3 flex-wrap" style={{ borderColor: N.rule }}>
-                <div>
-                  <div className="text-sm font-medium" style={{ color: N.ink }}>{c.categoria}</div>
-                  <div className="text-xs mt-0.5 font-mono tabular-nums" style={{ color: N.ink70 }}>
-                    {c.partidosADesignar} {c.partidosADesignar === 1 ? "partido" : "partidos"} a designar <span style={{ color: N.ink40 }}>· real</span>
-                    {" — "}
-                    {c.disponiblesCategoriaPropia} de categoría propia + {c.disponiblesCategoriaInferior} de categoría inferior = {c.totalDisponibles} {c.totalDisponibles === 1 ? "disponible" : "disponibles"} <span style={{ color: N.ambar }}>· sintético</span>
+          <>
+            {cobertura.datasetDisponibilidadVacio && (
+              <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: N.rojo, borderColor: N.rojoT, background: N.rojoT }}>
+                No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
+              </p>
+            )}
+            {categoriasConPartidos.length === 0 ? (
+              <p className="text-xs" style={{ color: N.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
+            ) : (
+              <div className="space-y-2.5">
+                {categoriasConPartidos.map((c) => (
+                  <div key={c.categoria} className="flex items-center justify-between gap-3 rounded border p-3 flex-wrap" style={{ borderColor: N.rule }}>
+                    <div>
+                      <div className="text-sm font-medium" style={{ color: N.ink }}>{c.categoria}</div>
+                      <div className="text-xs mt-0.5 font-mono tabular-nums" style={{ color: N.ink70 }}>
+                        {c.partidosADesignar} {c.partidosADesignar === 1 ? "partido" : "partidos"} a designar <span style={{ color: N.ink40 }}>· real</span>
+                        {" — "}
+                        {c.disponiblesCategoriaPropia} de categoría propia + {c.disponiblesCategoriaInferior} de categoría inferior = {c.totalDisponibles} {c.totalDisponibles === 1 ? "disponible" : "disponibles"} <span style={{ color: N.verde }}>· real</span>
+                      </div>
+                    </div>
+                    <BadgeCobertura estado={c.estado} />
                   </div>
-                </div>
-                <BadgeCobertura estado={c.estado} />
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
         <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
           “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
@@ -619,6 +675,19 @@ function Ficha({ T, a, back }) {
   const [guardandoNota, setGuardandoNota] = useState(false);
   const [errorNota, setErrorNota] = useState(null);
 
+  // specs/002-disponibilidad-arbitro: "ver como" sin autenticación real (FR-012) — estado
+  // local de esta ficha, no persiste entre visitas ni entre árbitros.
+  const [rolVista, setRolVista] = useState("comite");
+  const [logDisponibilidad, setLogDisponibilidad] = useState([]);
+  const [logDispEstado, setLogDispEstado] = useState("cargando"); // cargando | listo | error
+  const [patron, setPatron] = useState(null);
+  const [cicloDeclaracion, setCicloDeclaracion] = useState(ciclosAsignacion[0].id);
+  const [tipoDisponibilidad, setTipoDisponibilidad] = useState("disponible");
+  const [motivoIndisponibilidad, setMotivoIndisponibilidad] = useState("lesion");
+  const [bajaJustificada, setBajaJustificada] = useState(true);
+  const [guardandoDisponibilidad, setGuardandoDisponibilidad] = useState(false);
+  const [errorDisponibilidad, setErrorDisponibilidad] = useState(null);
+
   useEffect(() => {
     // key={a.id} en el punto de uso remonta Ficha al cambiar de árbitro, así
     // que aquí no hace falta resetear notasEstado a mano — ya nace "cargando".
@@ -634,6 +703,47 @@ function Ficha({ T, a, back }) {
     });
     return () => { cancelado = true; };
   }, [a.id]);
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerLogDisponibilidad(a.id)
+      .then((log) => {
+        if (cancelado) return;
+        setLogDisponibilidad(log);
+        setPatron(calcularPatronImplicacion(log));
+        setLogDispEstado("listo");
+      })
+      .catch(() => { if (!cancelado) setLogDispEstado("error"); });
+    return () => { cancelado = true; };
+  }, [a.id]);
+
+  const cicloSeleccionado = ciclosAsignacion.find((c) => c.id === cicloDeclaracion);
+  const antelacionFestivo =
+    tipoDisponibilidad === "festivo_solicitado" && cicloSeleccionado?.fechaInicioISO
+      ? validarAntelacionFestivo(new Date().toISOString(), cicloSeleccionado.fechaInicioISO)
+      : null;
+
+  const declarar = async () => {
+    if (guardandoDisponibilidad || (antelacionFestivo && !antelacionFestivo.valido)) return;
+    setGuardandoDisponibilidad(true);
+    setErrorDisponibilidad(null);
+    const resultado = await declararDisponibilidad({
+      arbitroId: a.id,
+      cicloId: cicloDeclaracion,
+      autor: rolVista,
+      tipo: tipoDisponibilidad,
+      motivo: tipoDisponibilidad === "no_disponible" ? motivoIndisponibilidad : null,
+      justificada: tipoDisponibilidad === "no_disponible" && motivoIndisponibilidad === "baja" ? bajaJustificada : null,
+    });
+    setGuardandoDisponibilidad(false);
+    if (!resultado.ok) {
+      setErrorDisponibilidad(resultado.motivoRechazo);
+      return;
+    }
+    const nuevoLog = [...logDisponibilidad, resultado.declaracion];
+    setLogDisponibilidad(nuevoLog);
+    setPatron(calcularPatronImplicacion(nuevoLog));
+  };
 
   const addNota = async () => {
     if (!nueva.trim() || guardandoNota) return;
@@ -655,9 +765,20 @@ function Ficha({ T, a, back }) {
 
   return (
     <div className="space-y-5">
-      <button onClick={back} className="text-xs flex items-center gap-1" style={{ color: N.ink70 }}>
-        <ChevronRight size={13} className="rotate-180" /> Volver a expedientes
-      </button>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <button onClick={back} className="text-xs flex items-center gap-1" style={{ color: N.ink70 }}>
+          <ChevronRight size={13} className="rotate-180" /> Volver a expedientes
+        </button>
+        <div className="flex items-center rounded-full border p-0.5 text-xs" style={{ borderColor: N.rule }}>
+          {[["arbitro", "Ver como árbitro"], ["comite", "Ver como comité"]].map(([val, label]) => (
+            <button key={val} onClick={() => setRolVista(val)}
+              className="rounded-full px-3 py-1 font-medium transition-colors"
+              style={{ background: rolVista === val ? T.primary : "transparent", color: rolVista === val ? "#FFF" : N.ink70 }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="rounded-md overflow-hidden" style={{ background: T.primary }}>
         <div className="p-6 flex flex-wrap items-center justify-between gap-6">
@@ -816,6 +937,106 @@ function Ficha({ T, a, back }) {
               </div>
             )}
           </Panel>
+
+          {/* disponibilidad declarada por ciclo — specs/002-disponibilidad-arbitro */}
+          <Panel title="Disponibilidad"
+            right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ink40 }}><Lock size={11} /> historial visible para ambos roles</span>}>
+            <div className="flex flex-wrap items-end gap-2 mb-3">
+              <div>
+                <label className="block text-[10px] uppercase tracking-[0.1em] mb-1" style={{ color: N.ink40 }}>Ciclo</label>
+                <select value={cicloDeclaracion} onChange={(e) => setCicloDeclaracion(e.target.value)}
+                  className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
+                  {ciclosAsignacion.map((cy) => <option key={cy.id} value={cy.id}>{cy.finDeSemana}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-[0.1em] mb-1" style={{ color: N.ink40 }}>Disponibilidad</label>
+                <select value={tipoDisponibilidad} onChange={(e) => setTipoDisponibilidad(e.target.value)}
+                  className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
+                  {Object.entries(TIPO_DISPONIBILIDAD).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                </select>
+              </div>
+              {tipoDisponibilidad === "no_disponible" && (
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.1em] mb-1" style={{ color: N.ink40 }}>Motivo</label>
+                  <select value={motivoIndisponibilidad} onChange={(e) => setMotivoIndisponibilidad(e.target.value)}
+                    className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
+                    {Object.entries(MOTIVO_INDISPONIBILIDAD).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                  </select>
+                </div>
+              )}
+              {tipoDisponibilidad === "no_disponible" && motivoIndisponibilidad === "baja" && (
+                <label className="flex items-center gap-1.5 text-xs pb-2" style={{ color: N.ink70 }}>
+                  <input type="checkbox" checked={bajaJustificada} onChange={(e) => setBajaJustificada(e.target.checked)} /> Justificada
+                </label>
+              )}
+              <button onClick={declarar}
+                disabled={guardandoDisponibilidad || Boolean(antelacionFestivo && !antelacionFestivo.valido)}
+                className="text-xs rounded px-3 py-2 text-white font-medium disabled:opacity-60" style={{ background: T.primary }}>
+                {guardandoDisponibilidad ? "Guardando…" : "Declarar"}
+              </button>
+            </div>
+
+            {antelacionFestivo && !antelacionFestivo.valido && (
+              <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: "#7A5A10", background: N.ambarT }}>
+                Un festivo solicitado necesita al menos 15 días de antelación (hay {antelacionFestivo.diasAntelacion}).
+              </p>
+            )}
+            {errorDisponibilidad && (
+              <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: N.rojo, background: N.rojoT }}>
+                No se pudo guardar: {errorDisponibilidad}
+              </p>
+            )}
+
+            <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2 pt-2 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+              Historial
+            </div>
+            {logDispEstado === "cargando" ? (
+              <p className="text-xs" style={{ color: N.ink40 }}>Cargando historial…</p>
+            ) : logDispEstado === "error" ? (
+              <p className="text-xs rounded px-3 py-2" style={{ color: N.rojo, background: N.rojoT }}>
+                No se pudo cargar el historial de disponibilidad.
+              </p>
+            ) : logDisponibilidad.length === 0 ? (
+              <p className="text-xs" style={{ color: N.ink40 }}>Sin declaraciones — se asume disponible por defecto.</p>
+            ) : (
+              <div className="space-y-2">
+                {logDisponibilidad.slice().reverse().map((d) => {
+                  const cicloEtiqueta = ciclosAsignacion.find((cy) => cy.id === d.cicloId)?.finDeSemana ?? d.cicloId;
+                  const fecha = new Date(d.fechaDeclaracion).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" });
+                  const noJustificada = d.motivo === "baja" && d.justificada === false;
+                  return (
+                    <div key={d.id} className="rounded border p-2.5 text-xs" style={{ borderColor: noJustificada ? "#F0C9C2" : N.rule, background: noJustificada ? N.rojoT : "#FFF" }}>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium" style={{ color: N.ink }}>{TIPO_DISPONIBILIDAD[d.tipo]?.label ?? d.tipo}</span>
+                        {d.motivo && <span style={{ color: N.ink70 }}>· {MOTIVO_INDISPONIBILIDAD[d.motivo]?.label ?? d.motivo}</span>}
+                        {d.motivo === "baja" && (
+                          <span style={{ color: d.justificada ? N.verde : N.rojo }}>· {d.justificada ? "justificada" : "no justificada"}</span>
+                        )}
+                        <span className="font-mono" style={{ color: N.ink40 }}>{cicloEtiqueta}</span>
+                        <span className="font-mono" style={{ color: N.ink40 }}>{fecha}</span>
+                        <span style={{ color: N.ink40 }}>· {d.autor}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {rolVista === "comite" && logDispEstado === "listo" && patron && (
+              <div className="mt-4 pt-3 border-t rounded p-2.5" style={{ borderColor: N.rule, background: N.paper }}>
+                <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2 flex items-center gap-1" style={{ color: N.ink40 }}>
+                  <Lock size={10} /> Patrón de implicación · solo comité
+                </div>
+                <div className="flex gap-5 text-xs flex-wrap" style={{ color: N.ink70 }}>
+                  <span>Bajas no justificadas: <b style={{ color: patron.bajasNoJustificadas > 0 ? N.rojo : N.ink }}>{patron.bajasNoJustificadas}</b></span>
+                  <span>Festivos solicitados: <b style={{ color: N.ink }}>{patron.festivosSolicitados}</b></span>
+                  <span>Urgencias: <b style={{ color: N.ink }}>{patron.urgencias}</b></span>
+                </div>
+                <p className="text-[11px] mt-2" style={{ color: N.ink40 }}>Descriptivo, no interviene en el score ni en ninguna clasificación.</p>
+              </div>
+            )}
+          </Panel>
         </div>
 
         <div className="space-y-5">
@@ -936,8 +1157,61 @@ function Ficha({ T, a, back }) {
 }
 
 /* ------------------------------- designación inteligente (v0, en construcción) ------------------------------- */
-function FilaJornada({ r, T, expandido, onToggle }) {
-  const { partido, asignado, alternativas, requiereRevision, motivoRevision } = r;
+/** Busca un candidato por id entre los ya calculados para esta fila; si no está (poco probable, ver research.md), cae al roster completo. */
+function candidatoPorId(r, arbitroId) {
+  if (r.asignado?.arbitro?.id === arbitroId) return r.asignado.arbitro;
+  const alt = r.alternativas.find((al) => al.arbitro.id === arbitroId);
+  if (alt) return alt.arbitro;
+  return ARBITROS.find((a) => a.id === arbitroId) ?? null;
+}
+
+function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
+  const { partido, asignado, alternativas, requiereRevision, motivoRevision, decisionVigente } = r;
+  const [guardandoId, setGuardandoId] = useState(null); // "sugerido" | id del arbitro de la alternativa en curso
+  const [errorDecision, setErrorDecision] = useState(null);
+  const [alternativaMotivo, setAlternativaMotivo] = useState(null); // id del arbitro cuyo campo de motivo está abierto
+  const [motivoTexto, setMotivoTexto] = useState("");
+
+  const candidatoDecidido = decisionVigente ? candidatoPorId(r, decisionVigente.arbitroId) : null;
+  const fechaDecision = decisionVigente
+    ? new Date(decisionVigente.decididoEn).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })
+    : null;
+
+  const confirmarSugerido = async (e) => {
+    e.stopPropagation();
+    if (!asignado || guardandoId) return;
+    setGuardandoId("sugerido");
+    setErrorDecision(null);
+    const resultado = await onDecidir({ partidoId: partido.id, arbitroId: asignado.arbitro.id, esSugerido: true, motivo: null });
+    setGuardandoId(null);
+    if (!resultado.ok) setErrorDecision(resultado.error);
+  };
+
+  const abrirMotivo = (e, arbitroId) => {
+    e.stopPropagation();
+    setAlternativaMotivo(arbitroId);
+    setMotivoTexto("");
+    setErrorDecision(null);
+  };
+
+  const cancelarMotivo = (e) => {
+    e.stopPropagation();
+    setAlternativaMotivo(null);
+    setMotivoTexto("");
+  };
+
+  const confirmarAlternativa = async (e, arbitroId) => {
+    e.stopPropagation();
+    if (!motivoTexto.trim() || guardandoId) return;
+    setGuardandoId(arbitroId);
+    setErrorDecision(null);
+    const resultado = await onDecidir({ partidoId: partido.id, arbitroId, esSugerido: false, motivo: motivoTexto });
+    setGuardandoId(null);
+    if (!resultado.ok) { setErrorDecision(resultado.error); return; }
+    setAlternativaMotivo(null);
+    setMotivoTexto("");
+  };
+
   return (
     <>
       <tr className="border-b cursor-pointer hover:bg-slate-50" style={{ borderColor: N.rule }} onClick={onToggle}>
@@ -957,9 +1231,27 @@ function FilaJornada({ r, T, expandido, onToggle }) {
           ) : (
             <span className="text-xs" style={{ color: N.rojo }}>Sin candidato disponible</span>
           )}
+          {!decisionVigente && asignado && (
+            <button onClick={confirmarSugerido} disabled={guardandoId === "sugerido"}
+              className="mt-2 text-[11px] rounded px-2 py-1 font-medium text-white flex items-center gap-1 disabled:opacity-60" style={{ background: N.verde }}>
+              <Check size={11} /> {guardandoId === "sugerido" ? "Guardando…" : "Confirmar"}
+            </button>
+          )}
         </td>
         <td className="px-3 py-3">
-          {requiereRevision ? (
+          {decisionVigente ? (
+            <div>
+              <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium" style={{ background: N.verdeT, color: N.verde }}>
+                <Check size={11} /> Decidida
+              </span>
+              <div className="text-[10px] mt-1" style={{ color: N.ink40 }}>
+                {candidatoDecidido?.n ?? "árbitro"} · {decisionVigente.decididoPorRol === "comite" ? "comité" : "árbitro"} · {fechaDecision}
+              </div>
+              {decisionVigente.motivo && (
+                <div className="text-[10px] italic mt-0.5" style={{ color: N.ink40 }}>{`"${decisionVigente.motivo}"`}</div>
+              )}
+            </div>
+          ) : requiereRevision ? (
             <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium" style={{ background: N.ambarT, color: N.ambar }}>
               <AlertTriangle size={11} /> Revisar
             </span>
@@ -976,10 +1268,15 @@ function FilaJornada({ r, T, expandido, onToggle }) {
       {expandido && (
         <tr>
           <td colSpan={4} className="px-3 pb-4" style={{ background: N.paper }}>
-            {motivoRevision.length > 0 && (
+            {motivoRevision.length > 0 && !decisionVigente && (
               <div className="rounded p-2.5 mb-3 text-xs" style={{ background: N.ambarT, color: "#7A5A10" }}>
                 {motivoRevision.map((m, i) => <div key={i}>· {m}</div>)}
               </div>
+            )}
+            {errorDecision && (
+              <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: N.rojo, background: N.rojoT }}>
+                No se pudo guardar: {errorDecision}
+              </p>
             )}
             <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2" style={{ color: N.ink40 }}>
               Alternativas ({alternativas.length})
@@ -989,17 +1286,39 @@ function FilaJornada({ r, T, expandido, onToggle }) {
             ) : (
               <div className="space-y-1.5">
                 {alternativas.map(({ arbitro, score, coste }) => (
-                  <div key={arbitro.id} className="flex items-center justify-between text-xs rounded border p-2" style={{ borderColor: N.rule, background: "#FFF" }}>
-                    <div className="flex items-center gap-2">
-                      <Avatar txt={arbitro.foto} T={T} size={22} />
-                      <span style={{ color: N.ink }}>{arbitro.n}</span>
-                      <span style={{ color: N.ink40 }}>vive en {arbitro.loc}</span>
+                  <div key={arbitro.id} className="text-xs rounded border p-2" style={{ borderColor: N.rule, background: "#FFF" }}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Avatar txt={arbitro.foto} T={T} size={22} />
+                        <span style={{ color: N.ink }}>{arbitro.n}</span>
+                        <span style={{ color: N.ink40 }}>vive en {arbitro.loc}</span>
+                      </div>
+                      <div className="flex items-center gap-4 font-mono" style={{ color: N.ink70 }}>
+                        <span>{score.toFixed(2)}</span>
+                        <span>{coste.distanciaKmAprox != null ? `${coste.distanciaKmAprox} km` : "s/d"}</span>
+                        <span>{coste.dentroTermino ? "sin dieta" : coste.costeFederacionEstimado != null ? `${coste.costeFederacionEstimado.toFixed(2)} €` : "s/d"}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4 font-mono" style={{ color: N.ink70 }}>
-                      <span>{score.toFixed(2)}</span>
-                      <span>{coste.distanciaKmAprox != null ? `${coste.distanciaKmAprox} km` : "s/d"}</span>
-                      <span>{coste.dentroTermino ? "sin dieta" : coste.costeFederacionEstimado != null ? `${coste.costeFederacionEstimado.toFixed(2)} €` : "s/d"}</span>
-                    </div>
+                    {!decisionVigente && (
+                      alternativaMotivo === arbitro.id ? (
+                        <div className="mt-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                          <input value={motivoTexto} onChange={(e) => setMotivoTexto(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && confirmarAlternativa(e, arbitro.id)}
+                            placeholder="Motivo del cambio (obligatorio)…" autoFocus
+                            className="flex-1 text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink }} />
+                          <button onClick={(e) => confirmarAlternativa(e, arbitro.id)} disabled={!motivoTexto.trim() || guardandoId === arbitro.id}
+                            className="text-[11px] rounded px-2 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+                            {guardandoId === arbitro.id ? "Guardando…" : "Guardar"}
+                          </button>
+                          <button onClick={cancelarMotivo} className="text-[11px]" style={{ color: N.ink40 }}>Cancelar</button>
+                        </div>
+                      ) : (
+                        <button onClick={(e) => abrirMotivo(e, arbitro.id)}
+                          className="mt-2 text-[11px] rounded px-2 py-1 font-medium" style={{ color: T.primary, background: T.accentTint }}>
+                          Elegir este candidato
+                        </button>
+                      )
+                    )}
                   </div>
                 ))}
               </div>
@@ -1014,6 +1333,8 @@ function FilaJornada({ r, T, expandido, onToggle }) {
 function DesignacionInteligente({ T }) {
   const [cicloId, setCicloId] = useState(ciclosAsignacion[0].id);
   const [expandidoId, setExpandidoId] = useState(null);
+  const [vigentes, setVigentes] = useState(new Map());
+  const [vigentesEstado, setVigentesEstado] = useState("cargando"); // cargando | listo | error
   const ciclo = ciclosAsignacion.find((c) => c.id === cicloId);
 
   const resultados = useMemo(() => {
@@ -1021,7 +1342,33 @@ function DesignacionInteligente({ T }) {
     return asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
   }, [ciclo]);
 
-  const nRevisar = resultados.filter((r) => r.requiereRevision).length;
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesPorCiclo(cicloId).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentes(resultado.vigentesPorPartido);
+        setVigentesEstado("listo");
+      } else {
+        setVigentesEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [cicloId]);
+
+  const resultadosConDecision = useMemo(() => conDecisionVigente(resultados, vigentes), [resultados, vigentes]);
+
+  const decidirYActualizar = async ({ partidoId, arbitroId, esSugerido, motivo }) => {
+    const resultado = await decidirDesignacion({ cicloId, partidoId, arbitroId, esSugerido, motivo, decididoPorRol: "comite" });
+    if (resultado.ok) {
+      setVigentes((prev) => new Map(prev).set(partidoId, resultado.designacion));
+    }
+    return resultado;
+  };
+
+  const nDecididos = resultadosConDecision.filter((r) => r.decisionVigente).length;
+  const nRevisar = resultadosConDecision.filter((r) => !r.decisionVigente && r.requiereRevision).length;
+  const nAutoConfirmable = resultadosConDecision.length - nDecididos - nRevisar;
 
   return (
     <div className="space-y-5">
@@ -1038,7 +1385,7 @@ function DesignacionInteligente({ T }) {
       </div>
 
       <Panel title="Ciclo de asignación" right={
-        <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); }}
+        <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); setVigentes(new Map()); setVigentesEstado("cargando"); }}
           className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
           {ciclosAsignacion.map((c) => <option key={c.id} value={c.id}>{c.etiqueta}</option>)}
         </select>
@@ -1046,9 +1393,17 @@ function DesignacionInteligente({ T }) {
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
           <span className="flex items-center gap-1.5" style={{ color: N.ink }}><Calendar size={14} style={{ color: N.ink40 }} /> {ciclo.finDeSemana}</span>
           <span style={{ color: N.ink70 }}>{resultados.length} partidos</span>
-          <span style={{ color: nRevisar > 0 ? N.ambar : N.verde }} className="font-medium">{nRevisar} para revisar · {resultados.length - nRevisar} auto-confirmables</span>
+          <span style={{ color: nRevisar > 0 ? N.ambar : N.verde }} className="font-medium">
+            {nRevisar} para revisar · {nDecididos} decididos · {nAutoConfirmable} auto-confirmables
+          </span>
         </div>
       </Panel>
+
+      {vigentesEstado === "error" && (
+        <p className="text-xs rounded px-3 py-2" style={{ color: N.rojo, background: N.rojoT }}>
+          No se pudieron cargar las decisiones ya tomadas para esta jornada. Comprueba la conexión y recarga antes de confirmar o cambiar candidatos.
+        </p>
+      )}
 
       <Panel title="Partidos de la jornada">
         <div className="-m-5 overflow-x-auto">
@@ -1062,9 +1417,10 @@ function DesignacionInteligente({ T }) {
               </tr>
             </thead>
             <tbody>
-              {resultados.map((r) => (
+              {resultadosConDecision.map((r) => (
                 <FilaJornada key={r.partido.id} r={r} T={T} expandido={expandidoId === r.partido.id}
-                  onToggle={() => setExpandidoId(expandidoId === r.partido.id ? null : r.partido.id)} />
+                  onToggle={() => setExpandidoId(expandidoId === r.partido.id ? null : r.partido.id)}
+                  onDecidir={decidirYActualizar} />
               ))}
             </tbody>
           </table>

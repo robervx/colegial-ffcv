@@ -73,4 +73,24 @@ describe("coberturaPorCategoria", () => {
     const { porCategoria } = coberturaPorCategoria(arbitros, ciclo([partido("Segona FFCV")]));
     expect(porCategoria.find((c) => c.categoria === "Segona FFCV").disponiblesCategoriaPropia).toBe(0);
   });
+
+  it("con vigentesPorArbitro real, un árbitro sin declaración cuenta disponible aunque la simulación sintética lo marcaría indisponible (FR-007)", () => {
+    const arbitros = [arbitro({ id: 5, cat: "Segona FFCV", indisp: 6 })]; // sintético lo marcaría indisponible
+    const { porCategoria } = coberturaPorCategoria(arbitros, ciclo([partido("Segona FFCV")]), new Map());
+    expect(porCategoria.find((c) => c.categoria === "Segona FFCV").disponiblesCategoriaPropia).toBe(1);
+  });
+
+  it("con vigentesPorArbitro real, una declaración no_disponible excluye al árbitro de su categoría propia", () => {
+    const arbitros = [arbitro({ id: 1, cat: "Segona FFCV" })];
+    const vigentes = new Map([[1, { tipo: "no_disponible" }]]);
+    const { porCategoria } = coberturaPorCategoria(arbitros, ciclo([partido("Segona FFCV")]), vigentes);
+    expect(porCategoria.find((c) => c.categoria === "Segona FFCV").disponiblesCategoriaPropia).toBe(0);
+  });
+
+  it("con vigentesPorArbitro real, solo_categoria_propia anula el extra de categoría inferior solo para este ciclo", () => {
+    const arbitros = [arbitro({ id: 2, cat: "Primera FFCV", disponibleCategoriasInferiores: true })];
+    const vigentes = new Map([[2, { tipo: "solo_categoria_propia" }]]);
+    const { porCategoria } = coberturaPorCategoria(arbitros, ciclo([partido("Segona FFCV")]), vigentes);
+    expect(porCategoria.find((c) => c.categoria === "Segona FFCV").disponiblesCategoriaInferior).toBe(0);
+  });
 });

@@ -67,11 +67,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] En `DesignacionInteligente()` (`CRMExpedientes.jsx:971`), cargar `designacionesRepo.obtenerVigentesPorCiclo(cicloId)` y fusionar con `resultados` vía `conDecisionVigente()` antes de pasarlos a `FilaJornada`
-- [ ] T018 [US2] En `FilaJornada()` (`CRMExpedientes.jsx:896`), añadir botón "Confirmar" sobre el candidato sugerido cuando no hay `decisionVigente` — llama a `designacionesRepo.decidir({ ..., esSugerido: true })`
-- [ ] T019 [US2] En la lista de alternativas de `FilaJornada()`, añadir una acción "Elegir este candidato" por alternativa — al pulsarla, pide un motivo (campo de texto) antes de habilitar el guardado; llama a `designacionesRepo.decidir({ ..., esSugerido: false, motivo })`
-- [ ] T020 [US2] Cuando existe `decisionVigente` para un partido, la fila deja de mostrar el estado "Auto-confirmable"/"Revisar" calculado en vivo y muestra en su lugar la decisión ya tomada (candidato, quién, cuándo, y motivo si aplica) — implementa FR-004, ningún recálculo automático la sustituye
-- [ ] T021 [US2] Validar manualmente en navegador los 4 Acceptance Scenarios de US2 en `quickstart.md` §US2, incluyendo el bloqueo por falta de motivo y la persistencia cruzada entre dispositivos
+- [x] T017 [US2] En `DesignacionInteligente()` (`CRMExpedientes.jsx:971`), cargar `designacionesRepo.obtenerVigentesPorCiclo(cicloId)` y fusionar con `resultados` vía `conDecisionVigente()` antes de pasarlos a `FilaJornada`
+- [x] T018 [US2] En `FilaJornada()` (`CRMExpedientes.jsx:896`), añadir botón "Confirmar" sobre el candidato sugerido cuando no hay `decisionVigente` — llama a `designacionesRepo.decidir({ ..., esSugerido: true })`
+- [x] T019 [US2] En la lista de alternativas de `FilaJornada()`, añadir una acción "Elegir este candidato" por alternativa — al pulsarla, pide un motivo (campo de texto) antes de habilitar el guardado; llama a `designacionesRepo.decidir({ ..., esSugerido: false, motivo })`
+- [x] T020 [US2] Cuando existe `decisionVigente` para un partido, la fila deja de mostrar el estado "Auto-confirmable"/"Revisar" calculado en vivo y muestra en su lugar la decisión ya tomada (candidato, quién, cuándo, y motivo si aplica) — implementa FR-004, ningún recálculo automático la sustituye
+- [x] T021 [US2] Validar manualmente en navegador los 4 Acceptance Scenarios de US2 en `quickstart.md` §US2, incluyendo el bloqueo por falta de motivo y la persistencia cruzada entre dispositivos
 
 **Checkpoint**: User Stories 1 y 2 funcionan de forma independiente.
 
@@ -85,11 +85,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Añadir selector "ver como: árbitro / comité" (estado local, sin persistencia — research.md de esta spec §... ver `002-disponibilidad-arbitro` FR-012) en la cabecera de `Ficha()`
-- [ ] T023 [US3] Añadir selector de disponibilidad (disponible / no disponible con motivo / solo categoría propia / festivo solicitado) en `Ficha()`, usando `lib/reglaFestivo.js` (ya construida) para validar la antelación antes de llamar a `disponibilidadRepo.declararDisponibilidad(...)`
-- [ ] T024 [US3] Mostrar el log de disponibilidad del árbitro en su ficha (histórico, visible en ambos roles) y, solo cuando el selector está en "comité", el resumen de `calcularPatronImplicacion` (usando `lib/patronImplicacion.js`, ya construida) — nunca visible en modo "árbitro" (FR-008 de 002)
-- [ ] T025 [US3] En `Dashboard()` (`001-dashboard-operativo`), sustituir la llamada a `conDisponibilidad` sintética dentro de `coberturaPorCategoria` por la disponibilidad real vía `disponibilidadRepo` para el ciclo activo (research.md de esta spec §4/§5) — `lib/coberturaCategoria.js` no cambia de forma, solo su fuente de datos
-- [ ] T026 [US3] Validar manualmente en navegador los escenarios de `specs/002-disponibilidad-arbitro/quickstart.md` (ahora ejecutables de principio a fin) y el de `quickstart.md` §US3 de esta spec
+- [x] T022 [US3] Añadir selector "ver como: árbitro / comité" (estado local, sin persistencia — research.md de esta spec §... ver `002-disponibilidad-arbitro` FR-012) en la cabecera de `Ficha()`
+- [x] T023 [US3] Añadir selector de disponibilidad (disponible / no disponible con motivo / solo categoría propia / festivo solicitado) en `Ficha()`, usando `lib/reglaFestivo.js` (ya construida) para validar la antelación antes de llamar a `disponibilidadRepo.declararDisponibilidad(...)`
+- [x] T024 [US3] Mostrar el log de disponibilidad del árbitro en su ficha (histórico, visible en ambos roles) y, solo cuando el selector está en "comité", el resumen de `calcularPatronImplicacion` (usando `lib/patronImplicacion.js`, ya construida) — nunca visible en modo "árbitro" (FR-008 de 002)
+- [x] T025 [US3] En `Dashboard()` (`001-dashboard-operativo`), sustituir la llamada a `conDisponibilidad` sintética dentro de `coberturaPorCategoria` por la disponibilidad real vía `disponibilidadRepo` para el ciclo activo (research.md de esta spec §4/§5) — `lib/coberturaCategoria.js` no cambia de forma, solo su fuente de datos
+- [x] T026 [US3] Validar manualmente en navegador los escenarios de `specs/002-disponibilidad-arbitro/quickstart.md` (ahora ejecutables de principio a fin) y el de `quickstart.md` §US3 de esta spec
 
 **Checkpoint**: las tres user stories funcionan de forma independiente entre sí — `002-disponibilidad-arbitro` queda completa (SC-002 de esta spec).
 
@@ -97,10 +97,10 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T027 [P] Ejecutar `npx vitest run` completo y confirmar que todo pasa (001 + 002 + 003)
-- [ ] T028 [P] Validar en navegador, de forma transversal, FR-006 (distinción real/sintético visible en las notas seed), FR-007 (mensaje de error claro simulando una caída de red/credenciales inválidas) y FR-008 (autoría y fecha en cualquier registro de las 3 tablas)
-- [ ] T029 Ejecutar `npm run lint` y confirmar que no hay regresiones
-- [ ] T030 Actualizar `docs/estado-actual.md` y `docs/decisiones-producto.md` documentando la entrega (spec 003) — convención del proyecto de documentar cada entrega en el momento
+- [x] T027 [P] Ejecutar `npx vitest run` completo y confirmar que todo pasa (001 + 002 + 003)
+- [x] T028 [P] Validar en navegador, de forma transversal, FR-006 (distinción real/sintético visible en las notas seed), FR-007 (mensaje de error claro simulando una caída de red/credenciales inválidas) y FR-008 (autoría y fecha en cualquier registro de las 3 tablas)
+- [x] T029 Ejecutar `npm run lint` y confirmar que no hay regresiones
+- [x] T030 Actualizar `docs/estado-actual.md` y `docs/decisiones-producto.md` documentando la entrega (spec 003) — convención del proyecto de documentar cada entrega en el momento
 
 ---
 

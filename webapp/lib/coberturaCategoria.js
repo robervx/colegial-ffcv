@@ -23,13 +23,36 @@ function estadoCobertura(partidosADesignar, totalDisponibles) {
 }
 
 /**
+ * Sustituye, para un árbitro dado, el indisponibleEsteFinde/disponibleCategoriasInferiores
+ * sintéticos por la declaración real vigente de disponibilidadRepo.obtenerVigentesPorCiclo
+ * (specs/002-disponibilidad-arbitro) — sin declaración, disponible por defecto (FR-007).
+ * "festivo_solicitado" cuenta como indisponible igual que "no_disponible" (el árbitro no
+ * estará ese fin de semana); "solo_categoria_propia" anula el extra de categoría inferior
+ * solo para este ciclo, sin tocar la preferencia general del árbitro.
+ */
+function conDisponibilidadReal(a, declaracionVigente) {
+  const base = conDisponibilidad(a);
+  if (!declaracionVigente) return { ...base, indisponibleEsteFinde: false };
+  const { tipo } = declaracionVigente;
+  return {
+    ...base,
+    indisponibleEsteFinde: tipo === "no_disponible" || tipo === "festivo_solicitado",
+    disponibleCategoriasInferiores: tipo === "solo_categoria_propia" ? false : base.disponibleCategoriasInferiores,
+  };
+}
+
+/**
  * @param {object[]} arbitrosRaw - dataset de árbitros (arbitros-200.json), sin enriquecer
  * @param {{partidos: object[]}} ciclo - ciclo activo de ciclos-asignacion.json (ej. ciclosAsignacion[0])
+ * @param {Map<number, object>|null} [vigentesPorArbitro] - declaraciones reales de disponibilidadRepo.obtenerVigentesPorCiclo
+ *   para este ciclo, indexadas por arbitroId; si se omite, usa la disponibilidad sintética de siempre (lib/disponibilidad.js)
  * @returns {{ datasetDisponibilidadVacio: boolean, porCategoria: object[] }}
  */
-export function coberturaPorCategoria(arbitrosRaw, ciclo) {
+export function coberturaPorCategoria(arbitrosRaw, ciclo, vigentesPorArbitro = null) {
   const partidos = ciclo?.partidos ?? [];
-  const arbitros = arbitrosRaw.map(conDisponibilidad);
+  const arbitros = vigentesPorArbitro
+    ? arbitrosRaw.map((a) => conDisponibilidadReal(a, vigentesPorArbitro.get(a.id)))
+    : arbitrosRaw.map(conDisponibilidad);
   const categorias = CATEGORIAS.filter((c) => c !== "Todas");
 
   const porCategoria = categorias.map((categoria) => {

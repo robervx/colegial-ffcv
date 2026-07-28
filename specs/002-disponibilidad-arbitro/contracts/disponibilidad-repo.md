@@ -17,6 +17,10 @@ Valida y persiste una nueva declaración:
 - Rechaza si el `cicloId` referenciado ya está cerrado (inmutabilidad, ver `data-model.md`).
 - En cualquier otro caso, añade la entrada al log — nunca sobrescribe ni elimina una anterior (FR-005).
 
+## `obtenerVigentesPorCiclo(cicloId) => Promise<Map<arbitroId, DeclaracionDisponibilidad>>`
+
+Añadida durante la implementación (Sprint 1/2, `specs/003-persistencia-real`, T025): la declaración vigente de cada árbitro para un ciclo, indexada por `arbitroId` — necesaria para que `coberturaPorCategoria` (`001-dashboard-operativo`) calcule la cobertura de los ~200 árbitros del ciclo activo con una sola consulta en vez de 200 llamadas a `obtenerVigente`. Mismo patrón que `designacionesRepo.obtenerVigentesPorCiclo` de `specs/003-persistencia-real/contracts/designaciones-repo.md`. Un árbitro ausente del `Map` no ha declarado nada para ese ciclo — se asume disponible (FR-007), igual que con `obtenerVigente`.
+
 ## `calcularPatronImplicacion(arbitroId) => PatronImplicacion`
 
 Envoltorio sobre `obtenerLog` + `lib/patronImplicacion.js` (función pura ya construible hoy, ver `research.md` §2) — separado en el contrato para que el repositorio pueda optimizarlo (ej. calcularlo en la base de datos) sin que la UI conozca la diferencia.

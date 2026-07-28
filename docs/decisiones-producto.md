@@ -169,6 +169,27 @@ Pendiente antes de especificar: quién marca la disponibilidad (¿el árbitro se
 
 **Ejecutado (27 jul 2026)**: Roberto creó el proyecto de Supabase (lo llamó "RefData", no "colegial-ffcv" que era la sugerencia — pendiente de unificar naming entre Supabase/GitHub/producto cuando el nombre definitivo esté cerrado, no bloqueante), credenciales en `webapp/.env.local`. Repo subido a GitHub como `robervx/colegial-ffcv` (privado), con integración GitHub↔Supabase conectada para sincronizar `supabase/migrations/`.
 
+## 19. Spec 003 completa: designaciones reales + disponibilidad operativa (28 jul 2026)
+
+**Ejecutado**: `specs/003-persistencia-real/tasks.md` T017-T026 (US2 y US3), sobre la base de T001-T016 ya cerrada la sesión anterior.
+
+- **US2** — página "Designación" pasa de informativa a operativa: botón "Confirmar" sobre el candidato sugerido y "Elegir este candidato" por alternativa (con motivo obligatorio si no es el sugerido), persistido en `designaciones` vía `designacionesRepo.js`. Una vez decidido un partido, la fila deja de recalcular "Revisar"/"Auto-confirmable" en vivo y muestra la decisión tomada (candidato, rol, fecha, motivo) — implementa FR-004 de la spec. `decididoPorRol` queda fijo a `"comite"` en esta página (no hay selector de rol aquí, a diferencia de la Ficha) porque la spec describe esta pantalla como uso exclusivo del comité.
+- **US3** — `002-disponibilidad-arbitro` queda completa de punta a punta: selector "ver como: árbitro/comité" en la ficha (FR-012), selector de disponibilidad (disponible/no disponible con motivo/solo categoría propia/festivo solicitado) validado contra `lib/reglaFestivo.js` antes de persistir, log histórico visible en ambos roles con distinción justificada/no justificada (FR-011), y resumen de `calcularPatronImplicacion` visible solo en modo comité (FR-008/FR-009). El Dashboard (001) sustituye la disponibilidad sintética de `coberturaPorCategoria` por disponibilidad real del ciclo activo vía una función nueva, `disponibilidadRepo.obtenerVigentesPorCiclo(cicloId)` — no estaba en el contrato original de 002 (que solo fijaba consulta por árbitro individual), añadida para evitar 200 llamadas individuales a Supabase en cada carga del Dashboard; documentada en el contrato correspondiente.
+- Verificado en navegador (no solo compilación): confirmar/elegir candidato con persistencia tras refresco completo, bloqueo real del festivo solicitado con menos de 15 días de antelación, patrón de implicación apareciendo/desapareciendo según el selector de rol. 30/30 tests Vitest, lint sin errores.
+- **Pendiente suelto, no bloqueante**: `supabase/migrations/0004_endurecer_rls_solo_lectura_insercion.sql` sigue sin aplicar/commitear (estrecha la política RLS permisiva de 0001-0003 quitando UPDATE/DELETE a `anon`) — mismo paso manual que ya hizo Roberto para 0001-0003.
+
+## 20. Modelo de roles ampliado a 5 y dos módulos nuevos (Equipos, Partidos) — capturado 28 jul 2026
+
+**Idea capturada** (pendiente de `/speckit-specify`, no construida todavía): Roberto quiere ampliar el binario árbitro/comité (FR-012 de 002) a 5 roles — **admin** (todo, incluida configuración), **directiva** (todo salvo configuración), **informadores** (fichas de árbitro + Equipos + Partidos, puede comentar), **árbitros** (su ficha + Equipos + Partidos para preparar el partido) y **administrativos** (disponibilidad/designaciones + vista económica). El detalle fino de quién ve/edita exactamente qué queda por concretar con ellos — esto es la filosofía de partida, no un permiso cerrado campo a campo.
+
+Junto a esto, dos páginas nuevas:
+- **Equipos**: perfil por equipo construido sobre dato real ya existente (`ffcv_public_data/`) — tarjetas por jugador, agregado del equipo, sanciones.
+- **Partidos**: vista por jornada con insights de valor para preparar el partido (ej. "equipo con pocas tarjetas → se le puede dejar jugar más" — el insight siempre muestra el número detrás, Principio III), más un registro de comentarios de árbitros por equipo con estructura sugerida de aporte, pensado para que sea útil al resto de compañeros.
+
+**Idea relacionada, marcada como de menor prioridad dentro de Partidos**: registrar si un árbitro consulta los insights de equipo/partido antes de dirigirlo, y con qué antelación — señal de preparación. Decisión de diseño ya adelantada (no cerrada en spec todavía): medir *eventos de consulta* (cuántas veces, cuánto antes del partido fue la última), no "tiempo en pantalla" — más honesto sobre lo que un navegador puede medir de verdad. Esta señal es descriptiva para el comité (Principio IV, nunca entra en `scoreB1`) y cada árbitro solo debería ver su propio registro, nunca un listado comparativo frente a otros árbitros (Principio V).
+
+**Orden de especificación acordado**: roles/permisos primero (transversal, lo necesitan las otras dos), luego Equipos, luego Partidos (depende del perfil de equipo). Las tres se specifican a la vez pero respetando ese orden de dependencia.
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)

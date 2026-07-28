@@ -102,3 +102,30 @@ export async function calcularPatronImplicacion(arbitroId) {
   const log = await obtenerLog(arbitroId);
   return calcularPatronSobreLog(log);
 }
+
+/**
+ * La declaración vigente de cada árbitro para un ciclo, indexada por arbitro_id
+ * — no forma parte del contrato original (que solo fija obtenerVigente por
+ * árbitro individual), añadida para 001-dashboard-operativo (T025 de
+ * specs/003-persistencia-real/tasks.md): la cobertura por categoría necesita
+ * la disponibilidad de los ~200 árbitros del ciclo activo a la vez, y hacer
+ * 200 llamadas individuales a obtenerVigente no es razonable. Mismo patrón que
+ * designacionesRepo.obtenerVigentesPorCiclo. Lanza si falla la infraestructura.
+ */
+export async function obtenerVigentesPorCiclo(cicloId) {
+  const { data, error } = await supabase
+    .from("declaraciones_disponibilidad")
+    .select("*")
+    .eq("ciclo_id", cicloId)
+    .order("creado_en", { ascending: false });
+
+  if (error) throw new Error(`No se pudo cargar la disponibilidad del ciclo: ${error.message}`);
+
+  const vigentesPorArbitro = new Map();
+  for (const fila of data) {
+    if (!vigentesPorArbitro.has(fila.arbitro_id)) {
+      vigentesPorArbitro.set(fila.arbitro_id, filaADeclaracion(fila));
+    }
+  }
+  return vigentesPorArbitro;
+}

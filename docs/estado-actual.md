@@ -1,29 +1,23 @@
-# Estado actual del proyecto — 27 jul 2026
+# Estado actual del proyecto — 28 jul 2026
 
 Fotografía de lo construido hasta hoy. Si vuelves a esta conversación más tarde, o alguien nuevo se incorpora, empieza por aquí — es más fiable que reconstruir la historia leyendo el chat.
 
-**Punto exacto en el que se dejó esta sesión (27 jul 2026, sesión larga — backend real montado):**
+**Punto exacto en el que se dejó esta sesión (28 jul 2026):**
 
-1. `specs/001-dashboard-operativo/` — **completada** de punta a punta (spec → plan → tasks → implementación).
-2. `specs/002-disponibilidad-arbitro/` — **spec y plan técnico completos**; la lógica pura ya estaba construida (`lib/reglaFestivo.js`, `lib/patronImplicacion.js`) y **ahora también la persistencia real** (ver punto 3) — solo falta la UI (selector en la ficha, selector de rol "ver como").
-3. `specs/003-persistencia-real/` — **backend real con Supabase montado y en producción de prototipo**. Esto es lo grande de hoy:
-   - Proyecto Supabase creado por Roberto (nombre real: **"RefData"**, no "colegial-ffcv" — pendiente de unificar naming cuando el nombre del producto esté cerrado). Credenciales en `webapp/.env.local` (fuera de git).
-   - **Repo subido a GitHub**: `robervx/colegial-ffcv` (privado), con integración GitHub↔Supabase conectada para sincronizar `supabase/migrations/`.
-   - **3 tablas reales en Supabase** (`anotaciones`, `designaciones`, `declaraciones_disponibilidad`), RLS activado con política permisiva documentada como límite temporal (sin auth real todavía) — ver `specs/003-persistencia-real/research.md` §3.
-   - **`lib/anotacionesRepo.js`, `lib/designacionesRepo.js` (nuevos), `lib/disponibilidadRepo.js` (de stub a real)** — patrón de repositorio, la UI nunca habla con Supabase directamente.
-   - **Seed cargado**: las 117 notas sintéticas de `arbitros-200.json` migradas a la tabla real con `fuente: 'sintetico'` (`webapp/scripts/seed-anotaciones.mjs`).
-   - **US1 completa y verificada en navegador**: "Guardar nota" en la ficha de árbitro persiste de verdad — probado con refresco completo de página, la nota nueva queda marcada `· real` junto a las sintéticas `· sintetico`. Esto era el MVP de la spec: prueba que toda la cadena (React → repositorio → Supabase → RLS → vuelta) funciona.
-   - 27/27 tests Vitest en verde, `npm run lint` sin errores. Todo commiteado y pusheado a `main` en GitHub.
-   - **Onboarding para otra sesión/colaborador**: `README.md` y `CLAUDE.md` en la raíz del repo (orden de lectura, regla de SDD, cómo trabaja Roberto, convenciones de git), `webapp/.env.example` sin secretos.
+1. `specs/001-dashboard-operativo/` — **completada** de punta a punta.
+2. `specs/002-disponibilidad-arbitro/` — **completada** de punta a punta (spec → plan → tasks → implementación real, ver punto 3).
+3. `specs/003-persistencia-real/` — **completada, T001-T030, las tres user stories**:
+   - **US1** (27 jul): "Guardar nota" en la ficha persiste de verdad contra Supabase (`anotaciones`).
+   - **US2** (28 jul): página "Designación" pasa de informativa a operativa — botones reales "Confirmar" y "Elegir este candidato" (con motivo obligatorio si se cambia del sugerido), persistidos en `designaciones` (`lib/designacionesRepo.js`). Una vez decidido un partido, la fila muestra la decisión tomada (candidato, rol, fecha, motivo) en vez de recalcular el estado en vivo.
+   - **US3** (28 jul): `002-disponibilidad-arbitro` queda operativa de principio a fin — selector "ver como: árbitro/comité" y selector de disponibilidad en la ficha (validado contra `lib/reglaFestivo.js`, 15 días de antelación para festivo), log histórico con distinción justificada/no justificada, patrón de implicación (`lib/patronImplicacion.js`) visible solo en modo comité. El Dashboard (001) ya no usa disponibilidad sintética para "Cobertura por categoría" — consume `disponibilidadRepo.obtenerVigentesPorCiclo(cicloId)` (función nueva, no estaba en el contrato original de 002, añadida para no hacer ~200 llamadas individuales a Supabase por carga de Dashboard).
+   - Todo verificado en navegador (no solo compilación), 30/30 tests Vitest, lint sin errores. Detalle completo en `docs/decisiones-producto.md` §19.
+   - **Pendiente suelto, no bloqueante**: `supabase/migrations/0004_endurecer_rls_solo_lectura_insercion.sql` sin aplicar/commitear (estrecha RLS quitando UPDATE/DELETE a `anon`) — mismo paso manual que ya hizo Roberto para 0001-0003.
 
-**Siguiente paso si se retoma aquí (en otro chat)**: seguir con `specs/003-persistencia-real/tasks.md` — quedan **T017-T030** sin hacer:
-- **US2 (P2, la de mayor valor de producto)**: añadir botones reales "Confirmar" / "Elegir este candidato" (con motivo obligatorio) en la página "Designación" (`DesignacionInteligente`/`FilaJornada`, `webapp/components/CRMExpedientes.jsx`), usando `designacionesRepo.js` ya construido — hoy esa página es puramente informativa, sin ningún botón de guardado. **Importante**: no confundir con el botón bloqueado "Confirmar y publicar (v2)" de `VistaRecomendaciones` — ese es un módulo distinto que la constitución exige mantener bloqueado, no se toca.
-- **US3 (P3)**: completar la UI de `002-disponibilidad-arbitro` — selector "ver como: árbitro/comité" y selector de disponibilidad en la ficha, más sustituir la disponibilidad sintética del Dashboard (001) por la real vía `disponibilidadRepo.js`.
-- Polish (T027-T030): vitest+lint completo, verificación transversal de FR-006/007/008, y volver a actualizar `docs/estado-actual.md`/`decisiones-producto.md` al cerrar.
+**Siguiente paso si se retoma aquí (en otro chat)**: Roberto pidió ampliar el modelo de roles (hoy solo árbitro/comité, FR-012 de 002) a 5 roles — admin, directiva, informadores, árbitros, administrativos — y dos módulos nuevos, Equipos y Partidos. Todavía **sin spec** (idea capturada en `docs/decisiones-producto.md` §20, incluida la filosofía de cada rol y una idea de tracking de preparación del árbitro con sus límites constitucionales ya señalados ahí — Principio IV y V). Orden acordado para especificar: **roles/permisos primero** (transversal, lo necesitan Equipos y Partidos), **luego Equipos**, **luego Partidos** (depende del perfil de equipo) — las tres a la vez pero respetando esa dependencia. Siguiente acción: `/speckit-specify` para roles/permisos.
 
-El plan técnico completo (esquema, contratos, decisiones) está en `specs/003-persistencia-real/plan.md`, `research.md`, `data-model.md` — no hace falta releer el chat, está todo documentado ahí.
+El plan técnico completo de 003 (esquema, contratos, decisiones) está en `specs/003-persistencia-real/plan.md`, `research.md`, `data-model.md` — no hace falta releer el chat, está todo documentado ahí.
 
-**Después de 003**: seguir con el orden ya acordado de próximos módulos de dashboard/consulta: Equipos → Partidos → Simulaciones → Económico (análisis de datos real ya hecho para justificar cada uno — tarjetas/goles por equipo en `ffcv_public_data/` dan señal real para "riesgo de equipo", `asignarJornada.js` ya sirve tal cual para Simulaciones).
+**Después de roles/Equipos/Partidos**: seguía en el radar el orden previo — Simulaciones → Económico (`asignarJornada.js` ya sirve tal cual para Simulaciones; tarjetas/goles por equipo en `ffcv_public_data/` ya usados en Equipos) — sin fecha fija, se retoma la prioridad relativa cuando roles/Equipos/Partidos estén encaminados.
 
 **Antes de eso**: se completó el scraping público (`ffcv_public_data/`, 25.256 partidos con árbitro, tarjetas y goles reales) y se volcó al dataset de trabajo — tarjetas ya reales, ficha de árbitro ampliada (contacto, plantillas de email, pruebas físicas, ventana de KPIs), logo real. Detalle completo en §6 más abajo.
 
