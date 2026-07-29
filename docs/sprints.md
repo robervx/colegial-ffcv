@@ -55,6 +55,7 @@ Idea capturada el 27 jul 2026 (`decisiones-producto.md` §15): selector de dispo
 
 - **Nombre del producto** ("Colegial" sigue siendo placeholder) — se trata cuando haya hueco, no condiciona ningún sprint.
 - **Recomendaciones** (acciones globales de comité) y **Económico** (impacto del motor + bienestar) — vistas previas bloqueadas, sin prioridad de desarrollo hasta que el motor de Designación esté validado con dato real.
+- **Quitar `Co-Authored-By: Claude` de todo el historial de git** (28 jul 2026) — Roberto no lo quiere en ningún commit, no solo en los nuevos. Reescribir commits ya empujados a `origin/main` exige force-push sobre una rama compartida entre dos sesiones/colaboradores — se hace cuando se coordine explícitamente con quien esté trabajando en la otra ventana en ese momento, no unilateralmente a mitad de una sesión. Hasta entonces: los commits nuevos ya no llevan la línea (aplicado desde el 28 jul), el historial antiguo se queda como está.
 
 ---
 
