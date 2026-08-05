@@ -29,8 +29,17 @@ Contenido movido a la spec: esquema de `Anotacion`, `Designacion`, `DeclaracionD
 Antes de inventar más capas sintéticas, aprovechar los scrapers que ya existen y están a medio terminar.
 
 - ~~Terminar/acelerar `scrape_ffcv_public.py` (tarjetas, goles, árbitros por acta)~~ **Hecho (23 jul 2026)**: 25.256 partidos procesados (todas las categorías adultas), con tarjetas y árbitros reales ya integrados en `generar_dataset_arbitros.py`. Da B.5 real (disciplina descriptiva). Pendiente suelto: solo cubre temporada 2025/26 — backfill de 23/24 y 24/25 relanzando el scraper con `--season 20`/`19` si hace falta para B.3 más adelante.
-- Ejecutar `scrape_directorio_equipos.py` (nunca corrido) para direcciones reales de club — sustituye el enfoque de geolocalizar por nombre de instalación, que tuvo rendimiento bajo (`geocode_campos.py`, mayoría sin resultado).
-- Virtualización del listado de Árbitros: 200 filas van bien, 1.800 (el volumen real del colectivo) no se ha probado y previsiblemente no aguanta sin virtualizar.
+- ~~Ejecutar `scrape_directorio_equipos.py` para direcciones reales de club~~ **Aparcado (30 jul 2026)**: la sesión de la intranet FFCV caduca en ~2-3 min, insuficiente para las 131 competiciones incluso tras corregir dos bugs reales del script (detalle en `docs/decisiones-producto.md` §29). **Sustituido (3 ago 2026)** por `geocode_campos_por_municipio.py`: geocodificación a nivel de municipio (no dirección de calle) vía la API pública de clubes de ffcv.es, sin login — 497/691 campos (72%) frente al 0,7% de `geocode_campos.py`. Ver §29 para el trade-off de precisión asumido.
+- ~~Virtualización del listado de Árbitros~~ **Hecho (29 jul 2026)**: windowing manual (sin dependencia nueva), verificado en navegador a 200 filas reales y a escala de prueba de 1.800. Detalle en `docs/decisiones-producto.md` §24.
+
+## Sprint demo (30 jul 2026) — Fachada visible para la reunión del comité (lunes 3 ago 2026)
+
+**Excepción puntual al orden de sprints**, no una redefinición del plan (ver `decisiones-producto.md` §25-§26 para el detalle completo). Roberto pidió adelantar visibilidad de 004/005/006 sin esperar su turno de implementación real, con un límite de tiempo concreto. Lo que salió de ahí, aprovechable para cuando toque especificar/implementar de verdad:
+
+- `generar_analitica_avanzada.py` (nuevo) ya deja `webapp/data/equipos-reales.json` (479 equipos reales, categoría adulta) y `webapp/data/heatmap-intrasemanal.json` — dato real reutilizable directamente cuando se implemente `005-equipos` de verdad, no hay que rehacer el cruce de CSVs.
+- Primera versión de heurísticas de "insight de cruce" entre dos equipos (`REGLAS_CRUCE` en `CRMExpedientes.jsx`) — candidato a Historia nueva de `006-partidos` cuando se retome esa rama, hoy sin validar con el comité.
+- **Pendiente**: trasladar estos dos hallazgos a `specs/005-equipos/spec.md` y `specs/006-partidos/spec.md` (viven en sus propias ramas, no en `main`) la próxima vez que se trabaje en cada una — no se ha tocado ninguna rama de spec en esta sesión.
+- Nada de esto adelanta la Fase 1/2/3 de `004-roles-permisos` (§22 de `decisiones-producto.md`) ni el orden de sprints de abajo — es fachada de demo en `main`, se descarta o reescribe cuando llegue la implementación real de cada pieza.
 
 ## Sprint 4 — Cuando llegue el dato real de evaluaciones
 

@@ -16,6 +16,7 @@ venv/
 .stversion/
 
 # Node / Next.js (webapp/)
+node_modules/
 webapp/node_modules/
 webapp/.next/
 webapp/out/
