@@ -90,15 +90,32 @@ export function calcularCoste({ origen, destino }) {
   };
 }
 
+const MOTIVO_LABEL = { lesion: "lesión", baja: "baja", urgencia: "urgencia" };
+
 /**
  * Filtro duro: excluye, no puntúa. Nunca debe aparecer un árbitro excluido
  * en el ranking con una puntuación baja — desaparece de la lista con motivo.
+ *
+ * `declaracionVigente` (opcional): la declaración real de disponibilidad
+ * (specs/002-disponibilidad-arbitro) vigente para este árbitro en el ciclo
+ * que se está asignando — viene de disponibilidadRepo.obtenerVigentesPorCiclo,
+ * no de arbitro.indisponibleEsteFinde (que sigue siendo el heurístico
+ * sintético anterior, ver lib/disponibilidad.js). Una baja médica sin
+ * justificar bloquea la designación hasta que se adjunte el justificante
+ * (Roberto, 30 jul 2026) — no es solo informativo como el resto de motivos
+ * de disponibilidad (kpis.md, "gestión no puntúa", pero aquí sí que excluye).
  */
-export function filtroDuro(arbitro, partido) {
+export function filtroDuro(arbitro, partido, declaracionVigente) {
   const motivos = [];
   const vetoActivo = (arbitro.vetos || []).find((v) => v.equipo === partido.equipoLocal || v.equipo === partido.equipoVisitante);
   if (vetoActivo) motivos.push(`Veto activo con ${vetoActivo.equipo} (${vetoActivo.motivo})`);
   if (arbitro.indisponibleEsteFinde) motivos.push("Indisponibilidad declarada este fin de semana");
+  if (declaracionVigente?.tipo === "no_disponible") {
+    const esBajaSinJustificar = declaracionVigente.motivo === "baja" && declaracionVigente.justificada === false;
+    motivos.push(esBajaSinJustificar
+      ? "Baja médica sin justificar — pendiente de adjuntar PDF (declaración real)"
+      : `Indisponibilidad declarada: ${MOTIVO_LABEL[declaracionVigente.motivo] ?? declaracionVigente.motivo} (declaración real)`);
+  }
   if (arbitro.catNivel < partido.catNivelMinimo) {
     motivos.push("Categoría insuficiente para este partido");
   } else if (arbitro.catNivel > partido.catNivelMinimo && !arbitro.disponibleCategoriasInferiores) {

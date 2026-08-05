@@ -3,24 +3,28 @@ import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, ReferenceLine,
+  Tooltip, ResponsiveContainer, ReferenceLine, Cell, Legend,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
 } from "recharts";
 import {
   Users, Search, ChevronRight, TrendingUp, TrendingDown, Minus,
   FileText, Calendar, AlertCircle, Lock, Sparkles,
-  MessageSquarePlus, Gavel, Wallet, Bot, Check, Ban, AlertTriangle, Send,
-  LayoutDashboard, Route, Scale, Info, Phone, Mail, Dumbbell, BookOpen,
+  MessageSquarePlus, Wallet, Bot, Check, AlertTriangle, Send,
+  Route, Scale, Info, Phone, Mail, Dumbbell, BookOpen,
+  MailCheck, UserCog, Trophy, Swords, Goal,
+  Gauge, Settings, ChevronsLeft, ChevronsRight,
 } from "lucide-react";
 import agregadosReales from "../data/agregados-reales.json";
 import localidadesGeo from "../data/localidades-geo.json";
 import arbitros200 from "../data/arbitros-200.json";
 import ciclosAsignacion from "../data/ciclos-asignacion.json";
+import equiposRealesData from "../data/equipos-reales.json";
+import heatmapIntrasemanalData from "../data/heatmap-intrasemanal.json";
 import { asignarJornada } from "../lib/asignarJornada";
 import { CATEGORIAS } from "../lib/categorias";
 import { conDisponibilidad } from "../lib/disponibilidad";
 import { coberturaPorCategoria } from "../lib/coberturaCategoria";
-import { obtenerAnotaciones, guardarAnotacion } from "../lib/anotacionesRepo";
+import { obtenerAnotaciones, guardarAnotacion, contarAnotaciones } from "../lib/anotacionesRepo";
 import { obtenerVigentesPorCiclo, decidir as decidirDesignacion, conDecisionVigente } from "../lib/designacionesRepo";
 import {
   obtenerLog as obtenerLogDisponibilidad,
@@ -52,12 +56,32 @@ const N = {
   rojo: "#C0392B", rojoT: "#FAE9E7", ta: "#E8C33C", tr: "#C0392B",
 };
 
+/* Paleta de dataviz (skill "dataviz"): categórica validada (CVD-safe, orden fijo,
+   no ciclar), secuencial azul para magnitud/heatmaps, estados fijos good/warning/
+   serious/critical (nunca reutilizados como "serie 4"). Sustituye N.verde/ambar/rojo
+   en gráficos e indicadores de estado — mismo criterio en toda la app, 30 jul 2026. */
+const VIZ = {
+  serie: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"],
+  secuencialAzul: ["#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#1c5cab", "#0d366b"],
+  estado: { good: "#0ca30c", goodT: "#E7F2EC", warning: "#fab219", warningT: "#FBF1DC", serious: "#ec835a", seriousT: "#FBEAE3", critical: "#d03b3b", criticalT: "#FAE9E7" },
+  /* Paleta pastel-viva (aprobada por Roberto 31 jul 2026, ver decisiones-producto.md) —
+     para gráficos donde el color distingue CATEGORÍA (identidad), nunca donde distingue
+     ESTADO. El semáforo de riesgo/estado de forma (VIZ.estado) no se toca ni se mezcla
+     con esta paleta — son dos lenguajes de color distintos a propósito. */
+  pastel: ["#4E9BE0", "#FF8F65", "#2FC3AE", "#9C8CF0", "#F17FB0", "#F2B233", "#52C46B"],
+  pastelSoft: ["#E3F1FC", "#FFEEE6", "#E1F9F5", "#EFEBFE", "#FDEBF3", "#FEF3DE", "#E8F8EB"],
+};
+
 /* --------- dataset de trabajo: 200 árbitros ---------
    Identidad + carga real de partidos_2025_2026.csv (designaciones públicas FFCV),
    resto (informes, notas, vetos, disponibilidad) sintético hasta tener export
    real del comité. Ver docs/decisiones-producto.md §6 y generar_dataset_arbitros.py.
    gest = gestión de partido, radar; indisp = fines de semana no disponibles. */
 const ARBITROS = arbitros200;
+/* Equipos reales: generar_analitica_avanzada.py sobre ffcv_public_data/ (25.256 partidos
+   reales, categorías adultas), 30 jul 2026 — ver decisiones-producto.md §25. Nada sintético. */
+const EQUIPOS = equiposRealesData.equipos;
+const HEATMAP_INTRASEMANAL = heatmapIntrasemanalData;
 
 /* --------- semáforo: media móvil 5 + tendencia --------- */
 function estadoForma(forma, { ventana = 5, alto = 8.0, bajo = 7.0 } = {}) {
@@ -150,9 +174,9 @@ function Panel({ title, children, right }) {
 }
 function coloresForma(color) {
   return {
-    verde: { bg: N.verdeT, fg: N.verde, dot: N.verde },
-    ambar: { bg: N.ambarT, fg: N.ambar, dot: N.ambar },
-    rojo: { bg: N.rojoT, fg: N.rojo, dot: N.rojo },
+    verde: { bg: VIZ.estado.goodT, fg: VIZ.estado.good, dot: VIZ.estado.good },
+    ambar: { bg: VIZ.estado.warningT, fg: VIZ.estado.warning, dot: VIZ.estado.warning },
+    rojo: { bg: VIZ.estado.criticalT, fg: VIZ.estado.critical, dot: VIZ.estado.critical },
   }[color];
 }
 function Semaforo({ estado, size = "sm" }) {
@@ -170,9 +194,9 @@ function Semaforo({ estado, size = "sm" }) {
 /* estados de CoberturaCategoria (lib/coberturaCategoria.js) — mismo patrón visual que coloresForma/Semaforo */
 function coloresCobertura(estado) {
   return {
-    riesgo: { bg: N.rojoT, fg: N.rojo, dot: N.rojo, label: "En riesgo" },
-    ajustado: { bg: N.ambarT, fg: N.ambar, dot: N.ambar, label: "Ajustado, sin margen" },
-    holgada: { bg: N.verdeT, fg: N.verde, dot: N.verde, label: "Cobertura holgada" },
+    riesgo: { bg: VIZ.estado.criticalT, fg: VIZ.estado.critical, dot: VIZ.estado.critical, label: "En riesgo" },
+    ajustado: { bg: VIZ.estado.warningT, fg: VIZ.estado.warning, dot: VIZ.estado.warning, label: "Ajustado, sin margen" },
+    holgada: { bg: VIZ.estado.goodT, fg: VIZ.estado.good, dot: VIZ.estado.good, label: "Cobertura holgada" },
     sin_partidos: { bg: "#F1F3F5", fg: N.ink40, dot: N.ink40, label: "Sin partidos este finde" },
   }[estado];
 }
@@ -227,16 +251,105 @@ function BannerV2({ T, version = "Versión 2", texto }) {
 }
 
 /* ------------------------------- dashboard ------------------------------- */
-function KpiCard({ eyebrow, valor, sub, T, tone, icon: Icon }) {
-  const col = tone === "warn" ? N.ambar : tone === "bad" ? N.rojo : T.primary;
+/* chip (índice opcional): color de identidad (VIZ.pastel) para el icono cuando el KPI
+   no representa un estado — nunca se usa a la vez que `tone`. `tone` (semáforo real/
+   estado de forma/riesgo) siempre gana: un KPI de estado no lleva un color de marca
+   encima, llevaría dos lenguajes de color a la vez y confundiría cuál es cuál. */
+function KpiCard({ eyebrow, valor, sub, T, tone, chip, icon: Icon }) {
+  const col = tone === "warn" ? VIZ.estado.warning : tone === "bad" ? VIZ.estado.critical : T.primary;
+  const iconColor = tone === "warn" ? VIZ.estado.warning : tone === "bad" ? VIZ.estado.critical
+    : chip != null ? VIZ.pastel[chip % VIZ.pastel.length] : N.ink40;
+  const chipBg = tone === "warn" ? VIZ.estado.warningT : tone === "bad" ? VIZ.estado.criticalT
+    : chip != null ? VIZ.pastelSoft[chip % VIZ.pastelSoft.length] : "transparent";
   return (
     <div className="rounded-md border p-4" style={{ background: N.card, borderColor: N.rule }}>
       <div className="flex items-center justify-between mb-2">
         <Eyebrow>{eyebrow}</Eyebrow>
-        {Icon && <Icon size={13} style={{ color: N.ink40 }} />}
+        {Icon && (
+          <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: chipBg }}>
+            <Icon size={13} style={{ color: iconColor }} />
+          </div>
+        )}
       </div>
       <div className="font-mono text-3xl" style={{ color: col }}>{valor}</div>
       {sub && <div className="text-xs mt-1" style={{ color: N.ink70 }}>{sub}</div>}
+    </div>
+  );
+}
+
+/* Heatmap intrasemanal: dataviz skill — magnitud = secuencial, un solo hue (azul),
+   claro→oscuro, con etiqueta directa en cada celda (rejilla pequeña, 7×6) y leyenda
+   de escala. Dato real: generar_analitica_avanzada.py sobre los 25.256 partidos de
+   ffcv_public_data/ (30 jul 2026). */
+/* compacto=true: días en columnas (abreviados a 1 letra) y franjas en filas —
+   cabe en una sola columna del grid del Cuadro de Mando (Roberto, 30 jul 2026)
+   en vez de las 6 columnas anchas de la versión completa. Mismo dato, mismo
+   componente, solo cambia la orientación de la rejilla. */
+function HeatmapIntrasemanal({ data, compacto = false }) {
+  const [hover, setHover] = useState(null);
+  const max = Math.max(1, ...data.celdas.map((c) => c.partidos));
+  const franjaCorta = (f) => f.replace(/\s*\(.*\)/, "");
+  const diaCorto = (d) => d.slice(0, 1);
+  const colorPara = (v) => {
+    if (v === 0) return N.paper;
+    const idx = Math.min(VIZ.secuencialAzul.length - 1, Math.floor((v / max) * VIZ.secuencialAzul.length));
+    return VIZ.secuencialAzul[idx];
+  };
+  const filas = compacto ? data.franjas : data.dias;
+  const columnas = compacto ? data.dias : data.franjas;
+  const valorDe = (fila, col) => {
+    const [dia, franja] = compacto ? [col, fila] : [fila, col];
+    return data.celdas.find((c) => c.dia === dia && c.franja === franja)?.partidos ?? 0;
+  };
+  const etiquetaHover = (fila, col) => compacto ? { dia: col, franja: fila } : { dia: fila, franja: col };
+  const cellW = compacto ? 30 : 58;
+  const cellH = compacto ? 24 : 34;
+
+  return (
+    <div>
+      <div className="overflow-x-auto">
+        <table style={{ borderCollapse: "separate", borderSpacing: 3 }}>
+          <thead>
+            <tr>
+              <th></th>
+              {columnas.map((c) => (
+                <th key={c} className="text-[9px] font-medium px-1 pb-1 whitespace-nowrap" style={{ color: N.ink40 }}>
+                  {compacto ? diaCorto(c) : franjaCorta(c)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map((fila) => (
+              <tr key={fila}>
+                <td className="text-[10px] pr-2 text-right whitespace-nowrap" style={{ color: N.ink70 }}>
+                  {compacto ? franjaCorta(fila) : fila}
+                </td>
+                {columnas.map((col) => {
+                  const v = valorDe(fila, col);
+                  const claro = v / max > 0.55;
+                  return (
+                    <td key={col} onMouseEnter={() => setHover(etiquetaHover(fila, col))} onMouseLeave={() => setHover(null)}
+                      className="rounded text-center align-middle cursor-default" style={{ width: cellW, height: cellH, background: colorPara(v) }}>
+                      <span className="text-[10px] font-mono tabular-nums" style={{ color: claro ? "#FFF" : N.ink70 }}>{v}</span>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className={`flex ${compacto ? "flex-col items-start" : "items-center justify-between"} mt-3 flex-wrap gap-2`}>
+        <div className="text-xs" style={{ color: N.ink70 }}>
+          {hover ? <><b>{hover.dia}</b> · {hover.franja}: <span className="font-mono">{hover.v}</span> partidos</> : "Pasa el ratón por una celda para ver el detalle"}
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px]" style={{ color: N.ink40 }}>menos</span>
+          {VIZ.secuencialAzul.map((c, i) => <span key={i} className="rounded-sm" style={{ width: 14, height: 8, background: c }} />)}
+          <span className="text-[10px]" style={{ color: N.ink40 }}>más</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -271,140 +384,233 @@ function Dashboard({ T, irArbitros }) {
   const categoriasConPartidos = cobertura.porCategoria.filter((c) => c.partidosADesignar > 0);
   const categoriasEnRiesgo = categoriasConPartidos.filter((c) => c.estado === "riesgo");
 
-  const [catVolumen, setCatVolumen] = useState("Todas");
-  const partidosVolumen = useMemo(
-    () => cicloActivo.partidos.filter((p) => catVolumen === "Todas" || p.categoriaMinima === catVolumen),
-    [cicloActivo, catVolumen]
-  );
+  /* Partidos de la jornada activa, por categoría — todas desplegadas a la vez
+     (Roberto, 30 jul 2026: "una tabla o gráfico chulo, por categoría todo
+     desplegado"), sustituye el selector que colapsaba a un único número. */
+  const partidosJornadaPorCategoria = useMemo(() => {
+    const acc = {};
+    for (const p of cicloActivo.partidos) acc[p.categoriaMinima] = (acc[p.categoriaMinima] || 0) + 1;
+    return Object.entries(acc).map(([categoria, partidos]) => ({ categoria, partidos })).sort((a, b) => b.partidos - a.partidos);
+  }, [cicloActivo]);
 
   const alertasForma = useMemo(() => {
     const todas = ARBITROS.map((a) => ({ a, est: estadoForma(a.forma) })).filter((x) => x.est.color !== "verde");
     const peso = { rojo: 0, ambar: 1 };
     return todas.sort((x, y) => peso[x.est.color] - peso[y.est.color]).slice(0, 6);
   }, []);
-  const totalAlertas = useMemo(
-    () => ARBITROS.reduce((n, a) => n + (estadoForma(a.forma).color !== "verde" ? 1 : 0), 0),
-    []
-  );
+
+  /* Distribución de estado de forma sobre los 200 expedientes de trabajo —
+     base de "ratio de irregulares"/"ratio en seguimiento". Umbrales de
+     estadoForma() (alto=8.0, bajo=7.0) son un punto de partida propio, no
+     validado con el comité — ver Glosario y gobernanza. */
+  const formaCounts = useMemo(() => {
+    const acc = { verde: 0, ambar: 0, rojo: 0 };
+    for (const a of ARBITROS) acc[estadoForma(a.forma).color]++;
+    return acc;
+  }, []);
+  const totalAlertas = formaCounts.ambar + formaCounts.rojo;
+
+  /* Árbitros de baja este ciclo, por motivo declarado — dato real (declaraciones_disponibilidad,
+     specs/002-disponibilidad-arbitro), no un cálculo aparte del ya usado en Cobertura por categoría. */
+  const bajasPorMotivo = useMemo(() => {
+    if (disponibilidadEstado !== "listo" || !vigentesDisponibilidad) return null;
+    const acc = { lesion: 0, baja: 0, urgencia: 0, festivo: 0, total: 0 };
+    for (const decl of vigentesDisponibilidad.values()) {
+      if (decl?.tipo === "no_disponible") {
+        acc.total++;
+        if (decl.motivo in acc) acc[decl.motivo]++;
+      } else if (decl?.tipo === "festivo_solicitado") {
+        acc.total++;
+        acc.festivo++;
+      }
+    }
+    return acc;
+  }, [vigentesDisponibilidad, disponibilidadEstado]);
+  const disponiblesEsteCiclo = bajasPorMotivo ? ARBITROS.length - bajasPorMotivo.total : null;
+
+  /* Ratio de informes por árbitro — media simple sobre numInformes (real, acumulado
+     de temporada, no hay desglose por jornada todavía). */
+  const informesStats = useMemo(() => {
+    const nums = ARBITROS.map((a) => a.numInformes || 0);
+    return { media: nums.reduce((a, b) => a + b, 0) / nums.length, min: Math.min(...nums), max: Math.max(...nums), total: nums.reduce((a, b) => a + b, 0) };
+  }, []);
+
+  /* "Ratio de valoraciones" — interpretado como cuántos árbitros tienen ya
+     score B.1 fiable según las bandas de shrinkage bayesiano de kpis.md
+     (4+ informes = 100% propio; 3 = 70/30; 0-2 = 50/50, poco fiable), no
+     "cuántas notas hay". Dato real, cálculo derivado de una tabla ya acordada. */
+  const bandasFiabilidad = useMemo(() => {
+    let fiable = 0, media = 0, baja = 0;
+    for (const a of ARBITROS) {
+      const n = a.numInformes || 0;
+      if (n >= 4) fiable++; else if (n === 3) media++; else baja++;
+    }
+    return { fiable, media, baja, total: ARBITROS.length };
+  }, []);
+
+  /* "Ratio de árbitros mejorando" — sintético a propósito (depende de forma[]
+     y de las anotaciones, ninguna de las dos real): anotación etiqueta "mejora"
+     Y pendiente de forma positiva a la vez, no solo una de las dos señales. */
+  const ratioMejorando = useMemo(() => ARBITROS.filter((a) =>
+    (a.notas || []).some((nt) => nt.etiqueta === "mejora") && estadoForma(a.forma).pend > 0
+  ).length, []);
+
+  /* "Incidencias más frecuentes": no existe todavía un registro real de incidencias
+     independiente — proxy más cercano hoy son las etiquetas de anotaciones de
+     seguimiento (sintéticas, ver arbitros-200.json). Etiquetado sin disimulo. */
+  const etiquetasNotas = useMemo(() => {
+    const acc = {};
+    for (const a of ARBITROS) for (const nt of a.notas || []) acc[nt.etiqueta] = (acc[nt.etiqueta] || 0) + 1;
+    return Object.entries(acc).sort((a, b) => b[1] - a[1]);
+  }, []);
+  const maxEtiqueta = Math.max(1, ...etiquetasNotas.map(([, n]) => n));
 
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <KpiCard T={T} icon={Users} eyebrow="Árbitros activos" valor={nf(agregadosReales.total_arbitros_activos_adulta)}
+        <KpiCard T={T} icon={Users} chip={0} eyebrow="Árbitros activos" valor={nf(agregadosReales.total_arbitros_activos_adulta)}
           sub="categoría adulta, temporada 25/26 — dato real" />
-        <KpiCard T={T} icon={Calendar} eyebrow="Partidos temporada" valor={nf(agregadosReales.total_partidos_categoria_adulta)}
+        <KpiCard T={T} icon={Calendar} chip={3} eyebrow="Partidos temporada" valor={nf(agregadosReales.total_partidos_categoria_adulta)}
           sub={`de ${nf(agregadosReales.total_partidos_temporada)} incl. fútbol base — dato real`} />
         <KpiCard T={T} icon={Scale} eyebrow="Equidad de carga" tone={cvTono} valor={cv.toFixed(2)}
           sub={`carga ${cvTexto} entre árbitros (CV) — dato real`} />
-        <KpiCard T={T} icon={AlertCircle} tone={agregadosReales.partidos_sin_arbitro_asignado > 0 ? "warn" : "ok"}
-          eyebrow="Partidos sin árbitro" valor={nf(agregadosReales.partidos_sin_arbitro_asignado)}
-          sub="pendientes de asignar — dato real" />
+        <KpiCard T={T} icon={Trophy} chip={2} eyebrow="Equipos con dato real" valor={nf(EQUIPOS.length)}
+          sub="categoría adulta, ver página Equipos · real" />
       </div>
 
-      <Panel
-        title={`Cobertura por categoría · ${cicloActivo.finDeSemana}`}
-        right={
-          disponibilidadEstado !== "listo" ? (
-            <span className="text-[11px]" style={{ color: N.ink40 }}>
-              {disponibilidadEstado === "cargando" ? "cargando disponibilidad…" : "disponibilidad no disponible"}
-            </span>
-          ) : categoriasEnRiesgo.length > 0 ? (
-            <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: N.rojo }}>
-              <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
-            </span>
-          ) : (
-            <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: N.verde }}>
-              <Check size={12} /> sin alertas de cobertura
-            </span>
-          )
-        }
-      >
-        {disponibilidadEstado === "cargando" ? (
-          <p className="text-xs" style={{ color: N.ink40 }}>Cargando disponibilidad real del ciclo…</p>
-        ) : disponibilidadEstado === "error" ? (
-          <p className="text-xs rounded px-3 py-2" style={{ color: N.rojo, background: N.rojoT }}>
-            No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
-          </p>
-        ) : (
-          <>
-            {cobertura.datasetDisponibilidadVacio && (
-              <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: N.rojo, borderColor: N.rojoT, background: N.rojoT }}>
-                No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
-              </p>
-            )}
-            {categoriasConPartidos.length === 0 ? (
-              <p className="text-xs" style={{ color: N.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
-            ) : (
-              <div className="space-y-2.5">
-                {categoriasConPartidos.map((c) => (
-                  <div key={c.categoria} className="flex items-center justify-between gap-3 rounded border p-3 flex-wrap" style={{ borderColor: N.rule }}>
-                    <div>
-                      <div className="text-sm font-medium" style={{ color: N.ink }}>{c.categoria}</div>
-                      <div className="text-xs mt-0.5 font-mono tabular-nums" style={{ color: N.ink70 }}>
-                        {c.partidosADesignar} {c.partidosADesignar === 1 ? "partido" : "partidos"} a designar <span style={{ color: N.ink40 }}>· real</span>
-                        {" — "}
-                        {c.disponiblesCategoriaPropia} de categoría propia + {c.disponiblesCategoriaInferior} de categoría inferior = {c.totalDisponibles} {c.totalDisponibles === 1 ? "disponible" : "disponibles"} <span style={{ color: N.verde }}>· real</span>
-                      </div>
-                    </div>
-                    <BadgeCobertura estado={c.estado} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-        <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
-          “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
-        </p>
-      </Panel>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <KpiCard T={T} icon={Users} chip={6} eyebrow="Árbitros disponibles (este ciclo)" valor={disponiblesEsteCiclo ?? "—"}
+          sub={disponiblesEsteCiclo != null ? `de ${ARBITROS.length} expedientes de trabajo · real` : "cargando…"} />
+        <KpiCard T={T} icon={AlertCircle} tone={bajasPorMotivo?.total > 0 ? "warn" : undefined}
+          eyebrow="Árbitros no disponibles (este ciclo)" valor={bajasPorMotivo ? bajasPorMotivo.total : "—"}
+          sub={bajasPorMotivo ? `lesión ${bajasPorMotivo.lesion} · baja ${bajasPorMotivo.baja} · urgencia ${bajasPorMotivo.urgencia} · festivo ${bajasPorMotivo.festivo} · real` : "cargando…"} />
+        <KpiCard T={T} icon={FileText} chip={5} eyebrow="Informes por árbitro (temporada)" valor={informesStats.media.toFixed(1)}
+          sub={`rango ${informesStats.min}-${informesStats.max}, ${nf(informesStats.total)} en total · real`} />
+      </div>
 
-      <Panel
-        title={`Partidos del fin de semana · ${cicloActivo.finDeSemana}`}
-        right={
-          <select value={catVolumen} onChange={(e) => setCatVolumen(e.target.value)}
-            className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
-            {CATEGORIAS.map((c) => <option key={c}>{c}</option>)}
-          </select>
-        }
-      >
-        <div className="font-mono text-2xl" style={{ color: T.primary }}>{partidosVolumen.length}</div>
-        <div className="text-xs mt-1" style={{ color: N.ink70 }}>
-          {catVolumen === "Todas" ? "partidos a designar, todas las categorías" : `partidos a designar en ${catVolumen}`} <span style={{ color: N.ink40 }}>· real</span>
-        </div>
-      </Panel>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <KpiCard T={T} icon={Gauge} chip={4} eyebrow="Score fiable (valoraciones)" valor={`${bandasFiabilidad.fiable}/${bandasFiabilidad.total}`}
+          sub="4+ informes, shrinkage 100% propio (B.1) · real" />
+        <KpiCard T={T} icon={TrendingDown} tone="warn" eyebrow="Árbitros irregulares" valor={`${formaCounts.ambar}/${ARBITROS.length}`}
+          sub="estado de forma ámbar · sintético" />
+        <KpiCard T={T} icon={AlertTriangle} tone="bad" eyebrow="Árbitros en seguimiento" valor={`${formaCounts.rojo}/${ARBITROS.length}`}
+          sub="estado de forma rojo (umbral propio, sin validar) · sintético" />
+        <KpiCard T={T} icon={TrendingUp} chip={6} eyebrow="Mejorando" valor={`${ratioMejorando}/${ARBITROS.length}`}
+          sub="anotación de mejora + tendencia positiva · sintético" />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 space-y-5">
-          <Panel title="Dónde atacar · mayor carga de partidos (dato real)" right={<span className="text-[11px]" style={{ color: N.ink40 }}>Top 8 de {nf(agregadosReales.total_arbitros_activos_adulta)}</span>}>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={agregadosReales.top_carga_arbitros} layout="vertical" margin={{ top: 4, right: 20, left: 10, bottom: 0 }}>
+          <Panel title={`Partidos de la jornada por categoría · ${cicloActivo.finDeSemana}`} right={<span className="text-[11px]" style={{ color: N.ink40 }}>{cicloActivo.partidos.length} partidos · real</span>}>
+            <ResponsiveContainer width="100%" height={Math.max(140, partidosJornadaPorCategoria.length * 44)}>
+              <BarChart data={partidosJornadaPorCategoria} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="2 4" stroke={N.rule} horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="nombre" width={170} tick={{ fontSize: 11, fill: N.ink70 }} axisLine={false} tickLine={false} />
+                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: N.ink70 }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }} formatter={(v) => [v, "Partidos"]} />
-                <Bar dataKey="partidos" fill={T.primary} radius={[0, 3, 3, 0]} />
+                <Bar dataKey="partidos" radius={[0, 3, 3, 0]}>
+                  {partidosJornadaPorCategoria.map((c, i) => <Cell key={c.categoria} fill={VIZ.pastel[i % VIZ.pastel.length]} />)}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
+          </Panel>
+
+          <Panel
+            title={`Cobertura por categoría · ${cicloActivo.finDeSemana}`}
+            right={
+              disponibilidadEstado !== "listo" ? (
+                <span className="text-[11px]" style={{ color: N.ink40 }}>
+                  {disponibilidadEstado === "cargando" ? "cargando disponibilidad…" : "disponibilidad no disponible"}
+                </span>
+              ) : categoriasEnRiesgo.length > 0 ? (
+                <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: VIZ.estado.critical }}>
+                  <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
+                </span>
+              ) : (
+                <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: VIZ.estado.good }}>
+                  <Check size={12} /> sin alertas de cobertura
+                </span>
+              )
+            }
+          >
+            {disponibilidadEstado === "cargando" ? (
+              <p className="text-xs" style={{ color: N.ink40 }}>Cargando disponibilidad real del ciclo…</p>
+            ) : disponibilidadEstado === "error" ? (
+              <p className="text-xs rounded px-3 py-2" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>
+                No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
+              </p>
+            ) : (
+              <>
+                {cobertura.datasetDisponibilidadVacio && (
+                  <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: VIZ.estado.critical, borderColor: VIZ.estado.criticalT, background: VIZ.estado.criticalT }}>
+                    No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
+                  </p>
+                )}
+                {categoriasConPartidos.length === 0 ? (
+                  <p className="text-xs" style={{ color: N.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
+                ) : (
+                  <>
+                    <ResponsiveContainer width="100%" height={Math.max(140, categoriasConPartidos.length * 48)}>
+                      <BarChart data={categoriasConPartidos} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="2 4" stroke={N.rule} horizontal={false} />
+                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
+                        <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: N.ink70 }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }}
+                          formatter={(v, name) => [v, name === "totalDisponibles" ? "Disponibles" : "A designar"]} />
+                        <Legend wrapperStyle={{ fontSize: 11 }} formatter={(value) => value === "totalDisponibles" ? "Disponibles" : "A designar"} />
+                        <Bar dataKey="partidosADesignar" fill={N.ink40} radius={[0, 3, 3, 0]} barSize={11} />
+                        <Bar dataKey="totalDisponibles" radius={[0, 3, 3, 0]} barSize={11}>
+                          {categoriasConPartidos.map((c) => (
+                            <Cell key={c.categoria} fill={c.estado === "riesgo" ? VIZ.estado.critical : c.estado === "ajustado" ? VIZ.estado.warning : VIZ.estado.good} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                    <div className="space-y-1.5 mt-3">
+                      {categoriasConPartidos.map((c) => (
+                        <div key={c.categoria} className="flex items-center justify-between text-[11px]" style={{ color: N.ink40 }}>
+                          <span>{c.categoria}: {c.disponiblesCategoriaPropia} propia + {c.disponiblesCategoriaInferior} inferior</span>
+                          <BadgeCobertura estado={c.estado} />
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
             <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
-              Carga real de designaciones públicas de la FFCV esta temporada. Un coeficiente de variación de {cv.toFixed(2)} indica reparto {cvTexto} — candidato directo a KPI A.6 (equidad de carga, ver kpis.md).
+              “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
             </p>
           </Panel>
 
-          <Panel title="Categorías con más volumen (dato real)">
+          <Panel title="Categorías con más volumen (temporada completa, dato real)">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={agregadosReales.distribucion_categorias.slice(0, 8)} margin={{ top: 4, right: 10, left: -10, bottom: 40 }}>
                 <CartesianGrid strokeDasharray="2 4" stroke={N.rule} vertical={false} />
                 <XAxis dataKey="competicion" tick={{ fontSize: 10, fill: N.ink40 }} axisLine={{ stroke: N.rule }} tickLine={false} angle={-30} textAnchor="end" interval={0} height={70} />
                 <YAxis tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }} formatter={(v) => [v, "Partidos"]} />
-                <Bar dataKey="partidos" fill={T.accent} radius={[3, 3, 0, 0]} />
+                <Bar dataKey="partidos" radius={[3, 3, 0, 0]}>
+                  {agregadosReales.distribucion_categorias.slice(0, 8).map((c, i) => <Cell key={c.competicion} fill={VIZ.pastel[i % VIZ.pastel.length]} />)}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </Panel>
         </div>
 
         <div className="space-y-5">
-          <Panel title={`Alertas de forma · top 6 de ${totalAlertas}`} right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ambar }}><Info size={11} /> sintético</span>}>
+          <Panel title="Carga de partidos por franja horaria" right={<span className="text-[11px]" style={{ color: N.ink40 }}>{nf(HEATMAP_INTRASEMANAL.total_partidos)} · real</span>}>
+            <HeatmapIntrasemanal data={HEATMAP_INTRASEMANAL} compacto />
+            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+              Cuándo se juega (todas las categorías), no disponibilidad individual — anticipa en qué franjas hace falta más cobertura.
+            </p>
+          </Panel>
+
+          <Panel title={`Alertas de forma · ${totalAlertas} de ${ARBITROS.length}`} right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ambar }}><Info size={11} /> sintético</span>}>
+            <div className="flex items-center gap-4 mb-4 pb-4 border-b" style={{ borderColor: N.rule }}>
+              <div className="font-mono text-4xl tabular-nums" style={{ color: formaCounts.rojo > 0 ? VIZ.estado.critical : VIZ.estado.good }}>{formaCounts.rojo}</div>
+              <div className="text-xs" style={{ color: N.ink70 }}>necesitan seguimiento ahora mismo — de {ARBITROS.length} expedientes de trabajo</div>
+            </div>
             {alertasForma.length === 0 ? (
               <p className="text-xs" style={{ color: N.ink40 }}>Sin alertas activas.</p>
             ) : (
@@ -412,20 +618,37 @@ function Dashboard({ T, irArbitros }) {
                 {alertasForma.map(({ a, est }) => (
                   <div key={a.id} className="flex items-center justify-between rounded border p-2.5" style={{ borderColor: N.rule }}>
                     <div>
-                      <div className="text-sm font-medium" style={{ color: N.ink }}>{a.n}</div>
+                      <div className="text-sm font-semibold" style={{ color: N.ink }}>{a.n}</div>
                       <div className="text-xs" style={{ color: N.ink70 }}>{a.cat} · {a.loc}</div>
                     </div>
-                    <Semaforo estado={est} />
+                    <Semaforo estado={est} size="lg" />
                   </div>
                 ))}
               </div>
             )}
             <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
-              Basado en el semáforo de forma — hoy con datos sintéticos (8 expedientes de muestra). Será real en cuanto haya informes reales cargados.
+              Basado en el semáforo de forma sobre los 200 expedientes de trabajo — sintético hasta tener informes reales del comité.
             </p>
             <button onClick={irArbitros} className="mt-3 text-xs font-medium flex items-center gap-1" style={{ color: T.primary }}>
               Ver en Árbitros <ChevronRight size={13} />
             </button>
+          </Panel>
+
+          <Panel title="Incidencias más frecuentes" right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ambar }}><Info size={11} /> sintético</span>}>
+            <div className="space-y-2">
+              {etiquetasNotas.map(([etiqueta, n], i) => (
+                <div key={etiqueta} className="flex items-center gap-2.5">
+                  <span className="text-xs w-24 shrink-0 capitalize" style={{ color: N.ink70 }}>{etiqueta}</span>
+                  <div className="flex-1 rounded-full h-2" style={{ background: N.paper }}>
+                    <div className="h-2 rounded-full" style={{ width: `${(n / maxEtiqueta) * 100}%`, background: VIZ.pastel[i % VIZ.pastel.length] }} />
+                  </div>
+                  <span className="text-xs font-mono tabular-nums w-6 text-right" style={{ color: N.ink }}>{n}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+              Proxy sobre etiquetas de anotaciones de seguimiento — no hay todavía un registro de incidencias independiente. «Disciplinaria» no aparece porque hoy no hay ninguna anotación con esa etiqueta en los 200 expedientes, no es un error.
+            </p>
           </Panel>
 
           <Panel title="Insights">
@@ -435,10 +658,7 @@ function Dashboard({ T, irArbitros }) {
                 el árbitro con más partidos dirige {agregadosReales.equidad_carga.max_partidos}, el de menos solo {agregadosReales.equidad_carga.min_partidos}. Media {agregadosReales.equidad_carga.media_partidos_por_arbitro} partidos/árbitro. <span className="text-[11px]" style={{ color: N.ambar }}>· real</span>
               </p>
               <p>
-                <span className="font-semibold" style={{ color: N.ink }}>{agregadosReales.partidos_sin_arbitro_asignado} partidos</span> de categoría adulta siguen sin árbitro asignado en el CSV público — puede ser normal (jornadas futuras) o señal de déficit de colegiados en alguna categoría. <span className="text-[11px]" style={{ color: N.ambar }}>· real, sin interpretar todavía</span>
-              </p>
-              <p>
-                <span className="font-semibold" style={{ color: N.ink }}>2 árbitros necesitan seguimiento</span> por caída de nota en informes recientes. <span className="text-[11px]" style={{ color: N.ambar }}>· sintético</span>
+                <span className="font-semibold" style={{ color: N.ink }}>{formaCounts.rojo} de {ARBITROS.length} árbitros</span> están en «necesita seguimiento» por caída de nota o tendencia descendente en sus últimos informes — umbral propio, todavía sin validar con el comité. <span className="text-[11px]" style={{ color: N.ambar }}>· sintético</span>
               </p>
             </div>
           </Panel>
@@ -449,11 +669,19 @@ function Dashboard({ T, irArbitros }) {
 }
 
 /* ------------------------------- listado ------------------------------- */
+/* virtualización de filas: la tabla de Árbitros va a 200 hoy y ~1800 si se
+   amplía el dataset a la escala real del colegio (Sprint 3, docs/sprints.md)
+   — solo se monta el DOM de las filas visibles + margen de scroll. */
+const FILA_ALTURA = 64;
+const FILA_OVERSCAN = 8;
+const LISTADO_ALTURA_VISIBLE = 640;
+
 function Listado({ T, onPick }) {
   const [q, setQ] = useState("");
   const [filtro, setFiltro] = useState("todos");
   const [cat, setCat] = useState("Todas");
   const [mediaMin, setMediaMin] = useState("Todas");
+  const [scrollTop, setScrollTop] = useState(0);
 
   const filas = useMemo(() => ARBITROS
     .map((a) => ({ a, est: estadoForma(a.forma), tot: totales(a), ultima: a.hist[a.hist.length - 1] }))
@@ -464,6 +692,28 @@ function Listado({ T, onPick }) {
       const okm = mediaMin === "Todas" || ultima.media >= parseFloat(mediaMin);
       return okq && okf && okc && okm;
     }), [q, filtro, cat, mediaMin]);
+
+  /* reset del scroll al cambiar filtros: patrón "ajustar estado durante el
+     render" (evita el efecto con setState síncrono que marca react-hooks) —
+     la key en el contenedor de scroll fuerza además el reset del scrollTop nativo. */
+  const filtroKey = `${q}|${filtro}|${cat}|${mediaMin}`;
+  const [ultimoFiltroKey, setUltimoFiltroKey] = useState(filtroKey);
+  let scrollTopEfectivo = scrollTop;
+  if (filtroKey !== ultimoFiltroKey) {
+    setUltimoFiltroKey(filtroKey);
+    setScrollTop(0);
+    scrollTopEfectivo = 0;
+  }
+
+  const filasVisiblesCount = Math.ceil(LISTADO_ALTURA_VISIBLE / FILA_ALTURA) + FILA_OVERSCAN * 2;
+  const inicio = Math.max(0, Math.min(
+    Math.floor(scrollTopEfectivo / FILA_ALTURA) - FILA_OVERSCAN,
+    Math.max(0, filas.length - 1),
+  ));
+  const fin = Math.min(filas.length, inicio + filasVisiblesCount);
+  const filasVisibles = filas.slice(inicio, fin);
+  const espacioArriba = inicio * FILA_ALTURA;
+  const espacioAbajo = (filas.length - fin) * FILA_ALTURA;
 
   const conteo = useMemo(() => {
     const c = { verde: 0, ambar: 0, rojo: 0 };
@@ -518,9 +768,10 @@ function Listado({ T, onPick }) {
             </div>
           </div>
         }>
-        <div className="overflow-x-auto -m-5">
+        <div key={filtroKey} className="overflow-auto -m-5" style={{ maxHeight: LISTADO_ALTURA_VISIBLE }}
+          onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}>
           <table className="w-full text-sm">
-            <thead>
+            <thead className="sticky top-0 z-10" style={{ background: N.card }}>
               <tr>
                 {["Colegiado", "Categoría", "Estado de forma", "Media 25/26", "PJ (total)", "Indisp.", ""].map((h) => (
                   <th key={h} className="text-left px-3 py-2.5 text-[10px] uppercase tracking-[0.12em] font-semibold border-b"
@@ -529,9 +780,10 @@ function Listado({ T, onPick }) {
               </tr>
             </thead>
             <tbody>
-              {filas.map(({ a, est, tot, ultima }) => (
-                <tr key={a.id} onClick={() => onPick(a)}
-                  className="cursor-pointer border-b hover:bg-slate-50 transition-colors" style={{ borderColor: N.rule }}>
+              {espacioArriba > 0 && <tr aria-hidden="true"><td colSpan={7} style={{ height: espacioArriba, padding: 0, border: 0 }} /></tr>}
+              {filasVisibles.map(({ a, est, tot, ultima }) => (
+                <tr key={a.id} onClick={() => onPick(a)} style={{ borderColor: N.rule, height: FILA_ALTURA }}
+                  className="cursor-pointer border-b hover:bg-slate-50 transition-colors">
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-3">
                       <Avatar txt={a.foto} T={T} size={36} />
@@ -550,6 +802,7 @@ function Listado({ T, onPick }) {
                   <td className="px-3 py-3"><ChevronRight size={14} style={{ color: N.ink40 }} /></td>
                 </tr>
               ))}
+              {espacioAbajo > 0 && <tr aria-hidden="true"><td colSpan={7} style={{ height: espacioAbajo, padding: 0, border: 0 }} /></tr>}
             </tbody>
           </table>
         </div>
@@ -687,6 +940,8 @@ function Ficha({ T, a, back }) {
   const [bajaJustificada, setBajaJustificada] = useState(true);
   const [guardandoDisponibilidad, setGuardandoDisponibilidad] = useState(false);
   const [errorDisponibilidad, setErrorDisponibilidad] = useState(null);
+  const [archivoJustificante, setArchivoJustificante] = useState(null);
+  const [guardandoJustificante, setGuardandoJustificante] = useState(false);
 
   useEffect(() => {
     // key={a.id} en el punto de uso remonta Ficha al cambiar de árbitro, así
@@ -745,6 +1000,36 @@ function Ficha({ T, a, back }) {
     const nuevoLog = [...logDisponibilidad, resultado.declaracion];
     setLogDisponibilidad(nuevoLog);
     setPatron(calcularPatronImplicacion(nuevoLog));
+  };
+
+  /* Vigente del ciclo seleccionado en el propio formulario de declaración —
+     derivado del log ya cargado (obtenerLog ordena por fecha ascendente),
+     no una llamada aparte. */
+  const vigenteCicloDeclaracion = logDisponibilidad.filter((d) => d.cicloId === cicloDeclaracion).at(-1) ?? null;
+  const bajaSinJustificarBloqueando = vigenteCicloDeclaracion?.tipo === "no_disponible"
+    && vigenteCicloDeclaracion?.motivo === "baja" && vigenteCicloDeclaracion?.justificada === false;
+
+  /* Adjuntar justificante (30 jul 2026, Roberto): una baja médica sin justificar
+     bloquea de verdad al árbitro en el motor de designación (ver filtroDuro,
+     motorAsignacion.js) — esto crea una NUEVA declaración justificada:true para
+     el mismo ciclo (declaraciones_disponibilidad es append-only, "vigente" =
+     la más reciente, nunca se sobrescribe una fila existente). El PDF en sí
+     todavía no se sube a ningún sitio (no hay bucket de Supabase Storage
+     creado) — esta acción sí registra de verdad la justificación, el
+     almacenamiento del archivo queda pendiente como paso siguiente. */
+  const justificarBaja = async () => {
+    if (!archivoJustificante || guardandoJustificante) return;
+    setGuardandoJustificante(true);
+    const resultado = await declararDisponibilidad({
+      arbitroId: a.id, cicloId: cicloDeclaracion, autor: rolVista,
+      tipo: "no_disponible", motivo: "baja", justificada: true,
+    });
+    setGuardandoJustificante(false);
+    if (!resultado.ok) { setErrorDisponibilidad(resultado.motivoRechazo); return; }
+    const nuevoLog = [...logDisponibilidad, resultado.declaracion];
+    setLogDisponibilidad(nuevoLog);
+    setPatron(calcularPatronImplicacion(nuevoLog));
+    setArchivoJustificante(null);
   };
 
   const addNota = async () => {
@@ -943,6 +1228,27 @@ function Ficha({ T, a, back }) {
           {/* disponibilidad declarada por ciclo — specs/002-disponibilidad-arbitro */}
           <Panel title="Disponibilidad"
             right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ink40 }}><Lock size={11} /> historial visible para ambos roles</span>}>
+            {bajaSinJustificarBloqueando && (
+              <div className="rounded border p-3 mb-3 flex items-start gap-2.5" style={{ borderColor: VIZ.estado.critical, background: VIZ.estado.criticalT }}>
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: VIZ.estado.critical }} />
+                <div className="flex-1">
+                  <div className="text-xs font-semibold" style={{ color: VIZ.estado.critical }}>
+                    Baja médica sin justificar — no se podrá designar a {a.n} para este ciclo hasta adjuntar el justificante
+                  </div>
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <input type="file" accept="application/pdf" onChange={(e) => setArchivoJustificante(e.target.files?.[0] ?? null)}
+                      className="text-xs" style={{ color: N.ink70 }} />
+                    <button onClick={justificarBaja} disabled={!archivoJustificante || guardandoJustificante}
+                      className="text-[11px] rounded px-2.5 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+                      {guardandoJustificante ? "Adjuntando…" : "Adjuntar justificante"}
+                    </button>
+                  </div>
+                  <p className="text-[10px] mt-1.5" style={{ color: N.ink40 }}>
+                    Esto registra de verdad la justificación en el histórico. El almacenamiento del PDF en sí queda pendiente (falta un bucket de Supabase Storage) — no se pierde la acción, pero el archivo no se sube todavía a ningún sitio.
+                  </p>
+                </div>
+              </div>
+            )}
             <div className="flex flex-wrap items-end gap-2 mb-3">
               <div>
                 <label className="block text-[10px] uppercase tracking-[0.1em] mb-1" style={{ color: N.ink40 }}>Ciclo</label>
@@ -1220,6 +1526,11 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
         <td className="px-3 py-3">
           <div className="font-medium" style={{ color: N.ink }}>{partido.equipoLocal} – {partido.equipoVisitante}</div>
           <div className="text-xs" style={{ color: N.ink40 }}>{partido.categoriaMinima} · {partido.localidad} · {partido.fecha}</div>
+          {partido.sensible && (
+            <div className="mt-1 flex items-center gap-1 text-[11px]" style={{ color: VIZ.estado.warning }}>
+              <AlertTriangle size={11} /> {partido.motivoSensible}
+            </div>
+          )}
         </td>
         <td className="px-3 py-3">
           {asignado ? (
@@ -1332,17 +1643,31 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
   );
 }
 
-function DesignacionInteligente({ T }) {
+function DesignacionInteligente({ T, onIrAPartido }) {
   const [cicloId, setCicloId] = useState(ciclosAsignacion[0].id);
   const [expandidoId, setExpandidoId] = useState(null);
   const [vigentes, setVigentes] = useState(new Map());
   const [vigentesEstado, setVigentesEstado] = useState("cargando"); // cargando | listo | error
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
   const ciclo = ciclosAsignacion.find((c) => c.id === cicloId);
+
+  /* Disponibilidad real (specs/002), no solo el heurístico sintético de
+     conDisponibilidad — una baja médica sin justificar excluye de verdad
+     al árbitro como candidato (Roberto, 30 jul 2026). Ver filtroDuro en
+     motorAsignacion.js. */
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloId).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) setVigentesDisponibilidad(resultado.vigentesPorArbitro);
+    });
+    return () => { cancelado = true; };
+  }, [cicloId]);
 
   const resultados = useMemo(() => {
     const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
-    return asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
-  }, [ciclo]);
+    return asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo, vigentesDisponibilidad ?? new Map());
+  }, [ciclo, vigentesDisponibilidad]);
 
   useEffect(() => {
     let cancelado = false;
@@ -1371,9 +1696,33 @@ function DesignacionInteligente({ T }) {
   const nDecididos = resultadosConDecision.filter((r) => r.decisionVigente).length;
   const nRevisar = resultadosConDecision.filter((r) => !r.decisionVigente && r.requiereRevision).length;
   const nAutoConfirmable = resultadosConDecision.length - nDecididos - nRevisar;
+  const situacionesSensibles = resultadosConDecision.filter((r) => r.partido.sensible);
 
   return (
     <div className="space-y-5">
+      {situacionesSensibles.length > 0 && (
+        <Panel title={`Situaciones a tener en cuenta esta jornada · ${situacionesSensibles.length}`}>
+          <p className="text-xs mb-3" style={{ color: N.ink70 }}>
+            Partidos con algo que el comité debería valorar al confirmar — derbis, historial de tarjetas entre estos equipos,
+            partidos con mucho en juego. No bloquean la decisión, es contexto para tomarla con criterio.
+          </p>
+          <div className="space-y-2">
+            {situacionesSensibles.map((r) => (
+              <div key={r.partido.id} className="rounded border p-3 flex items-start justify-between gap-3 flex-wrap cursor-pointer hover:bg-slate-50"
+                style={{ borderColor: N.rule }} onClick={() => (onIrAPartido ? onIrAPartido(r.partido.id) : setExpandidoId(r.partido.id))}>
+                <div>
+                  <div className="text-sm font-medium" style={{ color: N.ink }}>{r.partido.equipoLocal} – {r.partido.equipoVisitante}</div>
+                  <div className="text-xs mt-1 flex items-center gap-1" style={{ color: VIZ.estado.warning }}>
+                    <AlertTriangle size={11} /> {r.partido.motivoSensible}
+                  </div>
+                  {r.asignado && <div className="text-xs mt-1" style={{ color: N.ink40 }}>Sugerido: <span style={{ color: N.ink }}>{r.asignado.arbitro.n}</span></div>}
+                </div>
+                <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: T.primary }}>Ir al partido <ChevronRight size={12} /></span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
       <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: T.accent, background: T.accentTint }}>
         <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
         <div>
@@ -1387,7 +1736,7 @@ function DesignacionInteligente({ T }) {
       </div>
 
       <Panel title="Ciclo de asignación" right={
-        <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); setVigentes(new Map()); setVigentesEstado("cargando"); }}
+        <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); setVigentes(new Map()); setVigentesEstado("cargando"); setVigentesDisponibilidad(null); }}
           className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
           {ciclosAsignacion.map((c) => <option key={c.id} value={c.id}>{c.etiqueta}</option>)}
         </select>
@@ -1437,49 +1786,513 @@ function DesignacionInteligente({ T }) {
 }
 
 /* ------------------------------- vistas previas (v2/v3) ------------------------------- */
-const PROPUESTA = [
-  { partido: "Atlético Saguntino – CD Roda", cat: "Preferente", arb: "Aitana Sospedra Gil", km: 21, estado: "ok", nota: "Sin incompatibilidades · en forma · 14 días sin dirigir al Saguntino" },
-  { partido: "CD Buñol – Paterna CF", cat: "1ª Regional", arb: "Pau Llorens Sanchis", km: 68, estado: "aviso", nota: "Reside en Paterna · territorialidad pendiente de criterio del técnico" },
-  { partido: "Burjassot CF – CD Almazora", cat: "2ª Regional", arb: "Sergi Company Roig", km: 26, estado: "bloqueo", nota: "Estado de forma en rojo · el sistema sugiere revisión antes de confirmar" },
+/* Roles (004), Equipos (005) y Partidos (006): prototipos de demo sin spec formal
+   todavía (decisión explícita de Roberto, 30 jul 2026, ver decisiones-producto.md §25)
+   — mismo patrón visual de BannerV2 que Recomendaciones/Económico/IA, ningún botón
+   hace nada real. */
+const CUENTAS_EJEMPLO = [
+  { nombre: "Marisa Andújar Coll", rol: "Comité técnico", estado: "Activa", ultimo: "hace 2 días" },
+  { nombre: "Pau Llorens Sanchis", rol: "Árbitro", estado: "Invitación enviada", ultimo: "—" },
+  { nombre: "Ferran Botella Ibáñez", rol: "Informador", estado: "Activa", ultimo: "hace 5 días" },
 ];
 
-function VistaRecomendaciones({ T }) {
+function VistaRoles({ T }) {
   return (
     <div>
-      <BannerV2 T={T} version="Versión 2"
-        texto="Recomendaciones de designación con incompatibilidades y vetos. El sistema sugiere y explica; el técnico decide y firma. Necesita los expedientes poblados para funcionar." />
-      <Panel title="Ejemplo · recomendaciones para la jornada 31">
-        <div className="space-y-2 opacity-90">
-          {PROPUESTA.map((p, i) => (
-            <div key={i} className="rounded border p-4" style={{ borderColor: N.rule }}>
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium" style={{ color: N.ink }}>{p.partido}</span>
-                    <span className="text-[11px] rounded px-2 py-0.5" style={{ background: T.tint, color: T.primary }}>{p.cat}</span>
-                  </div>
-                  <div className="text-sm mt-1.5" style={{ color: N.ink }}>
-                    <span style={{ color: N.ink40 }}>Sugerido: </span><span className="font-medium">{p.arb}</span>
-                    <span className="font-mono text-xs ml-2" style={{ color: N.ink40 }}>{p.km} km</span>
-                  </div>
-                  <div className="text-xs mt-1" style={{ color: N.ink70 }}>{p.nota}</div>
-                </div>
-                <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium"
-                  style={p.estado === "ok" ? { background: N.verdeT, color: N.verde } : p.estado === "aviso" ? { background: N.ambarT, color: N.ambar } : { background: N.rojoT, color: N.rojo }}>
-                  {p.estado === "ok" ? <><Check size={11} /> Sin conflicto</> : p.estado === "aviso" ? <><AlertTriangle size={11} /> Revisar</> : <><Ban size={11} /> Atención</>}
-                </span>
-              </div>
+      <BannerV2 T={T} version="004 · Roles y permisos"
+        texto="Acceso real por enlace mágico (sin contraseña) y panel de administración de cuentas. Se activa en 3 fases: hoy (demo, sin cuentas), comité con datos reales, y por último árbitros por categoría. Bloqueante: hace falta el email oficial verificado de cada árbitro antes de poder darle de alta." />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <Panel title="Ejemplo · acceso por enlace mágico">
+          <div className="max-w-sm space-y-3 opacity-90">
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Correo electrónico</label>
+              <input disabled placeholder="nombre.apellido@arbitrosffcv.es"
+                className="w-full text-sm rounded border px-3 py-2 cursor-not-allowed" style={{ borderColor: N.rule, background: N.paper, color: N.ink40 }} />
             </div>
+            <button disabled className="w-full text-xs rounded px-4 py-2 font-medium cursor-not-allowed flex items-center justify-center gap-1.5"
+              style={{ background: N.rule, color: N.ink40 }}>
+              <MailCheck size={13} /> Enviar enlace mágico (disponible en 004)
+            </button>
+          </div>
+        </Panel>
+        <Panel title="Ejemplo · administración de cuentas">
+          <div className="space-y-2 opacity-90">
+            {CUENTAS_EJEMPLO.map((c, i) => (
+              <div key={i} className="rounded border p-3 flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: N.rule }}>
+                <div>
+                  <div className="text-sm font-medium" style={{ color: N.ink }}>{c.nombre}</div>
+                  <div className="text-xs mt-0.5" style={{ color: N.ink40 }}>{c.rol} · último acceso {c.ultimo}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] rounded px-2 py-0.5" style={{ background: c.estado === "Activa" ? N.verdeT : N.ambarT, color: c.estado === "Activa" ? N.verde : N.ambar }}>{c.estado}</span>
+                  <button disabled className="cursor-not-allowed" style={{ color: N.ink40 }}><UserCog size={14} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
+/* Medias por categoría, calculadas una vez sobre EQUIPOS (dato real) — usadas para
+   contextualizar la ficha de cada equipo ("por encima/debajo de la media de su grupo"). */
+const MEDIAS_POR_CATEGORIA = (() => {
+  const acc = {};
+  for (const e of EQUIPOS) {
+    if (!e.partidosJugados) continue;
+    const c = acc[e.categoria] || { pj: 0, gf: 0, gc: 0, am: 0, ro: 0 };
+    c.pj += e.partidosJugados; c.gf += e.golesFavor; c.gc += e.golesContra; c.am += e.amarillas; c.ro += e.rojas;
+    acc[e.categoria] = c;
+  }
+  const medias = {};
+  for (const [cat, c] of Object.entries(acc)) {
+    medias[cat] = { golesPorPartido: c.gf / c.pj, amarillasPorPartido: c.am / c.pj, rojasPorPartido: c.ro / c.pj };
+  }
+  return medias;
+})();
+
+function VistaEquipos({ T }) {
+  const [sel, setSel] = useState(null);
+  return sel ? <FichaEquipo T={T} equipo={sel} back={() => setSel(null)} /> : <ListadoEquipos T={T} onPick={setSel} />;
+}
+
+function ListadoEquipos({ T, onPick }) {
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState("Todas");
+  const categorias = useMemo(() => ["Todas", ...new Set(EQUIPOS.map((e) => e.categoria))], []);
+  const filtrados = useMemo(() => EQUIPOS.filter((e) =>
+    (cat === "Todas" || e.categoria === cat) && (q.trim() === "" || e.nombre.toLowerCase().includes(q.trim().toLowerCase()))
+  ), [q, cat]);
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-md border p-3 flex items-center gap-2 text-xs" style={{ borderColor: N.rule, background: "#FAFAF9", color: N.ink70 }}>
+        <Info size={13} style={{ color: N.ink40 }} />
+        {EQUIPOS.length} equipos sobre {nf(agregadosReales.total_partidos_categoria_adulta)} partidos reales de la temporada 25/26
+        (ffcv_public_data/) — sin sanciones disciplinarias ni titulares más frecuentes: no hay alineaciones en el scraping, solo goles y tarjetas.
+      </div>
+      <Panel title={`Equipos · ${filtrados.length} de ${EQUIPOS.length}`} right={
+        <div className="flex gap-2">
+          <select value={cat} onChange={(e) => setCat(e.target.value)}
+            className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
+            {categorias.map((c) => <option key={c}>{c}</option>)}
+          </select>
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar equipo…"
+            className="text-xs rounded border px-2 py-1.5 outline-none w-40" style={{ borderColor: N.rule, color: N.ink }} />
+        </div>
+      }>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          {filtrados.slice(0, 60).map((e) => (
+            <button key={e.id} onClick={() => onPick(e)} className="text-left rounded border p-4 hover:bg-slate-50 transition-colors" style={{ borderColor: N.rule }}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="text-sm font-medium" style={{ color: N.ink }}>{e.nombre}</div>
+                <Trophy size={14} style={{ color: N.ink40 }} />
+              </div>
+              <span className="text-[11px] rounded px-2 py-0.5 inline-block mt-1.5" style={{ background: T.tint, color: T.primary }}>{e.categoria}</span>
+              <div className="text-xs mt-3 flex items-center gap-3" style={{ color: N.ink70 }}>
+                <span><span style={{ color: N.ink40 }}>PJ</span> {e.partidosJugados}</span>
+                <span><span style={{ color: N.ink40 }}>GF</span> {e.golesFavor}</span>
+                <span><span style={{ color: N.ink40 }}>GC</span> {e.golesContra}</span>
+              </div>
+              {e.top_goleadores[0] && (
+                <div className="text-xs mt-2" style={{ color: N.ink70 }}>
+                  <span style={{ color: N.ink40 }}>Máx. goleador: </span>{e.top_goleadores[0].nombre} ({e.top_goleadores[0].goles})
+                </div>
+              )}
+            </button>
           ))}
         </div>
-        <button disabled className="mt-4 text-xs rounded px-4 py-2 font-medium cursor-not-allowed flex items-center gap-1.5"
-          style={{ background: N.rule, color: N.ink40 }}>
-          <Lock size={12} /> Confirmar y publicar (disponible en v2)
-        </button>
+        {filtrados.length > 60 && (
+          <p className="text-[11px] mt-3 text-center" style={{ color: N.ink40 }}>
+            Mostrando los primeros 60 de {filtrados.length} — afina la búsqueda o filtra por categoría para acotar.
+          </p>
+        )}
       </Panel>
     </div>
   );
 }
+
+function FichaEquipo({ T, equipo: e, back }) {
+  const media = MEDIAS_POR_CATEGORIA[e.categoria];
+  const golesPartido = e.partidosJugados ? e.golesFavor / e.partidosJugados : 0;
+  const amarillasPartido = e.partidosJugados ? e.amarillas / e.partidosJugados : 0;
+  const pctVictorias = e.partidosJugados ? Math.round((e.victorias / e.partidosJugados) * 100) : 0;
+
+  const insights = [];
+  if (media) {
+    if (golesPartido >= media.golesPorPartido * 1.2) insights.push({ tono: "warn", texto: `Ataque por encima de la media de ${e.categoria}: ${golesPartido.toFixed(2)} goles/partido frente a ${media.golesPorPartido.toFixed(2)} de media del grupo. Es un equipo que suele generar volumen ofensivo.` });
+    else if (golesPartido <= media.golesPorPartido * 0.7) insights.push({ tono: undefined, texto: `Ataque por debajo de la media de ${e.categoria}: ${golesPartido.toFixed(2)} goles/partido frente a ${media.golesPorPartido.toFixed(2)} de media del grupo.` });
+    if (amarillasPartido >= media.amarillasPorPartido * 1.25) insights.push({ tono: "warn", texto: `Disciplina más tensa que la media: ${amarillasPartido.toFixed(2)} amarillas/partido frente a ${media.amarillasPorPartido.toFixed(2)} de media de ${e.categoria}. Contexto a tener en cuenta para la gestión de tarjetas.` });
+  }
+  if (pctVictorias >= 65) insights.push({ tono: undefined, texto: `Buena racha de resultados: gana el ${pctVictorias}% de sus partidos — puede jugar con más intensidad al ir por delante en el marcador.` });
+
+  return (
+    <div className="space-y-5">
+      <button onClick={back} className="text-xs flex items-center gap-1 font-medium" style={{ color: T.primary }}>
+        <ChevronRight size={13} style={{ transform: "rotate(180deg)" }} /> Volver a equipos
+      </button>
+
+      <div className="rounded-md overflow-hidden" style={{ background: T.primary }}>
+        <div className="p-5 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.15)" }}>
+            <Trophy size={22} style={{ color: "#FFF" }} />
+          </div>
+          <div>
+            <div className="font-mono text-[11px] tracking-[0.2em] mb-1" style={{ color: T.accent }}>{e.categoria.toUpperCase()} · {e.grupo}</div>
+            <div className="text-white text-xl font-semibold">{e.nombre}</div>
+          </div>
+        </div>
+        <div className="h-1" style={{ background: T.accent }} />
+      </div>
+
+      <div className="rounded border px-3 py-2 flex items-center gap-2 text-[11px]" style={{ borderColor: N.rule, color: N.ink40, background: "#FAFAF9" }}>
+        <Info size={12} />
+Datos generados el {equiposRealesData.generado} a partir de {equiposRealesData.fuente}. Se actualizan cuando se relance el scraper tras cada jornada que publique la FFCV — cadencia real (¿miércoles?) pendiente de confirmar, no asumida.
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <KpiCard T={T} eyebrow="Partidos jugados" valor={e.partidosJugados} sub="temporada 25/26 · real" />
+        <KpiCard T={T} eyebrow="V-E-D" valor={`${e.victorias}-${e.empates}-${e.derrotas}`} sub={`${pctVictorias}% victorias · real`} />
+        <KpiCard T={T} eyebrow="Goles" valor={`${e.golesFavor}-${e.golesContra}`} sub={`diferencia ${e.golesFavor - e.golesContra >= 0 ? "+" : ""}${e.golesFavor - e.golesContra} · real`} />
+        <KpiCard T={T} eyebrow="Tarjetas" valor={`${e.amarillas} / ${e.rojas}`} tone={e.rojas > 3 ? "warn" : undefined} sub="amarillas / rojas · real" />
+      </div>
+
+      <Panel title="Insights para el árbitro">
+        {insights.length === 0 ? (
+          <p className="text-sm" style={{ color: N.ink70 }}>Sin patrones destacables frente a la media de su categoría con el volumen de partidos disponible.</p>
+        ) : (
+          <div className="space-y-2.5">
+            {insights.map((ins, i) => (
+              <div key={i} className="rounded border p-3 flex items-start gap-2.5" style={{ borderColor: N.rule }}>
+                {ins.tono === "warn" ? <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: VIZ.estado.warning }} /> : <Info size={14} className="mt-0.5 shrink-0" style={{ color: N.ink40 }} />}
+                <p className="text-sm" style={{ color: N.ink }}>{ins.texto}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+          Comparación estadística simple contra la media de {e.categoria} ({e.grupo}) — no es una recomendación validada por el comité, es una lectura directa del dato real.
+        </p>
+      </Panel>
+
+      <Panel title="Máximos goleadores (temporada 25/26, real)">
+        {e.top_goleadores.length === 0 ? (
+          <p className="text-sm" style={{ color: N.ink40 }}>Sin goles de jugador identificado registrados para este equipo.</p>
+        ) : (
+          <div className="space-y-2">
+            {e.top_goleadores.map((g, i) => (
+              <div key={g.nombre} className="flex items-center justify-between rounded border p-2.5" style={{ borderColor: N.rule }}>
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono text-xs w-4" style={{ color: N.ink40 }}>{i + 1}</span>
+                  <span className="text-sm" style={{ color: N.ink }}>{g.nombre}</span>
+                </div>
+                <span className="font-mono text-sm tabular-nums" style={{ color: T.primary }}>{g.goles}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+/* Biblioteca de heurísticas de cruce — heurística propia del equipo de producto,
+   NO validada por el comité (ver Roberto, 30 jul 2026). Siempre en condicional
+   ("suele", "posible"), nunca como certeza. Con el tiempo se perfeccionará con el
+   dato real de si la recomendación se cumplió o no (fuera de alcance hoy). */
+const REGLAS_CRUCE = [
+  {
+    test: (a, b, m) => a.gpp >= m.golesPorPartido * 1.15 && b.gpp >= m.golesPorPartido * 1.15,
+    texto: () => `Ambos equipos anotan por encima de la media de su categoría: partido probablemente abierto, con más ocasiones claras de las habituales. Suele venir con más protestas en jugadas de gol y presión en el área.`,
+  },
+  {
+    test: (a, b, m) => a.gpp <= m.golesPorPartido * 0.7 && b.gpp <= m.golesPorPartido * 0.7,
+    texto: () => `Ambos equipos anotan por debajo de la media: partido probablemente cerrado y de pocas ocasiones — cuando esto ocurre, una sola decisión (un penalti, una expulsión) suele pesar más de lo habitual en el resultado.`,
+  },
+  {
+    test: (a, b, m) => a.amp >= m.amarillasPorPartido * 1.25 && b.amp >= m.amarillasPorPartido * 1.25,
+    texto: (a, b) => `${a.nombre} y ${b.nombre} muestran tarjetas por encima de la media de su categoría: historial de tensión disciplinaria en ambos. Suele ayudar marcar criterio de tarjetas pronto en vez de esperar a la primera entrada dura.`,
+  },
+  {
+    test: (a, b) => Math.abs(a.pctVictorias - b.pctVictorias) >= 40,
+    texto: (a, b) => `Diferencia grande de rendimiento (${a.pctVictorias}% vs ${b.pctVictorias}% de victorias): posible partido con un dominador claro. Vigilar tanto la relajación del favorito con el marcador a favor como la frustración/tarjetas del equipo por detrás si el resultado se decanta pronto.`,
+  },
+  {
+    test: (a, b) => (a.rpp >= 0.15 || b.rpp >= 0.15),
+    texto: (a, b) => `${a.rpp >= 0.15 ? a.nombre : b.nombre} tiene un historial de expulsiones por encima de lo habitual (más de una roja cada ~7 partidos) — vigilar comportamientos límite, no solo entradas fuertes.`,
+  },
+];
+
+function generarInsightsCruce(equipoLocal, equipoVisitante) {
+  const prep = (e) => ({
+    nombre: e.nombre,
+    gpp: e.partidosJugados ? e.golesFavor / e.partidosJugados : 0,
+    amp: e.partidosJugados ? e.amarillas / e.partidosJugados : 0,
+    rpp: e.partidosJugados ? e.rojas / e.partidosJugados : 0,
+    pctVictorias: e.partidosJugados ? Math.round((e.victorias / e.partidosJugados) * 100) : 0,
+  });
+  const a = prep(equipoLocal), b = prep(equipoVisitante);
+  const m = MEDIAS_POR_CATEGORIA[equipoLocal.categoria] || MEDIAS_POR_CATEGORIA[equipoVisitante.categoria] || { golesPorPartido: 1.3, amarillasPorPartido: 2.5 };
+  return REGLAS_CRUCE.filter((r) => r.test(a, b, m)).map((r) => r.texto(a, b, m));
+}
+
+function SelectorEquipo({ label, value, onChange, opciones = EQUIPOS }) {
+  return (
+    <div className="flex-1 min-w-[200px]">
+      <label className="text-[10px] uppercase tracking-[0.14em] font-semibold block mb-1" style={{ color: N.ink40 }}>{label}</label>
+      <select value={value?.id ?? ""} onChange={(e) => onChange(opciones.find((eq) => eq.id === e.target.value) ?? null)}
+        className="w-full text-sm rounded border px-3 py-2 outline-none" style={{ borderColor: N.rule, color: N.ink, background: "#FFF" }}>
+        <option value="">Elegir equipo…</option>
+        {opciones.map((e) => <option key={e.id} value={e.id}>{e.nombre} · {e.categoria}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function ComparativaEquipos({ T, local, visitante }) {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {[local, visitante].map((e, i) => (
+        <div key={e.id} className="rounded border p-4" style={{ borderColor: N.rule }}>
+          <div className="text-sm font-semibold mb-2" style={{ color: i === 0 ? T.primary : N.ink }}>{e.nombre}</div>
+          <span className="text-[11px] rounded px-2 py-0.5 inline-block mb-3" style={{ background: T.tint, color: T.primary }}>{e.categoria}</span>
+          <div className="text-xs space-y-1.5" style={{ color: N.ink70 }}>
+            <div>PJ <b style={{ color: N.ink }}>{e.partidosJugados}</b> · V-E-D <b style={{ color: N.ink }}>{e.victorias}-{e.empates}-{e.derrotas}</b></div>
+            <div>Goles <b style={{ color: N.ink }}>{e.golesFavor}-{e.golesContra}</b></div>
+            <div>Tarjetas <b style={{ color: N.ink }}>{e.amarillas} / {e.rojas}</b> (amarillas / rojas)</div>
+            {e.top_goleadores[0] && <div>Máx. goleador <b style={{ color: N.ink }}>{e.top_goleadores[0].nombre}</b> ({e.top_goleadores[0].goles})</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function InsightsCruce({ local, visitante }) {
+  const insights = generarInsightsCruce(local, visitante);
+  return insights.length === 0 ? (
+    <p className="text-sm" style={{ color: N.ink70 }}>Sin patrones destacables entre estos dos equipos con las reglas actuales — no significa que el partido no tenga historia, solo que no encaja en ninguna de las heurísticas construidas hasta ahora.</p>
+  ) : (
+    <div className="space-y-2.5">
+      {insights.map((texto, i) => (
+        <div key={i} className="rounded border p-3 flex items-start gap-2.5" style={{ borderColor: "#F59B1E", background: "#FEF3E2" }}>
+          <Goal size={14} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
+          <p className="text-sm" style={{ color: "#7A5A10" }}>{texto}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Emparejar nombres de equipo de ciclos-asignacion.json (calendario de demo,
+   construido a mano) con equipos-reales.json (scraping) — son dos universos de
+   nombres construidos por separado, no hay garantía de coincidencia 1:1. Mejor
+   esfuerzo por normalización + prefijo, no siempre encuentra pareja. */
+function normalizarNombreEquipo(s) {
+  return s.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/["'.]/g, "").replace(/\s+/g, " ").trim();
+}
+function buscarEquipoReal(nombre) {
+  const norm = normalizarNombreEquipo(nombre);
+  return EQUIPOS.find((e) => normalizarNombreEquipo(e.nombre) === norm)
+    ?? EQUIPOS.find((e) => { const en = normalizarNombreEquipo(e.nombre); return en.startsWith(norm) || norm.startsWith(en); })
+    ?? null;
+}
+
+/* Partidos de los 3 ciclos de demo con árbitro asignado/decidido real —
+   compartido entre el enlace "ir al partido" de Designación y la lista de
+   Partidos, para que sea literalmente la misma ficha en los dos sitios. */
+function useJornadasConDesignacion() {
+  const [estado, setEstado] = useState("cargando");
+  const [filas, setFilas] = useState([]);
+  useEffect(() => {
+    let cancelado = false;
+    (async () => {
+      const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
+      const todas = [];
+      for (const ciclo of ciclosAsignacion) {
+        const resultados = asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
+        const vig = await obtenerVigentesPorCiclo(ciclo.id);
+        const conDecision = vig.ok ? conDecisionVigente(resultados, vig.vigentesPorPartido) : resultados.map((r) => ({ ...r, decisionVigente: null }));
+        for (const r of conDecision) todas.push({ ...r, cicloEtiqueta: ciclo.finDeSemana });
+      }
+      if (!cancelado) { setFilas(todas); setEstado("listo"); }
+    })();
+    return () => { cancelado = true; };
+  }, []);
+  return { estado, filas };
+}
+
+function FichaPartidoJornada({ T, fila, back }) {
+  const { partido, asignado, decisionVigente, cicloEtiqueta } = fila;
+  const local = buscarEquipoReal(partido.equipoLocal);
+  const visitante = buscarEquipoReal(partido.equipoVisitante);
+  const arbitroNombre = decisionVigente ? candidatoPorId(fila, decisionVigente.arbitroId)?.n : asignado?.arbitro?.n;
+
+  return (
+    <div className="space-y-5">
+      <button onClick={back} className="text-xs flex items-center gap-1 font-medium" style={{ color: T.primary }}>
+        <ChevronRight size={13} style={{ transform: "rotate(180deg)" }} /> Volver a partidos
+      </button>
+
+      <div className="rounded-md border p-4" style={{ borderColor: N.rule, background: N.card }}>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium" style={{ color: N.ink }}>{partido.equipoLocal}</span>
+            <Swords size={15} style={{ color: N.ink40 }} />
+            <span className="text-sm font-medium" style={{ color: N.ink }}>{partido.equipoVisitante}</span>
+          </div>
+          <span className="text-[11px] rounded px-2 py-0.5" style={{ background: T.tint, color: T.primary }}>{partido.categoriaMinima} · {cicloEtiqueta}</span>
+        </div>
+        {partido.sensible && (
+          <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: VIZ.estado.warning }}>
+            <AlertTriangle size={12} /> {partido.motivoSensible}
+          </div>
+        )}
+        <div className="mt-3 text-xs" style={{ color: N.ink70 }}>
+          Árbitro {decisionVigente ? "decidido" : "sugerido"}: <b style={{ color: T.primary }}>{arbitroNombre ?? "sin candidato"}</b>
+        </div>
+      </div>
+
+      {local && visitante ? (
+        <>
+          <Panel title="Comparativa" right={<span className="text-[11px]" style={{ color: N.ink40 }}>real · temporada 25/26</span>}>
+            <ComparativaEquipos T={T} local={local} visitante={visitante} />
+          </Panel>
+          <Panel title="Insights del cruce para el árbitro">
+            <InsightsCruce local={local} visitante={visitante} />
+          </Panel>
+        </>
+      ) : (
+        <Panel title="Comparativa">
+          <p className="text-sm" style={{ color: N.ink70 }}>
+            No se encontró ficha real de equipo para {!local ? partido.equipoLocal : partido.equipoVisitante} — el calendario
+            de demo (ciclos-asignacion.json) y el scraping real (equipos-reales.json) son dos universos de nombres
+            construidos por separado, sin garantía de coincidencia exacta. Pendiente de unificar cuando 006-partidos se
+            implemente de verdad.
+          </p>
+        </Panel>
+      )}
+    </div>
+  );
+}
+
+function VistaPartidos({ T, partidoDestacadoId, onConsumirDestacado }) {
+  const { filas } = useJornadasConDesignacion();
+  const [verComo, setVerComo] = useState("comite");
+  const [arbitroId, setArbitroId] = useState(ARBITROS[0]?.id ?? null);
+  const [catFiltro, setCatFiltro] = useState("Todas");
+  const [partidoSelManual, setPartidoSelManual] = useState(null);
+  const [local, setLocal] = useState(EQUIPOS.find((e) => e.nombre === "At. Saguntino") ?? EQUIPOS[0]);
+  const [visitante, setVisitante] = useState(EQUIPOS.find((e) => e.nombre.includes("Roda")) ?? EQUIPOS[1]);
+  const [catComparador, setCatComparador] = useState("Todas");
+
+  /* partidoSel se deriva en el propio render (nunca con un efecto que llame a
+     setState) — combina el clic manual en la lista con el enlace "ir al partido"
+     de Designación (prop controlada por el shell, ver irAPartido). */
+  const partidoSel = partidoSelManual ?? (partidoDestacadoId ? filas.find((f) => f.partido.id === partidoDestacadoId) ?? null : null);
+  const volverAlListado = () => { setPartidoSelManual(null); onConsumirDestacado?.(); };
+
+  const filasFiltradas = useMemo(() => filas.filter((f) => {
+    if (catFiltro !== "Todas" && f.partido.categoriaMinima !== catFiltro) return false;
+    if (verComo === "arbitro" && arbitroId) {
+      const idDecidido = f.decisionVigente?.arbitroId;
+      const idAsignado = f.asignado?.arbitro?.id;
+      return idDecidido === arbitroId || (!idDecidido && idAsignado === arbitroId);
+    }
+    return true;
+  }), [filas, catFiltro, verComo, arbitroId]);
+
+  const categoriasEquipos = useMemo(() => ["Todas", ...new Set(EQUIPOS.map((e) => e.categoria))], []);
+  const equiposComparador = useMemo(() => catComparador === "Todas" ? EQUIPOS : EQUIPOS.filter((e) => e.categoria === catComparador), [catComparador]);
+
+  if (partidoSel) return <FichaPartidoJornada T={T} fila={partidoSel} back={volverAlListado} />;
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: T.accent, background: T.accentTint }}>
+        <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
+        <div>
+          <div className="text-sm font-semibold" style={{ color: "#7A5A10" }}>Prepartido con dato real + heurística propia</div>
+          <p className="text-xs mt-0.5" style={{ color: "#7A5A10" }}>
+            Los KPIs de cada equipo son reales (ffcv_public_data/). Los insights de cruce son una <b>heurística propia del
+            equipo de producto, sin validar todavía con el comité</b> — se leen como probabilidad, no como certeza.
+          </p>
+        </div>
+      </div>
+
+      <Panel title="Ver como">
+        <div className="flex items-center gap-2 flex-wrap">
+          {[["comite", "Comité / directiva"], ["arbitro", "Árbitro"], ["informador", "Informador"]].map(([val, label]) => (
+            <button key={val} onClick={() => setVerComo(val)} className="text-xs rounded-full px-3 py-1.5 font-medium transition-colors"
+              style={{ background: verComo === val ? T.primary : "transparent", color: verComo === val ? "#FFF" : N.ink70, border: `1px solid ${verComo === val ? T.primary : N.rule}` }}>
+              {label}
+            </button>
+          ))}
+          {verComo === "arbitro" && (
+            <select value={arbitroId ?? ""} onChange={(e) => setArbitroId(e.target.value ? Number(e.target.value) : null)}
+              className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
+              {ARBITROS.map((a) => <option key={a.id} value={a.id}>{a.n}</option>)}
+            </select>
+          )}
+        </div>
+        {verComo === "informador" && (
+          <p className="text-[11px] mt-2" style={{ color: N.ink40 }}>
+            De momento ve lo mismo que comité/directiva — falta el modelo de datos de asignación informador↔partido (hoy solo existe designación de árbitro). Pendiente, ver decisiones-producto.md.
+          </p>
+        )}
+      </Panel>
+
+      <Panel title={`Partidos de la jornada · ${filasFiltradas.length}`} right={
+        <select value={catFiltro} onChange={(e) => setCatFiltro(e.target.value)}
+          className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
+          {categoriasEquipos.map((c) => <option key={c}>{c}</option>)}
+        </select>
+      }>
+        {filasFiltradas.length === 0 ? (
+          <p className="text-sm" style={{ color: N.ink40 }}>Sin partidos para este filtro.</p>
+        ) : (
+          <div className="space-y-2">
+            {filasFiltradas.map((f) => (
+              <div key={f.partido.id} onClick={() => setPartidoSelManual(f)}
+                className="rounded border p-3 flex items-center justify-between gap-3 flex-wrap cursor-pointer hover:bg-slate-50" style={{ borderColor: N.rule }}>
+                <div>
+                  <div className="text-sm font-medium" style={{ color: N.ink }}>{f.partido.equipoLocal} – {f.partido.equipoVisitante}</div>
+                  <div className="text-xs mt-0.5" style={{ color: N.ink40 }}>{f.partido.categoriaMinima} · {f.partido.fecha} · {f.cicloEtiqueta}</div>
+                </div>
+                <ChevronRight size={14} style={{ color: N.ink40 }} />
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+
+      <Panel title="Comparador libre de equipos" right={
+        <select value={catComparador} onChange={(e) => setCatComparador(e.target.value)}
+          className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
+          {categoriasEquipos.map((c) => <option key={c}>{c}</option>)}
+        </select>
+      }>
+        <div className="flex items-end gap-3 flex-wrap mb-4">
+          <SelectorEquipo label="Equipo local" value={local} onChange={setLocal} opciones={equiposComparador} />
+          <Swords size={18} className="mb-2.5 shrink-0" style={{ color: N.ink40 }} />
+          <SelectorEquipo label="Equipo visitante" value={visitante} onChange={setVisitante} opciones={equiposComparador} />
+        </div>
+        {local && visitante && (
+          <div className="space-y-4">
+            <ComparativaEquipos T={T} local={local} visitante={visitante} />
+            <InsightsCruce local={local} visitante={visitante} />
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+/* Recomendaciones (antigua vista previa v2) se fusionó dentro de Designación
+   el 30 jul 2026 — ver panel "Situaciones a tener en cuenta" en DesignacionInteligente,
+   que usa el campo real partido.sensible/motivoSensible en vez de datos de ejemplo. */
 
 function VistaIA({ T }) {
   return (
@@ -1514,39 +2327,246 @@ function VistaIA({ T }) {
   );
 }
 
-const COSTE_MES = [
-  { m: "Sep", km: 8400, opt: 7100 }, { m: "Oct", km: 12600, opt: 10200 },
-  { m: "Nov", km: 13100, opt: 10800 }, { m: "Ene", km: 12800, opt: 10400 },
-  { m: "Feb", km: 13400, opt: 10900 }, { m: "Mar", km: 14100, opt: 11300 },
-];
+/* Seguimiento operativo (antes "Económico") — renombrado 30 jul 2026 a propósito
+   menos vistoso: control interno del motor de designación, no algo de cara al comité.
+   Calculado de verdad sobre los 3 ciclos de ciclos-asignacion.json y las decisiones
+   ya persistidas en Supabase (designacionesRepo) — no son cifras de ejemplo, aunque
+   la base sea pequeña (30 partidos de demo, no la temporada completa). */
+function useResumenOperativo() {
+  const [estado, setEstado] = useState("cargando"); // cargando | listo | error
+  const [r, setR] = useState(null);
 
-function VistaEconomica({ T }) {
+  useEffect(() => {
+    let cancelado = false;
+    (async () => {
+      const acc = {
+        totalPartidos: 0, decididos: 0, ajustesManuales: 0,
+        sensiblesDetectadas: 0, sensiblesResueltas: 0,
+        costeSiSugerido: 0, costeSiDecidido: 0, kmSugerido: 0, kmDecidido: 0,
+        partidosConCoste: 0,
+      };
+      const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
+      for (const ciclo of ciclosAsignacion) {
+        const resultados = asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
+        const vig = await obtenerVigentesPorCiclo(ciclo.id);
+        if (!vig.ok) continue;
+        const conDecision = conDecisionVigente(resultados, vig.vigentesPorPartido);
+        for (const res of conDecision) {
+          acc.totalPartidos++;
+          if (res.partido.sensible) {
+            acc.sensiblesDetectadas++;
+            if (res.decisionVigente) acc.sensiblesResueltas++;
+          }
+          const costeSugerido = res.asignado?.coste;
+          if (costeSugerido?.costeFederacionEstimado != null) {
+            acc.costeSiSugerido += costeSugerido.costeFederacionEstimado;
+            acc.kmSugerido += costeSugerido.distanciaKmAprox ?? 0;
+            acc.partidosConCoste++;
+          }
+          if (res.decisionVigente) {
+            acc.decididos++;
+            if (!res.decisionVigente.esSugerido) acc.ajustesManuales++;
+            const idDecidido = res.decisionVigente.arbitroId;
+            const costeDecidido = res.asignado?.arbitro?.id === idDecidido
+              ? res.asignado.coste
+              : res.alternativas.find((a) => a.arbitro.id === idDecidido)?.coste;
+            if (costeDecidido?.costeFederacionEstimado != null) {
+              acc.costeSiDecidido += costeDecidido.costeFederacionEstimado;
+              acc.kmDecidido += costeDecidido.distanciaKmAprox ?? 0;
+            }
+          } else if (costeSugerido?.costeFederacionEstimado != null) {
+            acc.costeSiDecidido += costeSugerido.costeFederacionEstimado;
+            acc.kmDecidido += costeSugerido.distanciaKmAprox ?? 0;
+          }
+        }
+      }
+      const notas = await contarAnotaciones();
+      if (!cancelado) {
+        setR({ ...acc, totalAnotaciones: notas.ok ? notas.total : null });
+        setEstado("listo");
+      }
+    })();
+    return () => { cancelado = true; };
+  }, []);
+
+  return { estado, r };
+}
+
+function VistaSeguimientoOperativo({ T }) {
+  const { estado, r } = useResumenOperativo();
+
+  if (estado === "cargando") {
+    return <p className="text-sm" style={{ color: N.ink40 }}>Calculando sobre los ciclos de designación…</p>;
+  }
+  if (estado !== "listo" || !r) {
+    return <p className="text-sm" style={{ color: VIZ.estado.critical }}>No se pudo calcular el seguimiento operativo. Recarga la página.</p>;
+  }
+
+  const diferenciaCoste = r.costeSiDecidido - r.costeSiSugerido;
+  const tasaAceptacionTop1 = r.decididos > 0 ? Math.round(((r.decididos - r.ajustesManuales) / r.decididos) * 100) : null;
+
   return (
-    <div>
-      <BannerV2 T={T} version="Versión 3"
-        texto="Control económico: kilometraje liquidado frente a asignación por proximidad, y otros ahorros. Necesita el motor de designación de la v2 funcionando." />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5 opacity-90">
-        {[["Kilometraje liquidado", "28.230 €", N.ink], ["Con reparto por proximidad", "23.070 €", N.verde], ["Diferencia", "5.160 €", N.rojo]].map(([l, v, col]) => (
-          <div key={l} className="rounded-md border p-4" style={{ background: N.card, borderColor: N.rule }}>
-            <Eyebrow>{l}</Eyebrow>
-            <div className="font-mono text-2xl mt-2" style={{ color: col }}>{v}</div>
-          </div>
-        ))}
-      </div>
-      <Panel title="Ejemplo · kilómetros liquidados frente a óptimos (una delegación)">
-        <div className="opacity-90">
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={COSTE_MES} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="2 4" stroke={N.rule} vertical={false} />
-              <XAxis dataKey="m" tick={{ fontSize: 11, fill: N.ink40 }} axisLine={{ stroke: N.rule }} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }} formatter={(v, k) => [`${nf(v)} km`, k === "km" ? "Liquidado" : "Por proximidad"]} />
-              <Area type="monotone" dataKey="km" stroke={T.accent} fill={T.accent} fillOpacity={0.1} strokeWidth={2.5} />
-              <Area type="monotone" dataKey="opt" stroke={T.primary} fill={T.primary} fillOpacity={0.06} strokeWidth={2} strokeDasharray="4 3" />
-            </AreaChart>
-          </ResponsiveContainer>
+    <div className="space-y-5">
+      <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: N.rule, background: "#FAFAF9" }}>
+        <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ink40 }} />
+        <div>
+          <div className="text-sm font-semibold" style={{ color: N.ink }}>Control interno, no una vista de producto</div>
+          <p className="text-xs mt-0.5" style={{ color: N.ink70 }}>
+            Sirve para que el equipo técnico vea cómo se está adoptando el motor de designación, no para enseñar al comité.
+            Calculado sobre los {r.totalPartidos} partidos de los 3 ciclos de demo cargados hoy — a más volumen real, esta
+            base crece sola, no hay nada sintético en el cálculo en sí.
+          </p>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <KpiCard T={T} icon={UserCog} eyebrow="Ajustes manuales" valor={r.ajustesManuales}
+          sub={`de ${r.decididos} decididos · real`} tone={r.ajustesManuales > 0 ? "warn" : undefined} />
+        <KpiCard T={T} icon={Gauge} eyebrow="Aceptación del top-1"
+          valor={tasaAceptacionTop1 != null ? `${tasaAceptacionTop1}%` : "—"} sub="sin cambio sobre lo sugerido · real" />
+        <KpiCard T={T} icon={AlertTriangle} eyebrow="Situaciones sensibles" valor={r.sensiblesDetectadas}
+          sub={`${r.sensiblesResueltas} ya resueltas · real (no son incidencias disciplinarias)`} />
+        <KpiCard T={T} icon={MessageSquarePlus} eyebrow="Anotaciones registradas"
+          valor={r.totalAnotaciones ?? "—"} sub="todas las fichas · real" />
+        <KpiCard T={T} icon={AlertCircle} tone={agregadosReales.partidos_sin_arbitro_asignado > 0 ? "warn" : undefined}
+          eyebrow="Partidos sin árbitro" valor={nf(agregadosReales.partidos_sin_arbitro_asignado)}
+          sub="pendientes de asignar, temporada completa · real" />
+      </div>
+
+      <Panel title="Coste federación: sugerido por el motor vs. finalmente decidido">
+        <p className="text-xs mb-4" style={{ color: N.ink70 }}>
+          Tarifa real (0,26€/km, mínimo 4€, sin dieta dentro del término municipal — ver tarifas.md), no una cifra
+          orientativa inventada. La diferencia solo aparece cuando el comité cambia el candidato sugerido.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            ["Si se sigue siempre la sugerencia", r.costeSiSugerido, VIZ.serie[0]],
+            ["Coste con las decisiones tomadas", r.costeSiDecidido, VIZ.serie[1]],
+            ["Diferencia por ajustes manuales", diferenciaCoste, diferenciaCoste > 0 ? VIZ.estado.critical : VIZ.estado.good],
+          ].map(([l, v, col]) => (
+            <div key={l} className="rounded-md border p-4" style={{ background: N.card, borderColor: N.rule }}>
+              <Eyebrow>{l}</Eyebrow>
+              <div className="font-mono text-2xl mt-2 tabular-nums" style={{ color: col }}>
+                {v >= 0 ? "" : "−"}{Math.abs(v).toFixed(2)} €
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] mt-3" style={{ color: N.ink40 }}>
+          Kilometraje total: {r.kmSugerido.toFixed(0)} km sugeridos · {r.kmDecidido.toFixed(0)} km finalmente asignados.
+          Desglose por dietas/desplazamiento pendiente de más volumen real para que tenga sentido estadístico — ver sprints.md.
+        </p>
       </Panel>
+
+      <Panel title="Reparto de carga entre árbitros (dato real)" right={<span className="text-[11px]" style={{ color: N.ink40 }}>Top 8 de {nf(agregadosReales.total_arbitros_activos_adulta)}</span>}>
+        <p className="text-xs mb-3" style={{ color: N.ink70 }}>
+          Antes vivía en el Cuadro de Mando como «Dónde atacar» — movido aquí porque es una señal operativa para repartir
+          designaciones de forma más inteligente, no algo que el comité necesite ver en la demo general.
+        </p>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={agregadosReales.top_carga_arbitros} layout="vertical" margin={{ top: 4, right: 20, left: 10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="2 4" stroke={N.rule} horizontal={false} />
+            <XAxis type="number" tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="nombre" width={170} tick={{ fontSize: 11, fill: N.ink70 }} axisLine={false} tickLine={false} />
+            <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }} formatter={(v) => [v, "Partidos"]} />
+            <Bar dataKey="partidos" radius={[0, 3, 3, 0]}>
+              {agregadosReales.top_carga_arbitros.map((a, i) => <Cell key={a.nombre} fill={VIZ.pastel[i % VIZ.pastel.length]} />)}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+        <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+          Coeficiente de variación de {agregadosReales.equidad_carga.coeficiente_variacion.toFixed(2)} — candidato directo a KPI A.6 (equidad de carga, ver kpis.md).
+        </p>
+      </Panel>
+    </div>
+  );
+}
+
+/* ------------------------------- glosario / gobernanza ------------------------------- */
+/* Contenido tomado literalmente de docs/kpis.md y docs/tarifas.md (30 jul 2026) —
+   no son definiciones nuevas inventadas para la demo, son las que ya gobiernan
+   el motor de asignación construido en 003-persistencia-real. */
+function Definicion({ titulo, children }) {
+  return (
+    <div className="pb-4 mb-4 border-b last:border-0 last:mb-0 last:pb-0" style={{ borderColor: N.rule }}>
+      <div className="text-sm font-semibold mb-1.5" style={{ color: N.ink }}>{titulo}</div>
+      <div className="text-sm leading-relaxed" style={{ color: N.ink70 }}>{children}</div>
+    </div>
+  );
+}
+
+function VistaGlosario({ T }) {
+  return (
+    <div className="space-y-5">
+      <Panel title="Score del motor inteligente de designación (B.1–B.5)">
+        <Definicion titulo="B.1 — Score de nivel general">
+          <code className="block rounded px-3 py-2 my-2 text-xs font-mono" style={{ background: N.paper, color: T.primary }}>
+            Score = 0,40·nota_evaluaciones + 0,20·prueba_física + 0,20·prueba_teórica + 0,20·consistencia − penalización(incidencias)
+          </code>
+          Pesos configurables por el comité (40/20/20/20 es punto de partida, no una constante cerrada). Con pocos informes
+          acumulados se aplica <b>shrinkage bayesiano</b> para no dejar que un solo informe dispare el ranking: 1-2 informes →
+          50% propio / 50% media de categoría; 3 informes → 70/30; 4 o más → 100% propio.
+        </Definicion>
+        <Definicion titulo="B.2 — Estado de forma">
+          Tendencia, no nivel: media móvil ponderada (últimos 2 informes al 60%, resto del histórico al 40%). Un árbitro
+          puede tener nivel medio-alto con tendencia descendente, o nivel medio con tendencia ascendente — son decisiones
+          distintas para el comité, por eso se muestran separadas.
+        </Definicion>
+        <Definicion titulo="B.3 — Idoneidad situacional (matching)">
+          Distinto de B.1: no es «quién es el mejor en general» sino «quién ha rendido mejor en partidos parecidos a este»
+          (conflictividad, categoría, si es decisivo). Solo se considera fiable con <b>3 o más partidos de contexto similar</b>;
+          por debajo de eso, cae automáticamente al score general B.1 — nunca se inventa confianza donde no hay datos.
+        </Definicion>
+        <Definicion titulo="B.4 — Alertas automáticas">
+          Caída de nota ≥1,5 puntos en 2 informes consecutivos · prueba física por debajo del mínimo de su categoría ·
+          inactividad &gt;4 semanas en temporada activa · sobrecarga &gt;130% de la media de partidos de su categoría.
+        </Definicion>
+        <Definicion titulo="B.5 — Disciplina del árbitro">
+          Tarjetas mostradas (media por encuentro, comparada con la de su categoría). <b>Es descriptivo, no entra en B.1 ni en
+          ningún score</b> — más tarjetas no es automáticamente peor arbitraje, puede reflejar partidos más conflictivos.
+        </Definicion>
+      </Panel>
+
+      <Panel title="Principio de gobernanza (no confundir gestión con clasificación)">
+        <p className="text-sm leading-relaxed" style={{ color: N.ink70 }}>
+          La disponibilidad declarada y los kilómetros recorridos <b>no puntúan</b> — son datos de gestión (sirven para
+          calcular coste y logística), nunca criterio de B.1 o de clasificación. La disciplina (B.5) es descriptiva, no
+          evaluativa. Esta distinción tiene que ser explícita en la interfaz, no solo en la lógica interna, para que el
+          comité confíe en que el ranking mide lo que dice medir.
+        </p>
+        <p className="text-sm leading-relaxed mt-3" style={{ color: N.ink70 }}>
+          El motor opera en dos fases: <b>filtro duro</b> (veto activo, indisponibilidad declarada, incompatibilidad de
+          categoría — un candidato excluido no aparece con score bajo, se quita de la lista) y <b>score blando</b> (ranking
+          sobre los candidatos no excluidos).
+        </p>
+      </Panel>
+
+      <Panel title="Tarifas y coste (dato real, circulares oficiales FFCV)">
+        <p className="text-sm leading-relaxed" style={{ color: N.ink70 }}>
+          <b>0,26 €/km</b> (mínimo 4 €) fuera del término municipal de residencia del árbitro; <b>dentro del término, sin
+          dieta, sea cual sea la distancia real</b>. Cualquier cifra que calcule Colegial es una estimación (etiquetada como
+          tal) — el Comité de Árbitros de la FFCV es quien interpreta la aplicación real de dietas y desplazamientos.
+        </p>
+      </Panel>
+
+      <Panel title="Procedimientos de uso de la webapp">
+        <ul className="text-sm leading-relaxed list-disc pl-5 space-y-1.5" style={{ color: N.ink70 }}>
+          <li>Aceptar el candidato sugerido en Designación es un clic («Confirmar»); cambiar de candidato exige motivo
+            obligatorio — nunca opcional, para no perder el dato de por qué se hizo el ajuste.</li>
+          <li>Un partido marcado como «sensible» no bloquea la decisión, es contexto para tomarla con criterio (derbi,
+            historial de tarjetas entre estos equipos, partido con mucho en juego).</li>
+          <li>Todo lo etiquetado <span className="font-mono text-xs">· sintético</span> en la app es un dato inventado para
+            poder mostrar la funcionalidad mientras no existe el dato real (evaluaciones del comité, contacto de árbitros).
+            Nunca se presenta como si fuera real.</li>
+          <li>El botón «Guardar nota» y las decisiones de Designación sí persisten de verdad contra Supabase — no es
+            estado local que se pierda al recargar.</li>
+        </ul>
+      </Panel>
+
+      <p className="text-[11px]" style={{ color: N.ink40 }}>
+        Fuente: docs/kpis.md y docs/tarifas.md. Si algo de aquí cambia, se actualiza primero en esos documentos y luego aquí —
+        esta página es un espejo de la documentación, no una fuente alternativa.
+      </p>
     </div>
   );
 }
@@ -1555,62 +2575,101 @@ function VistaEconomica({ T }) {
 export default function CRMExpedientes() {
   const [vista, setVista] = useState("dashboard");
   const [sel, setSel] = useState(null);
+  const [colapsado, setColapsado] = useState(false);
+  const [partidoDestacadoId, setPartidoDestacadoId] = useState(null);
   const T = THEMES.ffcv;
 
+  /* Núcleo de competición + Cuadro de Mando: navegación principal, mismo nivel,
+     sin candado. Equipos/Partidos promovidos desde "Próximas versiones" el 30 jul 2026
+     (decisiones-producto.md) — dejan de ser vista previa bloqueada. */
   const navV1 = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "dashboard", label: "Cuadro de Mando", icon: Gauge },
     { id: "arbitros", label: "Árbitros", icon: Users },
+    { id: "equipos", label: "Equipos", icon: Trophy },
+    { id: "partidos", label: "Partidos", icon: Swords },
     { id: "designacion", label: "Designación", icon: Route },
   ];
+  /* Único hueco real que queda como vista previa bloqueada (v3, sin construir). */
   const navFuturo = [
-    { id: "recomendaciones", label: "Recomendaciones", icon: Gavel, v: "v2" },
-    { id: "economico", label: "Económico", icon: Wallet, v: "v3" },
     { id: "ia", label: "Consultar con IA", icon: Sparkles, v: "v3" },
   ];
+  /* Grupo aparte, deliberadamente menos vistoso (decisión 30 jul 2026): control interno
+     del motor, administración de cuentas y la referencia de conceptos — construidas,
+     no vistas previas, pero no es lo que se enseña primero en una demo. */
+  const navSistema = [
+    { id: "economico", label: "Seguimiento operativo", icon: Wallet },
+    { id: "roles", label: "Configuración", icon: Settings },
+    { id: "glosario", label: "Glosario y gobernanza", icon: BookOpen },
+  ];
   const ir = (v) => { setVista(v); setSel(null); };
-  const tituloVista = { dashboard: "Dashboard", arbitros: "Árbitros", designacion: "Designación inteligente", recomendaciones: "Recomendaciones de designación", economico: "Control económico", ia: "Consultar con IA" };
+  /* Enlace real Designación -> Partidos (30 jul 2026): "ir al partido" abre la
+     misma ficha de partido, no un duplicado. */
+  const irAPartido = (partidoId) => { setVista("partidos"); setSel(null); setPartidoDestacadoId(partidoId); };
+  const tituloVista = {
+    dashboard: "Cuadro de Mando", arbitros: "Árbitros", equipos: "Equipos", partidos: "Partidos",
+    designacion: "Designación inteligente", roles: "Configuración", economico: "Seguimiento operativo",
+    glosario: "Glosario y gobernanza", ia: "Consultar con IA",
+  };
+  const todosLosItems = [...navV1, ...navFuturo, ...navSistema];
+
+  const BotonNav = ({ n, tamañoIcono = 15, futuro = false }) => {
+    const on = vista === n.id;
+    if (colapsado) {
+      return (
+        <button key={n.id} onClick={() => ir(n.id)} title={n.label}
+          className="w-full flex items-center justify-center rounded px-2 py-2.5 transition-colors"
+          style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : "#A9C3D8" }}>
+          <n.icon size={16} />
+        </button>
+      );
+    }
+    return (
+      <button key={n.id} onClick={() => ir(n.id)}
+        className="w-full flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors"
+        style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : "#A9C3D8", boxShadow: on ? `inset 3px 0 0 ${T.accent}` : "none" }}>
+        <n.icon size={tamañoIcono} />
+        <span className="flex-1 text-left">{n.label}</span>
+        {futuro && <>
+          <span className="text-[9px] font-mono rounded px-1 py-0.5" style={{ background: "rgba(255,255,255,0.1)", color: "#8FA9BF" }}>{n.v}</span>
+          <Lock size={10} />
+        </>}
+      </button>
+    );
+  };
 
   return (
     <div className="min-h-screen font-sans" style={{ background: N.paper, color: N.ink }}>
       <div className="flex">
-        <aside className="w-56 shrink-0 min-h-screen hidden md:flex flex-col" style={{ background: T.primary }}>
-          <div className="p-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+        <aside className={`${colapsado ? "w-16" : "w-56"} shrink-0 min-h-screen hidden md:flex flex-col transition-[width] duration-150`} style={{ background: T.primary }}>
+          <div className={`p-5 flex items-center ${colapsado ? "justify-center" : "gap-3"} border-b`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
             <Escudo T={T} />
-            <div className="min-w-0">
-              <div className="text-white text-base font-semibold leading-none">Colegial</div>
-              <div className="text-[10px] mt-1 truncate" style={{ color: "#A9C3D8" }}>Comité Técnico · {T.corto}</div>
-            </div>
+            {!colapsado && (
+              <div className="min-w-0">
+                <div className="text-white text-base font-semibold leading-none">Colegial</div>
+                <div className="text-[10px] mt-1 truncate" style={{ color: "#A9C3D8" }}>Comité Técnico · {T.corto}</div>
+              </div>
+            )}
           </div>
-          <nav className="p-3 space-y-1 flex-1">
-            {navV1.map((n) => {
-              const on = vista === n.id;
-              return (
-                <button key={n.id} onClick={() => ir(n.id)}
-                  className="w-full flex items-center gap-3 rounded px-3 py-2 text-sm transition-colors"
-                  style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : "#A9C3D8", boxShadow: on ? `inset 3px 0 0 ${T.accent}` : "none" }}>
-                  <n.icon size={15} /> {n.label}
-                </button>
-              );
-            })}
+          <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
+            {navV1.map((n) => <BotonNav key={n.id} n={n} />)}
             <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-              <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: "#6C8AA5" }}>Próximas versiones</div>
-              {navFuturo.map((n) => {
-                const on = vista === n.id;
-                return (
-                  <button key={n.id} onClick={() => ir(n.id)}
-                    className="w-full flex items-center gap-2.5 rounded px-3 py-2 text-[13px] transition-colors"
-                    style={{ background: on ? "rgba(255,255,255,0.08)" : "transparent", color: on ? "#D8E4EE" : "#6C8AA5", boxShadow: on ? `inset 3px 0 0 ${T.accent}` : "none" }}>
-                    <n.icon size={14} />
-                    <span className="flex-1 text-left">{n.label}</span>
-                    <span className="text-[9px] font-mono rounded px-1 py-0.5" style={{ background: "rgba(255,255,255,0.1)", color: "#8FA9BF" }}>{n.v}</span>
-                    <Lock size={10} />
-                  </button>
-                );
-              })}
+              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: "#6C8AA5" }}>Próximas versiones</div>}
+              {navFuturo.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} futuro />)}
+            </div>
+            <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: "#6C8AA5" }}>Sistema</div>}
+              {navSistema.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} />)}
             </div>
           </nav>
-          <div className="p-4 border-t" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
-            <p className="text-[9px] leading-snug" style={{ color: "#7B9BB5" }}>Datos sintéticos. Ningún colegiado real.</p>
+          <div className="p-2 border-t" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+            <button onClick={() => setColapsado(!colapsado)} title={colapsado ? "Expandir menú" : "Plegar menú"}
+              className="w-full flex items-center justify-center gap-2 rounded px-3 py-2 text-xs transition-colors"
+              style={{ color: "#A9C3D8" }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
+              {colapsado ? <ChevronsRight size={15} /> : <><ChevronsLeft size={15} /> Plegar menú</>}
+            </button>
+            {!colapsado && <p className="text-[9px] leading-snug px-3 mt-2" style={{ color: "#7B9BB5" }}>Datos sintéticos. Ningún colegiado real.</p>}
           </div>
         </aside>
 
@@ -1623,7 +2682,7 @@ export default function CRMExpedientes() {
               <p className="text-xs mt-1" style={{ color: N.ink70 }}>{T.nombre} · Base de datos de expedientes arbitrales</p>
             </div>
             <div className="flex md:hidden gap-1 flex-wrap">
-              {[...navV1, ...navFuturo].map((n) => (
+              {todosLosItems.map((n) => (
                 <button key={n.id} onClick={() => ir(n.id)} className="text-xs rounded border px-2 py-1"
                   style={{ borderColor: N.rule, background: vista === n.id ? T.primary : "#FFF", color: vista === n.id ? "#FFF" : N.ink70 }}>{n.label}</button>
               ))}
@@ -1633,9 +2692,12 @@ export default function CRMExpedientes() {
           {vista === "dashboard" && <Dashboard T={T} irArbitros={() => ir("arbitros")} />}
           {vista === "arbitros" && !sel && <Listado T={T} onPick={setSel} />}
           {vista === "arbitros" && sel && <Ficha key={sel.id} T={T} a={sel} back={() => setSel(null)} />}
-          {vista === "designacion" && <DesignacionInteligente T={T} />}
-          {vista === "recomendaciones" && <VistaRecomendaciones T={T} />}
-          {vista === "economico" && <VistaEconomica T={T} />}
+          {vista === "equipos" && <VistaEquipos T={T} />}
+          {vista === "partidos" && <VistaPartidos T={T} partidoDestacadoId={partidoDestacadoId} onConsumirDestacado={() => setPartidoDestacadoId(null)} />}
+          {vista === "designacion" && <DesignacionInteligente T={T} onIrAPartido={irAPartido} />}
+          {vista === "roles" && <VistaRoles T={T} />}
+          {vista === "economico" && <VistaSeguimientoOperativo T={T} />}
+          {vista === "glosario" && <VistaGlosario T={T} />}
           {vista === "ia" && <VistaIA T={T} />}
         </main>
       </div>

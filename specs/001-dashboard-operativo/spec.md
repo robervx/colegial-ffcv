@@ -56,6 +56,22 @@ El jefe del comité quiere ver cuántos partidos hay que designar el próximo fi
 
 ---
 
+### User Story 4 - Ver la salud general del comité de un vistazo (Priority: P2)
+
+**Añadida 4 ago 2026** (enmienda posterior a la implementación inicial, ver `docs/decisiones-producto.md` §30). El jefe del comité quiere ver, sin entrar a ningún árbitro concreto, cuántos colegiados están en buena forma, cuántos irregulares y cuántos en seguimiento, y cuántos están disponibles para el ciclo activo frente a los que no lo están y por qué motivo — como fotografía agregada de la plantilla, distinta de la cobertura por categoría (User Story 1) o de la equidad de carga (User Story 2).
+
+**Por qué esta prioridad**: es la pregunta de "cómo está mi gente" antes de entrar en el detalle operativo de un fin de semana concreto — apoya la gestión del colectivo, más frecuente de consultar que el resto de indicadores de apoyo pero no tan urgente como el riesgo de cobertura inmediato.
+
+**Prueba independiente**: se puede validar comprobando que la suma de los recuentos de cada estado de forma (y de cada motivo de no disponibilidad) coincide siempre con el total de la plantilla activa, sin depender de ningún filtro aplicado.
+
+**Acceptance Scenarios**:
+
+1. **Given** la plantilla activa de árbitros, **When** el jefe del comité abre el Cuadro de Mando, **Then** ve el recuento exacto de árbitros en cada estado de forma (en forma / irregular / en seguimiento) sin necesidad de filtrar.
+2. **Given** la disponibilidad declarada para el ciclo activo, **When** se muestra el indicador de disponibilidad, **Then** ve el recuento de disponibles frente a no disponibles, desglosado por motivo real (lesión, baja, urgencia, festivo solicitado).
+3. **Given** estado de forma y disponibilidad son preguntas de negocio distintas (rendimiento vs. logística operativa), **When** se muestran ambos indicadores, **Then** aparecen como dos widgets visualmente separados, nunca combinados en un único valor o gráfico.
+
+---
+
 ### Edge Cases
 
 - ¿Qué se muestra cuando una categoría no tiene ningún partido programado el fin de semana en curso? (no debe aparecer como "en riesgo" por ausencia de datos — riesgo solo aplica cuando hay partidos a cubrir).
@@ -76,12 +92,17 @@ El jefe del comité quiere ver cuántos partidos hay que designar el próximo fi
 - **FR-007**: Todo indicador calculado DEBE mostrar de dónde sale su valor (fórmula o desglose accesible), nunca un número o color aislado sin explicación.
 - **FR-008**: El sistema DEBE marcar visualmente qué indicadores se apoyan en dato sintético (disponibilidad, bajas, lesión, indisponibilidad) frente a los que se apoyan en dato real (partidos, carga histórica), de forma consistente con cómo ya se distingue en el resto de la aplicación.
 - **FR-009**: El sistema NO DEBE persistir ningún cambio de estado nuevo como resultado de ver el dashboard (es una vista de consulta, no de edición).
+- **FR-010** *(User Story 4, añadida 4 ago 2026)*: El sistema DEBE mostrar, sin necesidad de filtrar, el estado de forma agregado de la plantilla activa (en forma / irregular / en seguimiento) con el **recuento exacto** de árbitros en cada estado — nunca solo un porcentaje o índice compuesto (mismo principio de "sin falsa precisión" ya aplicado al resto del dashboard, ver `docs/decisiones-producto.md` §27).
+- **FR-011** *(User Story 4, añadida 4 ago 2026)*: El sistema DEBE mostrar, sin necesidad de filtrar, la disponibilidad agregada de la plantilla para el ciclo activo, desglosada por motivo real (`lesión`, `baja`, `urgencia`, `festivo solicitado`, ver `specs/002-disponibilidad-arbitro/data-model.md`) frente a disponibles, con el recuento exacto de cada categoría.
+- **FR-012** *(User Story 4, añadida 4 ago 2026)*: Estado de forma (FR-010) y disponibilidad (FR-011) DEBEN presentarse como dos indicadores visualmente separados — nunca combinados en un único valor, gráfico o gauge, para no mezclar rendimiento con disponibilidad operativa (son ejes de negocio distintos).
 
 ### Key Entities
 
 - **Cobertura de categoría**: para una categoría y un fin de semana dados, relaciona partidos a designar (real) con árbitros disponibles (sintético hasta tener dato real de bajas/indisponibilidad), y desglosa cuántos de esos disponibles son de categoría propia frente a categoría inferior activada.
 - **Indicador de equidad de carga**: resumen agregado (ya existente como cálculo, ver `agregados-reales.json`) de cómo se reparten los partidos de la temporada entre los árbitros activos.
 - **Árbitro disponible**: un árbitro de la plantilla de trabajo que no está de baja, lesionado, ni ha declarado indisponibilidad para el fin de semana en cuestión (hoy sintético en su totalidad — no existe ese dato en ningún sistema real todavía).
+- **Estado de forma agregado del comité** *(User Story 4)*: recuento de la plantilla activa por estado de forma (`estadoForma()`, `lib` de `CRMExpedientes.jsx`), ya calculado hoy como `formaCounts` — este indicador solo lo visualiza de forma agregada y prominente, no introduce cálculo nuevo.
+- **Disponibilidad agregada del comité** *(User Story 4)*: recuento de declaraciones de disponibilidad vigentes para el ciclo activo (`disponibilidadRepo`), desglosado por `tipo`/`motivo` real (`specs/002-disponibilidad-arbitro/data-model.md`). **Resuelto (4 ago 2026)**: `bajasPorMotivo` en `CRMExpedientes.jsx` ya suma también `tipo === "festivo_solicitado"` (campo `festivo`, aparte de `lesion`/`baja`/`urgencia`), y `disponiblesEsteCiclo` los descuenta igual que hace `coberturaPorCategoria` — antes un árbitro con festivo solicitado aparecía como "disponible" en el KPI, ahora es consistente con el panel de Cobertura por categoría.
 
 ## Success Criteria *(mandatory)*
 

@@ -28,7 +28,7 @@ const UMBRAL_AMBIGUO = 0.15; // diferencia de score entre 1º y 2º candidato
  * revisión si aplica, y las alternativas (top 5) para que el humano pueda
  * elegir otra sin recalcular nada.
  */
-export function asignarJornada(partidos, arbitros, localidadesGeo) {
+export function asignarJornada(partidos, arbitros, localidadesGeo, vigentesDisponibilidad) {
   const categorias = [...new Set(arbitros.map((a) => a.cat))];
   const mediasCategoria = Object.fromEntries(categorias.map((c) => [c, mediaCategoria(arbitros, c)]));
 
@@ -42,7 +42,7 @@ export function asignarJornada(partidos, arbitros, localidadesGeo) {
     const destino = localidadesGeo[partido.localidad];
 
     const evaluados = arbitros.map((a) => {
-      const { excluido, motivos } = filtroDuro(a, partido);
+      const { excluido, motivos } = filtroDuro(a, partido, vigentesDisponibilidad?.get(a.id));
       if (excluido) return { arbitro: a, excluido: true, motivos, score: null };
 
       const esPropia = a.catNivel === partido.catNivelMinimo;

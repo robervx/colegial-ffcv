@@ -33,6 +33,18 @@ export async function obtenerAnotaciones(arbitroId) {
   return { ok: true, anotaciones: data.map(filaAAnotacion) };
 }
 
+/** Recuento total de notas registradas (todos los árbitros) — para el panel de seguimiento operativo. */
+export async function contarAnotaciones() {
+  const { count, error } = await supabase
+    .from("anotaciones")
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    return { ok: false, error: `No se pudo contar las notas: ${error.message}` };
+  }
+  return { ok: true, total: count };
+}
+
 /** Inserta una nota nueva. fuente siempre "real": toda nota guardada desde la UI es una acción genuina. */
 export async function guardarAnotacion({ arbitroId, etiqueta, texto, autor }) {
   const textoLimpio = (texto ?? "").trim();

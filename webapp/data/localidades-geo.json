@@ -269,5 +269,1181 @@
     "cp": "46019",
     "municipio": "València"
   },
-  "_nota": "lat/lon y municipio vienen de Nominatim. `municipio` es el término municipal real resuelto (relevante para la regla de dieta de tarifas.md), puede diferir del nombre buscado si es un barrio (ej. Torrefiel -> municipio Valencia)."
+  "0": {
+    "lat": 38.0792503,
+    "lon": -0.9338758,
+    "cp": "03300",
+    "municipio": "Orihuela"
+  },
+  "Agost": {
+    "lat": 38.436906,
+    "lon": -0.6396687,
+    "cp": "03698",
+    "municipio": "Agost"
+  },
+  "Agullent": {
+    "lat": 38.8232056,
+    "lon": -0.5475331,
+    "cp": "46890",
+    "municipio": "Agullent"
+  },
+  "Aielo De Malferit": {
+    "lat": 38.8803632,
+    "lon": -0.5911695,
+    "cp": "46812",
+    "municipio": "Aielo de Malferit"
+  },
+  "Albaida": {
+    "lat": 38.838669,
+    "lon": -0.5181895,
+    "cp": "46860",
+    "municipio": "Albaida"
+  },
+  "Albal": {
+    "lat": 39.3956438,
+    "lon": -0.4150821,
+    "cp": "",
+    "municipio": "Albal"
+  },
+  "Albalat De La Ribera": {
+    "lat": 39.2012627,
+    "lon": -0.3866468,
+    "cp": "",
+    "municipio": "Albalat de la Ribera"
+  },
+  "Albalat Dels Sorells": {
+    "lat": 39.5436955,
+    "lon": -0.3461912,
+    "cp": "",
+    "municipio": "Albalat dels Sorells"
+  },
+  "Albatera": {
+    "lat": 38.1786069,
+    "lon": -0.8695616,
+    "cp": "03340",
+    "municipio": "Albatera"
+  },
+  "Alberic": {
+    "lat": 39.1164369,
+    "lon": -0.5201838,
+    "cp": "",
+    "municipio": "Alberic"
+  },
+  "Alborache": {
+    "lat": 39.3917086,
+    "lon": -0.7711311,
+    "cp": "",
+    "municipio": "Alborache"
+  },
+  "Alboraya": {
+    "lat": 39.5010119,
+    "lon": -0.3499577,
+    "cp": "46120",
+    "municipio": "Alboraia / Alboraya"
+  },
+  "Albuixech": {
+    "lat": 39.5442852,
+    "lon": -0.3247783,
+    "cp": "46550",
+    "municipio": "Albuixech"
+  },
+  "Alcora (L')": {
+    "lat": 40.0746619,
+    "lon": -0.2142146,
+    "cp": "12110",
+    "municipio": "l'Alcora"
+  },
+  "Alcoy": {
+    "lat": 38.6982348,
+    "lon": -0.4747619,
+    "cp": "",
+    "municipio": "Alcoi / Alcoy"
+  },
+  "Alfafar": {
+    "lat": 39.4200749,
+    "lon": -0.3891355,
+    "cp": "46910",
+    "municipio": "Alfafar"
+  },
+  "Alfara Del Patriarca": {
+    "lat": 39.544129,
+    "lon": -0.3856585,
+    "cp": "46115",
+    "municipio": "Alfara del Patriarca"
+  },
+  "Alfàs Del Pi (L')": {
+    "lat": 38.5676462,
+    "lon": -0.0929643,
+    "cp": "03580",
+    "municipio": "l'Alfàs del Pi"
+  },
+  "Alginet": {
+    "lat": 39.2651129,
+    "lon": -0.4716912,
+    "cp": "46230",
+    "municipio": "Alginet"
+  },
+  "Algorfa": {
+    "lat": 38.0862119,
+    "lon": -0.796152,
+    "cp": "",
+    "municipio": "Algorfa"
+  },
+  "Almazora": {
+    "lat": 39.9435743,
+    "lon": -0.0634783,
+    "cp": "12550",
+    "municipio": "Almassora"
+  },
+  "Almoines": {
+    "lat": 38.9435394,
+    "lon": -0.1817019,
+    "cp": "46723",
+    "municipio": "Almoines"
+  },
+  "Almoradí": {
+    "lat": 38.1096615,
+    "lon": -0.7919322,
+    "cp": "",
+    "municipio": "Almoradí"
+  },
+  "Almussafes": {
+    "lat": 39.2924334,
+    "lon": -0.4138577,
+    "cp": "46440",
+    "municipio": "Almussafes"
+  },
+  "Alqueria De La Comtessa (L')": {
+    "lat": 38.9353629,
+    "lon": -0.1533346,
+    "cp": "46715",
+    "municipio": "l'Alqueria de la Comtessa"
+  },
+  "Alquerías Del Niño Perdido": {
+    "lat": 39.8963328,
+    "lon": -0.1143587,
+    "cp": "12539",
+    "municipio": "les Alqueries / Alquerías del Niño Perdido"
+  },
+  "Altea": {
+    "lat": 38.6028245,
+    "lon": -0.0472059,
+    "cp": "",
+    "municipio": "Altea"
+  },
+  "Altura": {
+    "lat": 39.8512304,
+    "lon": -0.5128608,
+    "cp": "",
+    "municipio": "Altura"
+  },
+  "Anna": {
+    "lat": 39.0204311,
+    "lon": -0.6461361,
+    "cp": "46820",
+    "municipio": "Anna"
+  },
+  "Artana": {
+    "lat": 39.8911264,
+    "lon": -0.2576603,
+    "cp": "12527",
+    "municipio": "Artana"
+  },
+  "Aspe": {
+    "lat": 38.3460834,
+    "lon": -0.7692034,
+    "cp": "03680",
+    "municipio": "Aspe"
+  },
+  "Atzeneta D'Albaida": {
+    "lat": 38.8328755,
+    "lon": -0.4971297,
+    "cp": "46869",
+    "municipio": "Atzeneta d'Albaida"
+  },
+  "Ayora": {
+    "lat": 39.0596612,
+    "lon": -1.057216,
+    "cp": "46620",
+    "municipio": "Ayora"
+  },
+  "Banyeres De Mariola": {
+    "lat": 38.7156535,
+    "lon": -0.6577745,
+    "cp": "03450",
+    "municipio": "Banyeres de Mariola"
+  },
+  "Bellreguard": {
+    "lat": 38.9462948,
+    "lon": -0.1615484,
+    "cp": "",
+    "municipio": "Bellreguard"
+  },
+  "Benaguasil": {
+    "lat": 39.5942907,
+    "lon": -0.588849,
+    "cp": "46180",
+    "municipio": "Benaguasil"
+  },
+  "Benasal": {
+    "lat": 40.3796457,
+    "lon": -0.1422927,
+    "cp": "12160",
+    "municipio": "Benassal"
+  },
+  "Benferri": {
+    "lat": 38.1406587,
+    "lon": -0.9628468,
+    "cp": "",
+    "municipio": "Benferri"
+  },
+  "Beniarbeig": {
+    "lat": 38.8221689,
+    "lon": -0.0018612,
+    "cp": "03778",
+    "municipio": "Beniarbeig"
+  },
+  "Benidorm": {
+    "lat": 38.5406255,
+    "lon": -0.1290929,
+    "cp": "",
+    "municipio": "Benidorm"
+  },
+  "Benigánim": {
+    "lat": 38.9438844,
+    "lon": -0.4441621,
+    "cp": "",
+    "municipio": "Benigànim"
+  },
+  "Benimodo": {
+    "lat": 39.2135344,
+    "lon": -0.5267415,
+    "cp": "46291",
+    "municipio": "Benimodo"
+  },
+  "Beniparrell": {
+    "lat": 39.3819923,
+    "lon": -0.4119964,
+    "cp": "46469",
+    "municipio": "Beniparrell"
+  },
+  "Benissa": {
+    "lat": 38.7163735,
+    "lon": 0.0534016,
+    "cp": "03720",
+    "municipio": "Benissa"
+  },
+  "Benitachell": {
+    "lat": 38.7322971,
+    "lon": 0.1438442,
+    "cp": "03726",
+    "municipio": "el Poble Nou de Benitatxell / Benitachell"
+  },
+  "Biar": {
+    "lat": 38.6305367,
+    "lon": -0.7646666,
+    "cp": "03410",
+    "municipio": "Biar"
+  },
+  "Bigastro": {
+    "lat": 38.0628171,
+    "lon": -0.8996755,
+    "cp": "03380",
+    "municipio": "Bigastro"
+  },
+  "Bocairent": {
+    "lat": 38.7669181,
+    "lon": -0.610892,
+    "cp": "46880",
+    "municipio": "Bocairent"
+  },
+  "Bolbaite": {
+    "lat": 39.0609622,
+    "lon": -0.6744835,
+    "cp": "",
+    "municipio": "Bolbaite"
+  },
+  "Borriol": {
+    "lat": 40.0422215,
+    "lon": -0.0714919,
+    "cp": "12190",
+    "municipio": "Borriol"
+  },
+  "Burriana": {
+    "lat": 39.8876912,
+    "lon": -0.0846321,
+    "cp": "12530",
+    "municipio": "Borriana / Burriana"
+  },
+  "Busot": {
+    "lat": 38.4848359,
+    "lon": -0.417211,
+    "cp": "",
+    "municipio": "Busot"
+  },
+  "Cabanes": {
+    "lat": 40.1564567,
+    "lon": 0.0437829,
+    "cp": "",
+    "municipio": "Cabanes"
+  },
+  "Callosa D'En Sarrià": {
+    "lat": 38.6513893,
+    "lon": -0.1225274,
+    "cp": "03510",
+    "municipio": "Callosa d'en Sarrià"
+  },
+  "Callosa De Segura": {
+    "lat": 38.1251825,
+    "lon": -0.8778548,
+    "cp": "03360",
+    "municipio": "Callosa de Segura"
+  },
+  "Calpe": {
+    "lat": 38.6443252,
+    "lon": 0.046012,
+    "cp": "03710",
+    "municipio": "Calp"
+  },
+  "Campello (El)": {
+    "lat": 38.4525475,
+    "lon": -0.3663033,
+    "cp": "",
+    "municipio": "el Campello"
+  },
+  "Campo De Mirra": {
+    "lat": 38.6864162,
+    "lon": -0.7782888,
+    "cp": "",
+    "municipio": "el Camp de Mirra / Campo de Mirra"
+  },
+  "Camporrobles": {
+    "lat": 39.6472415,
+    "lon": -1.4009335,
+    "cp": "",
+    "municipio": "Camporrobles"
+  },
+  "Canals": {
+    "lat": 38.9623954,
+    "lon": -0.5832175,
+    "cp": "46650",
+    "municipio": "Canals"
+  },
+  "Canet D'En Berenguer": {
+    "lat": 39.6804554,
+    "lon": -0.2209621,
+    "cp": "46529",
+    "municipio": "Canet d'en Berenguer"
+  },
+  "Carlet": {
+    "lat": 39.2251696,
+    "lon": -0.5202051,
+    "cp": "46240",
+    "municipio": "Carlet"
+  },
+  "Casinos": {
+    "lat": 39.6995635,
+    "lon": -0.7073505,
+    "cp": "",
+    "municipio": "Casinos"
+  },
+  "Castalla": {
+    "lat": 38.5957233,
+    "lon": -0.6702617,
+    "cp": "03420",
+    "municipio": "Castalla"
+  },
+  "Castellnovo": {
+    "lat": 39.8620764,
+    "lon": -0.4574769,
+    "cp": "12413",
+    "municipio": "Castellnovo"
+  },
+  "Castellón De La Plana": {
+    "lat": 39.9860347,
+    "lon": -0.0377354,
+    "cp": "",
+    "municipio": "Castelló de la Plana / Castellón de la Plana"
+  },
+  "Catadau": {
+    "lat": 39.2748065,
+    "lon": -0.5710963,
+    "cp": "46196",
+    "municipio": "Catadau"
+  },
+  "Catral": {
+    "lat": 38.1602989,
+    "lon": -0.8014035,
+    "cp": "03158",
+    "municipio": "Catral"
+  },
+  "Caudete De Las Fuentes": {
+    "lat": 39.5591102,
+    "lon": -1.2803019,
+    "cp": "46315",
+    "municipio": "Caudete de las Fuentes"
+  },
+  "Caudiel": {
+    "lat": 39.947341,
+    "lon": -0.5683782,
+    "cp": "12440",
+    "municipio": "Caudiel"
+  },
+  "Chella": {
+    "lat": 39.0419132,
+    "lon": -0.6590644,
+    "cp": "46821",
+    "municipio": "Chella"
+  },
+  "Chelva": {
+    "lat": 39.7486658,
+    "lon": -0.9976861,
+    "cp": "",
+    "municipio": "Chelva"
+  },
+  "Chert": {
+    "lat": 40.5186118,
+    "lon": 0.1585541,
+    "cp": "",
+    "municipio": "Xert"
+  },
+  "Cheste": {
+    "lat": 39.4939368,
+    "lon": -0.6842101,
+    "cp": "46380",
+    "municipio": "Cheste"
+  },
+  "Chilches": {
+    "lat": 39.782029,
+    "lon": -0.1876251,
+    "cp": "12592",
+    "municipio": "Xilxes / Chilches"
+  },
+  "Chiva": {
+    "lat": 39.4726098,
+    "lon": -0.7178348,
+    "cp": "46370",
+    "municipio": "Chiva"
+  },
+  "Cinctorres": {
+    "lat": 40.5764594,
+    "lon": -0.2185666,
+    "cp": "12318",
+    "municipio": "Cinctorres"
+  },
+  "Cocentaina": {
+    "lat": 38.744158,
+    "lon": -0.4400707,
+    "cp": "03820",
+    "municipio": "Cocentaina"
+  },
+  "Cox": {
+    "lat": 38.1413164,
+    "lon": -0.8871616,
+    "cp": "03350",
+    "municipio": "Cox"
+  },
+  "Crevillent": {
+    "lat": 38.2493099,
+    "lon": -0.8111359,
+    "cp": "",
+    "municipio": "Crevillent"
+  },
+  "Càlig": {
+    "lat": 40.4619719,
+    "lon": 0.3548686,
+    "cp": "12589",
+    "municipio": "Càlig"
+  },
+  "Daya Nueva": {
+    "lat": 38.1138879,
+    "lon": -0.7609301,
+    "cp": "03159",
+    "municipio": "Daya Nueva"
+  },
+  "Dolores": {
+    "lat": 38.1392436,
+    "lon": -0.769318,
+    "cp": "03150",
+    "municipio": "Dolores"
+  },
+  "El Altet": {
+    "lat": 38.2730178,
+    "lon": -0.5392499,
+    "cp": "03195",
+    "municipio": "Elx / Elche"
+  },
+  "Eliana (L')": {
+    "lat": 39.5659086,
+    "lon": -0.5302784,
+    "cp": "",
+    "municipio": "l'Eliana"
+  },
+  "Enguera": {
+    "lat": 38.9804366,
+    "lon": -0.6894299,
+    "cp": "46810",
+    "municipio": "Enguera"
+  },
+  "Estivella": {
+    "lat": 39.7133707,
+    "lon": -0.3485272,
+    "cp": "",
+    "municipio": "Estivella"
+  },
+  "Faura": {
+    "lat": 39.7262295,
+    "lon": -0.2611236,
+    "cp": "46512",
+    "municipio": "Faura"
+  },
+  "Favara": {
+    "lat": 39.1273559,
+    "lon": -0.2916155,
+    "cp": "",
+    "municipio": "Favara"
+  },
+  "Finestrat": {
+    "lat": 38.5679236,
+    "lon": -0.2122319,
+    "cp": "03509",
+    "municipio": "Finestrat"
+  },
+  "Formentera Del Segura": {
+    "lat": 38.0851143,
+    "lon": -0.7459956,
+    "cp": "03179",
+    "municipio": "Formentera del Segura"
+  },
+  "Fuenterrobles": {
+    "lat": 39.5851621,
+    "lon": -1.364704,
+    "cp": "",
+    "municipio": "Fuenterrobles"
+  },
+  "Gata De Gorgos": {
+    "lat": 38.7695694,
+    "lon": 0.067245,
+    "cp": "03740",
+    "municipio": "Gata de Gorgos"
+  },
+  "Gilet": {
+    "lat": 39.6786015,
+    "lon": -0.32506,
+    "cp": "46149",
+    "municipio": "Gilet"
+  },
+  "Godella": {
+    "lat": 39.5184276,
+    "lon": -0.4103168,
+    "cp": "46110",
+    "municipio": "Godella"
+  },
+  "Godelleta": {
+    "lat": 39.427628,
+    "lon": -0.6705911,
+    "cp": "46388",
+    "municipio": "Godelleta"
+  },
+  "Granja De Rocamora": {
+    "lat": 38.1506475,
+    "lon": -0.8899808,
+    "cp": "03348",
+    "municipio": "Granja de Rocamora"
+  },
+  "Guadassuar": {
+    "lat": 39.1857839,
+    "lon": -0.4778181,
+    "cp": "46610",
+    "municipio": "Guadassuar"
+  },
+  "Guardamar Del Segura": {
+    "lat": 38.0899985,
+    "lon": -0.65381,
+    "cp": "03140",
+    "municipio": "Guardamar del Segura"
+  },
+  "Ibi": {
+    "lat": 38.623288,
+    "lon": -0.5730513,
+    "cp": "03440",
+    "municipio": "Ibi"
+  },
+  "Jacarilla": {
+    "lat": 38.061345,
+    "lon": -0.8680849,
+    "cp": "03310",
+    "municipio": "Jacarilla"
+  },
+  "Jijona": {
+    "lat": 38.5392703,
+    "lon": -0.5075903,
+    "cp": "03100",
+    "municipio": "Xixona / Jijona"
+  },
+  "Llocnou De Sant Jeroni": {
+    "lat": 38.9130107,
+    "lon": -0.2841276,
+    "cp": "46726",
+    "municipio": "Llocnou de Sant Jeroni"
+  },
+  "Llosa De Ranes (La)": {
+    "lat": 39.0213713,
+    "lon": -0.5244333,
+    "cp": "",
+    "municipio": "la Llosa de Ranes"
+  },
+  "Llutxent": {
+    "lat": 38.9427057,
+    "lon": -0.3565953,
+    "cp": "",
+    "municipio": "Llutxent"
+  },
+  "Losa Del Obispo": {
+    "lat": 39.695763,
+    "lon": -0.8710594,
+    "cp": "",
+    "municipio": "Losa del Obispo"
+  },
+  "Manuel": {
+    "lat": 39.0513265,
+    "lon": -0.4909038,
+    "cp": "46660",
+    "municipio": "Manuel"
+  },
+  "Marines": {
+    "lat": 39.6755957,
+    "lon": -0.5612995,
+    "cp": "",
+    "municipio": "Marines"
+  },
+  "Massamagrell": {
+    "lat": 39.5703995,
+    "lon": -0.3302101,
+    "cp": "46130",
+    "municipio": "Massamagrell"
+  },
+  "Massanassa": {
+    "lat": 39.4108561,
+    "lon": -0.4000846,
+    "cp": "",
+    "municipio": "Massanassa"
+  },
+  "Meliana": {
+    "lat": 39.528475,
+    "lon": -0.3488606,
+    "cp": "46133",
+    "municipio": "Meliana"
+  },
+  "Miramar": {
+    "lat": 38.9505154,
+    "lon": -0.1415109,
+    "cp": "46713",
+    "municipio": "Miramar"
+  },
+  "Mogente": {
+    "lat": 38.8753162,
+    "lon": -0.7495353,
+    "cp": "46640",
+    "municipio": "Moixent / Mogente"
+  },
+  "Moncada": {
+    "lat": 39.5450484,
+    "lon": -0.3941015,
+    "cp": "",
+    "municipio": "Montcada / Moncada"
+  },
+  "Moncofa": {
+    "lat": 39.808205,
+    "lon": -0.1452657,
+    "cp": "12593",
+    "municipio": "Moncofa"
+  },
+  "Monforte Del Cid": {
+    "lat": 38.3791541,
+    "lon": -0.7290459,
+    "cp": "03670",
+    "municipio": "Monforte del Cid"
+  },
+  "Montaverner": {
+    "lat": 38.8879955,
+    "lon": -0.4932477,
+    "cp": "",
+    "municipio": "Montaverner"
+  },
+  "Montesa": {
+    "lat": 38.9481556,
+    "lon": -0.6492732,
+    "cp": "46692",
+    "municipio": "Montesa"
+  },
+  "Montesinos (Los)": {
+    "lat": 38.0274262,
+    "lon": -0.7434529,
+    "cp": "03187",
+    "municipio": "Los Montesinos"
+  },
+  "Morella": {
+    "lat": 40.6188277,
+    "lon": -0.0998026,
+    "cp": "",
+    "municipio": "Morella"
+  },
+  "Museros": {
+    "lat": 39.5603068,
+    "lon": -0.3365952,
+    "cp": "46136",
+    "municipio": "Museros"
+  },
+  "Mutxamel": {
+    "lat": 38.4136518,
+    "lon": -0.444471,
+    "cp": "",
+    "municipio": "Mutxamel"
+  },
+  "Novelda": {
+    "lat": 38.3842144,
+    "lon": -0.7674146,
+    "cp": "03660",
+    "municipio": "Novelda"
+  },
+  "Oliva": {
+    "lat": 38.9202443,
+    "lon": -0.1208981,
+    "cp": "46780",
+    "municipio": "Oliva"
+  },
+  "Olleria (L')": {
+    "lat": 38.9144633,
+    "lon": -0.5535651,
+    "cp": "46850",
+    "municipio": "l'Olleria"
+  },
+  "Olocau": {
+    "lat": 39.7006763,
+    "lon": -0.531206,
+    "cp": "46169",
+    "municipio": "Olocau"
+  },
+  "Onda": {
+    "lat": 39.965214,
+    "lon": -0.2625745,
+    "cp": "12200",
+    "municipio": "Onda"
+  },
+  "Ondara": {
+    "lat": 38.8277759,
+    "lon": 0.0170054,
+    "cp": "03760",
+    "municipio": "Ondara"
+  },
+  "Onil": {
+    "lat": 38.6298061,
+    "lon": -0.6740951,
+    "cp": "",
+    "municipio": "Onil"
+  },
+  "Orba": {
+    "lat": 38.7803753,
+    "lon": -0.0638798,
+    "cp": "",
+    "municipio": "Orba"
+  },
+  "Oropesa Del Mar": {
+    "lat": 40.0932078,
+    "lon": 0.1358123,
+    "cp": "12594",
+    "municipio": "Orpesa / Oropesa del Mar"
+  },
+  "Paiporta": {
+    "lat": 39.4279722,
+    "lon": -0.4184254,
+    "cp": "46200",
+    "municipio": "Paiporta"
+  },
+  "Pedralba": {
+    "lat": 39.6053522,
+    "lon": -0.7260062,
+    "cp": "46164",
+    "municipio": "Pedralba"
+  },
+  "Pedreguer": {
+    "lat": 38.7938437,
+    "lon": 0.0343336,
+    "cp": "03750",
+    "municipio": "Pedreguer"
+  },
+  "Pego": {
+    "lat": 38.8421876,
+    "lon": -0.1178782,
+    "cp": "03780",
+    "municipio": "Pego"
+  },
+  "Petrer": {
+    "lat": 38.485008,
+    "lon": -0.7703987,
+    "cp": "03610",
+    "municipio": "Petrer"
+  },
+  "Picanya": {
+    "lat": 39.4353965,
+    "lon": -0.4358777,
+    "cp": "46210",
+    "municipio": "Picanya"
+  },
+  "Pilar De La Horadada": {
+    "lat": 37.8994714,
+    "lon": -0.8257645,
+    "cp": "",
+    "municipio": "Pilar de la Horadada"
+  },
+  "Piles": {
+    "lat": 38.9407693,
+    "lon": -0.1325845,
+    "cp": "46712",
+    "municipio": "Piles"
+  },
+  "Pinós (El)": {
+    "lat": 38.4035556,
+    "lon": -1.0411933,
+    "cp": "03650",
+    "municipio": "el Pinós / Pinoso"
+  },
+  "Pobla De Farnals (La)": {
+    "lat": 39.5788818,
+    "lon": -0.3296332,
+    "cp": "46139",
+    "municipio": "la Pobla de Farnals"
+  },
+  "Pobla Del Duc (La)": {
+    "lat": 38.9010354,
+    "lon": -0.3907092,
+    "cp": "46841",
+    "municipio": "Castelló de Rugat"
+  },
+  "Pobla Llarga (La)": {
+    "lat": 39.0832888,
+    "lon": -0.4696305,
+    "cp": "46666",
+    "municipio": "la Pobla Llarga"
+  },
+  "Polop": {
+    "lat": 38.6226795,
+    "lon": -0.1275385,
+    "cp": "03520",
+    "municipio": "Polop"
+  },
+  "Puig": {
+    "lat": 39.5887818,
+    "lon": -0.3062566,
+    "cp": "",
+    "municipio": "el Puig de Santa Maria"
+  },
+  "Quart De Poblet": {
+    "lat": 39.4827253,
+    "lon": -0.4438854,
+    "cp": "46930",
+    "municipio": "Quart de Poblet"
+  },
+  "Rafal": {
+    "lat": 38.1036225,
+    "lon": -0.8499366,
+    "cp": "03369",
+    "municipio": "Rafal"
+  },
+  "Rafelbuñol": {
+    "lat": 39.5884632,
+    "lon": -0.3325421,
+    "cp": "46138",
+    "municipio": "Rafelbunyol"
+  },
+  "Rafelcofer": {
+    "lat": 38.9327181,
+    "lon": -0.1664006,
+    "cp": "",
+    "municipio": "Rafelcofer"
+  },
+  "Rafelguaraf": {
+    "lat": 39.0516722,
+    "lon": -0.4550355,
+    "cp": "46666",
+    "municipio": "Rafelguaraf"
+  },
+  "Real De Gandía": {
+    "lat": 38.9482364,
+    "lon": -0.1915574,
+    "cp": "",
+    "municipio": "el Real de Gandia"
+  },
+  "Real De Montroi": {
+    "lat": 39.3342846,
+    "lon": -0.608392,
+    "cp": "46194",
+    "municipio": "Real"
+  },
+  "Riba-Roja De Túria": {
+    "lat": 39.5463524,
+    "lon": -0.5699662,
+    "cp": "",
+    "municipio": "Riba-roja de Túria"
+  },
+  "Ribesalbes": {
+    "lat": 40.0220526,
+    "lon": -0.2782945,
+    "cp": "",
+    "municipio": "Ribesalbes"
+  },
+  "Rocafort": {
+    "lat": 39.5300573,
+    "lon": -0.4109383,
+    "cp": "46111",
+    "municipio": "Rocafort"
+  },
+  "Rojales": {
+    "lat": 38.0871747,
+    "lon": -0.7228213,
+    "cp": "03170",
+    "municipio": "Rojales"
+  },
+  "Romana (La)": {
+    "lat": 38.3672767,
+    "lon": -0.8968792,
+    "cp": "03669",
+    "municipio": "la Romana"
+  },
+  "Rossell": {
+    "lat": 40.61827,
+    "lon": 0.2214019,
+    "cp": "12511",
+    "municipio": "Rossell"
+  },
+  "Salzadella (La)": {
+    "lat": 40.4177148,
+    "lon": 0.1740316,
+    "cp": "12186",
+    "municipio": "la Salzadella"
+  },
+  "San Antonio De Benagéber": {
+    "lat": 39.5619478,
+    "lon": -0.5001275,
+    "cp": "46184",
+    "municipio": "San Antonio de Benagéber"
+  },
+  "San Fulgencio": {
+    "lat": 38.1120067,
+    "lon": -0.7188823,
+    "cp": "03177",
+    "municipio": "San Fulgencio"
+  },
+  "San Isidro": {
+    "lat": 38.1707587,
+    "lon": -0.8387399,
+    "cp": "",
+    "municipio": "San Isidro"
+  },
+  "San Miguel De Salinas": {
+    "lat": 37.9769051,
+    "lon": -0.7890649,
+    "cp": "03193",
+    "municipio": "San Miguel de Salinas"
+  },
+  "San Vicente Del Raspeig": {
+    "lat": 38.3964248,
+    "lon": -0.5250339,
+    "cp": "",
+    "municipio": "Sant Vicent del Raspeig / San Vicente del Raspeig"
+  },
+  "Sant Joan D'Alacant": {
+    "lat": 38.4014162,
+    "lon": -0.4359957,
+    "cp": "03550",
+    "municipio": "Sant Joan d'Alacant"
+  },
+  "Sant Joan De Moró": {
+    "lat": 40.0607474,
+    "lon": -0.1373779,
+    "cp": "12130",
+    "municipio": "Sant Joan de Moró"
+  },
+  "Sant Mateu": {
+    "lat": 40.4650329,
+    "lon": 0.1793192,
+    "cp": "12170",
+    "municipio": "Sant Mateu"
+  },
+  "Santa Pola": {
+    "lat": 38.1923641,
+    "lon": -0.5555464,
+    "cp": "03130",
+    "municipio": "Santa Pola"
+  },
+  "Sax": {
+    "lat": 38.5350323,
+    "lon": -0.818913,
+    "cp": "",
+    "municipio": "Sax"
+  },
+  "Segorbe": {
+    "lat": 39.8519011,
+    "lon": -0.4895537,
+    "cp": "12400",
+    "municipio": "Segorbe"
+  },
+  "Serra": {
+    "lat": 39.6851966,
+    "lon": -0.4281287,
+    "cp": "46118",
+    "municipio": "Serra"
+  },
+  "Sierra Engarcerán": {
+    "lat": 40.2696396,
+    "lon": -0.0190324,
+    "cp": "",
+    "municipio": "Sierra Engarcerán"
+  },
+  "Simat De La Valldigna": {
+    "lat": 39.0435012,
+    "lon": -0.3114531,
+    "cp": "46750",
+    "municipio": "Simat de la Valldigna"
+  },
+  "Sollana": {
+    "lat": 39.2784514,
+    "lon": -0.3818215,
+    "cp": "46430",
+    "municipio": "Sollana"
+  },
+  "Soneja": {
+    "lat": 39.8156407,
+    "lon": -0.4300063,
+    "cp": "12480",
+    "municipio": "Soneja"
+  },
+  "Tavernes Blanques": {
+    "lat": 39.5064294,
+    "lon": -0.3625992,
+    "cp": "",
+    "municipio": "Tavernes Blanques"
+  },
+  "Tavernes De La Valldigna": {
+    "lat": 39.0715565,
+    "lon": -0.2678045,
+    "cp": "",
+    "municipio": "Tavernes de la Valldigna"
+  },
+  "Teulada": {
+    "lat": 38.7286834,
+    "lon": 0.1044885,
+    "cp": "",
+    "municipio": "Teulada"
+  },
+  "Torreblanca": {
+    "lat": 40.2202661,
+    "lon": 0.1953363,
+    "cp": "12596",
+    "municipio": "Torreblanca"
+  },
+  "Torrevieja": {
+    "lat": 37.9775416,
+    "lon": -0.6828446,
+    "cp": "",
+    "municipio": "Torrevieja"
+  },
+  "Tous": {
+    "lat": 39.1397505,
+    "lon": -0.5881834,
+    "cp": "46269",
+    "municipio": "Tous"
+  },
+  "Traiguera": {
+    "lat": 40.5246503,
+    "lon": 0.2899844,
+    "cp": "12330",
+    "municipio": "Traiguera"
+  },
+  "Utiel": {
+    "lat": 39.5680797,
+    "lon": -1.2051604,
+    "cp": "",
+    "municipio": "Utiel"
+  },
+  "Vall D'Alba": {
+    "lat": 40.1758674,
+    "lon": -0.0351001,
+    "cp": "12194",
+    "municipio": "Vall d'Alba"
+  },
+  "Vall D'Uixó (La)": {
+    "lat": 39.8209011,
+    "lon": -0.2319275,
+    "cp": "",
+    "municipio": "la Vall d'Uixó"
+  },
+  "Venta Del Moro": {
+    "lat": 39.4838261,
+    "lon": -1.3565015,
+    "cp": "46310",
+    "municipio": "Venta del Moro"
+  },
+  "Verger (El)": {
+    "lat": 38.8551573,
+    "lon": 0.0003254,
+    "cp": "03770",
+    "municipio": "el Verger"
+  },
+  "Vilamarxant": {
+    "lat": 39.5680723,
+    "lon": -0.6227531,
+    "cp": "46191",
+    "municipio": "Vilamarxant"
+  },
+  "Vilanova D'Alcolea": {
+    "lat": 40.2309678,
+    "lon": 0.072647,
+    "cp": "12183",
+    "municipio": "Vilanova d'Alcolea"
+  },
+  "Vilavella (La)": {
+    "lat": 39.8587438,
+    "lon": -0.1831882,
+    "cp": "12526",
+    "municipio": "la Vilavella"
+  },
+  "Villafranca Del Cid": {
+    "lat": 40.4270481,
+    "lon": -0.2577181,
+    "cp": "12150",
+    "municipio": "Vilafranca / Villafranca del Cid"
+  },
+  "Villajoyosa": {
+    "lat": 38.5100778,
+    "lon": -0.2296202,
+    "cp": "03570",
+    "municipio": "la Vila Joiosa / Villajoyosa"
+  },
+  "Villalonga": {
+    "lat": 38.8853294,
+    "lon": -0.2066001,
+    "cp": "46720",
+    "municipio": "Vilallonga / Villalonga"
+  },
+  "Villanueva De Castellón": {
+    "lat": 39.0795781,
+    "lon": -0.5123755,
+    "cp": "46270",
+    "municipio": "Castelló"
+  },
+  "Villar Del Arzobispo": {
+    "lat": 39.7337011,
+    "lon": -0.8273481,
+    "cp": "46170",
+    "municipio": "Villar del Arzobispo"
+  },
+  "Vinalesa": {
+    "lat": 39.537576,
+    "lon": -0.3706682,
+    "cp": "46114",
+    "municipio": "Vinalesa"
+  },
+  "_nota": "lat/lon y municipio vienen de Nominatim. `municipio` es el término municipal real resuelto (relevante para la regla de dieta de tarifas.md), puede diferir del nombre buscado si es un barrio (ej. Torrefiel -> municipio Valencia). Ampliado por geocode_campos_por_municipio.py con localidades de clubes, no solo de árbitros."
 }
