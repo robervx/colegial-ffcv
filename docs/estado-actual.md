@@ -1,6 +1,11 @@
-# Estado actual del proyecto — 28 jul 2026 (actualizado 30 jul 2026)
+# Estado actual del proyecto — 28 jul 2026 (actualizado 7 ago 2026)
 
 Fotografía de lo construido hasta hoy. Si vuelves a esta conversación más tarde, o alguien nuevo se incorpora, empieza por aquí — es más fiable que reconstruir la historia leyendo el chat.
+
+**Actualización 7 ago 2026 (§33 de `decisiones-producto.md`)**: reactividad entre pantallas para designaciones, y primer paso hacia una futura integración con Novanet (app/cloud del comité en AWS, sin documentación técnica todavía).
+- `webapp/lib/designacionesStore.js` (nuevo): caché compartida de `vigentesPorCiclo` vía `useSyncExternalStore`. `DesignacionInteligente`, `useJornadasConDesignacion` (Partidos) y `useResumenOperativo` (Seguimiento operativo) ya no piden cada uno su propia copia a Supabase — confirmar una designación en Designación se refleja al instante en las demás pantallas, sin recargar. Verificado en navegador.
+- Decisión de patrón: cualquier fuente de datos futura (mock o real) sigue el contrato `{ok, ...}` ya usado en `lib/*Repo.js`, para que el día que haya API real de Novanet solo cambie la implementación interna de un repo, no las pantallas. Sin nada técnico de Novanet todavía que integrar de verdad.
+- Explícitamente no tocado esta sesión: el fuzzy-matching de nombres de equipo (`CRMExpedientes.jsx:2086-2097`) y cualquier migración de Árbitro/Equipo/Partido a tablas Supabase con FK real — Roberto lo descartó por ahora, ver §33.
 
 **Actualización 30 jul 2026 (§25-§26 de `decisiones-producto.md`)**: de cara a una demo al comité el **lunes 3 ago 2026**, la app se reestructuró a fondo. Cambios que sí importan para retomar sesión:
 - **Navegación**: Equipos y Partidos ya son navegación principal (no vista previa bloqueada). Dashboard → **"Cuadro de Mando"**. Recomendaciones desapareció del sidebar (fusionada dentro de Designación). Económico → **"Seguimiento operativo"**, agrupado con Configuración (antes "Roles y usuarios") y Glosario y gobernanza (página nueva) en un bloque "Sistema" aparte. Sidebar plegable.

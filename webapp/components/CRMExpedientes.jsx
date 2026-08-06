@@ -25,7 +25,8 @@ import { CATEGORIAS } from "../lib/categorias";
 import { conDisponibilidad } from "../lib/disponibilidad";
 import { coberturaPorCategoria } from "../lib/coberturaCategoria";
 import { obtenerAnotaciones, guardarAnotacion, contarAnotaciones } from "../lib/anotacionesRepo";
-import { obtenerVigentesPorCiclo, decidir as decidirDesignacion, conDecisionVigente } from "../lib/designacionesRepo";
+import { decidir as decidirDesignacion, conDecisionVigente } from "../lib/designacionesRepo";
+import { useVigentesPorCiclo, useVigentesPorCiclos, registrarDecision } from "../lib/designacionesStore";
 import {
   obtenerLog as obtenerLogDisponibilidad,
   declararDisponibilidad,
@@ -1646,8 +1647,6 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
 function DesignacionInteligente({ T, onIrAPartido }) {
   const [cicloId, setCicloId] = useState(ciclosAsignacion[0].id);
   const [expandidoId, setExpandidoId] = useState(null);
-  const [vigentes, setVigentes] = useState(new Map());
-  const [vigentesEstado, setVigentesEstado] = useState("cargando"); // cargando | listo | error
   const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
   const ciclo = ciclosAsignacion.find((c) => c.id === cicloId);
 
@@ -1669,26 +1668,14 @@ function DesignacionInteligente({ T, onIrAPartido }) {
     return asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo, vigentesDisponibilidad ?? new Map());
   }, [ciclo, vigentesDisponibilidad]);
 
-  useEffect(() => {
-    let cancelado = false;
-    obtenerVigentesPorCiclo(cicloId).then((resultado) => {
-      if (cancelado) return;
-      if (resultado.ok) {
-        setVigentes(resultado.vigentesPorPartido);
-        setVigentesEstado("listo");
-      } else {
-        setVigentesEstado("error");
-      }
-    });
-    return () => { cancelado = true; };
-  }, [cicloId]);
+  const { estado: vigentesEstado, vigentesPorPartido: vigentes } = useVigentesPorCiclo(cicloId);
 
   const resultadosConDecision = useMemo(() => conDecisionVigente(resultados, vigentes), [resultados, vigentes]);
 
   const decidirYActualizar = async ({ partidoId, arbitroId, esSugerido, motivo }) => {
     const resultado = await decidirDesignacion({ cicloId, partidoId, arbitroId, esSugerido, motivo, decididoPorRol: "comite" });
     if (resultado.ok) {
-      setVigentes((prev) => new Map(prev).set(partidoId, resultado.designacion));
+      registrarDecision(cicloId, partidoId, resultado.designacion);
     }
     return resultado;
   };
@@ -1736,7 +1723,7 @@ function DesignacionInteligente({ T, onIrAPartido }) {
       </div>
 
       <Panel title="Ciclo de asignación" right={
-        <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); setVigentes(new Map()); setVigentesEstado("cargando"); setVigentesDisponibilidad(null); }}
+        <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); setVigentesDisponibilidad(null); }}
           className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
           {ciclosAsignacion.map((c) => <option key={c.id} value={c.id}>{c.etiqueta}</option>)}
         </select>
@@ -2103,25 +2090,27 @@ function buscarEquipoReal(nombre) {
 /* Partidos de los 3 ciclos de demo con árbitro asignado/decidido real —
    compartido entre el enlace "ir al partido" de Designación y la lista de
    Partidos, para que sea literalmente la misma ficha en los dos sitios. */
+const CICLO_IDS = ciclosAsignacion.map((c) => c.id);
+
 function useJornadasConDesignacion() {
-  const [estado, setEstado] = useState("cargando");
-  const [filas, setFilas] = useState([]);
-  useEffect(() => {
-    let cancelado = false;
-    (async () => {
-      const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
-      const todas = [];
-      for (const ciclo of ciclosAsignacion) {
-        const resultados = asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
-        const vig = await obtenerVigentesPorCiclo(ciclo.id);
-        const conDecision = vig.ok ? conDecisionVigente(resultados, vig.vigentesPorPartido) : resultados.map((r) => ({ ...r, decisionVigente: null }));
-        for (const r of conDecision) todas.push({ ...r, cicloEtiqueta: ciclo.finDeSemana });
-      }
-      if (!cancelado) { setFilas(todas); setEstado("listo"); }
-    })();
-    return () => { cancelado = true; };
-  }, []);
-  return { estado, filas };
+  const vigentesPorCiclos = useVigentesPorCiclos(CICLO_IDS);
+  const cargando = vigentesPorCiclos.some((v) => v.estado === "cargando");
+
+  const filas = useMemo(() => {
+    const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
+    const todas = [];
+    for (const ciclo of ciclosAsignacion) {
+      const resultados = asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
+      const vig = vigentesPorCiclos.find((v) => v.cicloId === ciclo.id);
+      const conDecision = vig && vig.estado !== "error"
+        ? conDecisionVigente(resultados, vig.vigentesPorPartido)
+        : resultados.map((r) => ({ ...r, decisionVigente: null }));
+      for (const r of conDecision) todas.push({ ...r, cicloEtiqueta: ciclo.finDeSemana });
+    }
+    return todas;
+  }, [vigentesPorCiclos]);
+
+  return { estado: cargando ? "cargando" : "listo", filas };
 }
 
 function FichaPartidoJornada({ T, fila, back }) {
@@ -2333,63 +2322,70 @@ function VistaIA({ T }) {
    ya persistidas en Supabase (designacionesRepo) — no son cifras de ejemplo, aunque
    la base sea pequeña (30 partidos de demo, no la temporada completa). */
 function useResumenOperativo() {
-  const [estado, setEstado] = useState("cargando"); // cargando | listo | error
-  const [r, setR] = useState(null);
+  const [notasEstado, setNotasEstado] = useState("cargando"); // cargando | listo
+  const [totalAnotaciones, setTotalAnotaciones] = useState(null);
+  const vigentesPorCiclos = useVigentesPorCiclos(CICLO_IDS);
+  const cargandoVigentes = vigentesPorCiclos.some((v) => v.estado === "cargando");
+  const todosLosCiclosFallaron = vigentesPorCiclos.every((v) => v.estado === "error");
 
   useEffect(() => {
     let cancelado = false;
-    (async () => {
-      const acc = {
-        totalPartidos: 0, decididos: 0, ajustesManuales: 0,
-        sensiblesDetectadas: 0, sensiblesResueltas: 0,
-        costeSiSugerido: 0, costeSiDecidido: 0, kmSugerido: 0, kmDecidido: 0,
-        partidosConCoste: 0,
-      };
-      const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
-      for (const ciclo of ciclosAsignacion) {
-        const resultados = asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
-        const vig = await obtenerVigentesPorCiclo(ciclo.id);
-        if (!vig.ok) continue;
-        const conDecision = conDecisionVigente(resultados, vig.vigentesPorPartido);
-        for (const res of conDecision) {
-          acc.totalPartidos++;
-          if (res.partido.sensible) {
-            acc.sensiblesDetectadas++;
-            if (res.decisionVigente) acc.sensiblesResueltas++;
-          }
-          const costeSugerido = res.asignado?.coste;
-          if (costeSugerido?.costeFederacionEstimado != null) {
-            acc.costeSiSugerido += costeSugerido.costeFederacionEstimado;
-            acc.kmSugerido += costeSugerido.distanciaKmAprox ?? 0;
-            acc.partidosConCoste++;
-          }
-          if (res.decisionVigente) {
-            acc.decididos++;
-            if (!res.decisionVigente.esSugerido) acc.ajustesManuales++;
-            const idDecidido = res.decisionVigente.arbitroId;
-            const costeDecidido = res.asignado?.arbitro?.id === idDecidido
-              ? res.asignado.coste
-              : res.alternativas.find((a) => a.arbitro.id === idDecidido)?.coste;
-            if (costeDecidido?.costeFederacionEstimado != null) {
-              acc.costeSiDecidido += costeDecidido.costeFederacionEstimado;
-              acc.kmDecidido += costeDecidido.distanciaKmAprox ?? 0;
-            }
-          } else if (costeSugerido?.costeFederacionEstimado != null) {
-            acc.costeSiDecidido += costeSugerido.costeFederacionEstimado;
-            acc.kmDecidido += costeSugerido.distanciaKmAprox ?? 0;
-          }
-        }
-      }
-      const notas = await contarAnotaciones();
-      if (!cancelado) {
-        setR({ ...acc, totalAnotaciones: notas.ok ? notas.total : null });
-        setEstado("listo");
-      }
-    })();
+    contarAnotaciones().then((notas) => {
+      if (cancelado) return;
+      setTotalAnotaciones(notas.ok ? notas.total : null);
+      setNotasEstado("listo");
+    });
     return () => { cancelado = true; };
   }, []);
 
-  return { estado, r };
+  const acc = useMemo(() => {
+    const base = {
+      totalPartidos: 0, decididos: 0, ajustesManuales: 0,
+      sensiblesDetectadas: 0, sensiblesResueltas: 0,
+      costeSiSugerido: 0, costeSiDecidido: 0, kmSugerido: 0, kmDecidido: 0,
+      partidosConCoste: 0,
+    };
+    const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
+    for (const ciclo of ciclosAsignacion) {
+      const resultados = asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo);
+      const vig = vigentesPorCiclos.find((v) => v.cicloId === ciclo.id);
+      if (!vig || vig.estado === "error") continue;
+      const conDecision = conDecisionVigente(resultados, vig.vigentesPorPartido);
+      for (const res of conDecision) {
+        base.totalPartidos++;
+        if (res.partido.sensible) {
+          base.sensiblesDetectadas++;
+          if (res.decisionVigente) base.sensiblesResueltas++;
+        }
+        const costeSugerido = res.asignado?.coste;
+        if (costeSugerido?.costeFederacionEstimado != null) {
+          base.costeSiSugerido += costeSugerido.costeFederacionEstimado;
+          base.kmSugerido += costeSugerido.distanciaKmAprox ?? 0;
+          base.partidosConCoste++;
+        }
+        if (res.decisionVigente) {
+          base.decididos++;
+          if (!res.decisionVigente.esSugerido) base.ajustesManuales++;
+          const idDecidido = res.decisionVigente.arbitroId;
+          const costeDecidido = res.asignado?.arbitro?.id === idDecidido
+            ? res.asignado.coste
+            : res.alternativas.find((a) => a.arbitro.id === idDecidido)?.coste;
+          if (costeDecidido?.costeFederacionEstimado != null) {
+            base.costeSiDecidido += costeDecidido.costeFederacionEstimado;
+            base.kmDecidido += costeDecidido.distanciaKmAprox ?? 0;
+          }
+        } else if (costeSugerido?.costeFederacionEstimado != null) {
+          base.costeSiDecidido += costeSugerido.costeFederacionEstimado;
+          base.kmDecidido += costeSugerido.distanciaKmAprox ?? 0;
+        }
+      }
+    }
+    return base;
+  }, [vigentesPorCiclos]);
+
+  if (cargandoVigentes || notasEstado === "cargando") return { estado: "cargando", r: null };
+  if (todosLosCiclosFallaron) return { estado: "error", r: null };
+  return { estado: "listo", r: { ...acc, totalAnotaciones } };
 }
 
 function VistaSeguimientoOperativo({ T }) {
