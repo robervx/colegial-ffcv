@@ -10,7 +10,7 @@ import {
   Users, Search, ChevronRight, TrendingUp, TrendingDown, Minus,
   FileText, Calendar, AlertCircle, Lock, Sparkles,
   MessageSquarePlus, Wallet, Bot, Check, AlertTriangle, Send,
-  Route, Scale, Info, Phone, Mail, Dumbbell, BookOpen,
+  Route, Info, Phone, Mail, Dumbbell, BookOpen,
   MailCheck, UserCog, Trophy, Swords, Goal,
   Gauge, Settings, ChevronsLeft, ChevronsRight,
 } from "lucide-react";
@@ -71,6 +71,29 @@ const VIZ = {
      con esta paleta — son dos lenguajes de color distintos a propósito. */
   pastel: ["#4E9BE0", "#FF8F65", "#2FC3AE", "#9C8CF0", "#F17FB0", "#F2B233", "#52C46B"],
   pastelSoft: ["#E3F1FC", "#FFEEE6", "#E1F9F5", "#EFEBFE", "#FDEBF3", "#FEF3DE", "#E8F8EB"],
+};
+
+/* Paleta oscura "Cuarto árbitro" — SOLO para el lienzo del Cuadro de Mando
+   (aprobada por Roberto 4 ago 2026 tras dos rondas de revisión visual, ver
+   docs/decisiones-producto.md §30-32: campo de noche, líneas de campo como
+   estructura, círculo central alojando los dos gauges de estado de forma/
+   disponibilidad). El resto de la app (sidebar, Árbitros, Seguimiento
+   operativo, Equipos, Partidos...) sigue con N/THEMES/VIZ sin tocar —
+   Roberto pidió expresamente no rediseñar la app entera, solo esta página.
+   Los 4 colores de estado son una recalibración de VIZ.estado para fondo
+   oscuro (misma semántica good/warning/serious/critical, más luminancia
+   porque un fondo oscuro exige colores más claros para el mismo contraste
+   percibido que sobre blanco) — nunca se usan fuera de este lienzo. */
+const DARK = {
+  pitchDeep: "#0a1712", pitch: "#13281d", surface: "#1b3524", surfaceRaised: "#22402c",
+  line06: "rgba(237,247,240,.10)", line12: "rgba(237,247,240,.17)", line16: "rgba(237,247,240,.21)",
+  line24: "rgba(237,247,240,.32)", lineStrong: "rgba(237,247,240,.52)",
+  ink: "#f8fbf8", ink70: "#cbdace", ink40: "#93ab9b",
+  accent: "#7fd4ff", accentDeep: "#3f9fd1", synth: "#e3b34d",
+  good: "#34e19b", goodT: "rgba(52,225,155,.14)",
+  warning: "#ffc24b", warningT: "rgba(255,194,75,.14)",
+  serious: "#ff9466", seriousT: "rgba(255,148,102,.14)",
+  critical: "#ff5c5c", criticalT: "rgba(255,92,92,.16)",
 };
 
 /* --------- dataset de trabajo: 200 árbitros ---------
@@ -192,24 +215,11 @@ function Semaforo({ estado, size = "sm" }) {
     </span>
   );
 }
-/* estados de CoberturaCategoria (lib/coberturaCategoria.js) — mismo patrón visual que coloresForma/Semaforo */
-function coloresCobertura(estado) {
-  return {
-    riesgo: { bg: VIZ.estado.criticalT, fg: VIZ.estado.critical, dot: VIZ.estado.critical, label: "En riesgo" },
-    ajustado: { bg: VIZ.estado.warningT, fg: VIZ.estado.warning, dot: VIZ.estado.warning, label: "Ajustado, sin margen" },
-    holgada: { bg: VIZ.estado.goodT, fg: VIZ.estado.good, dot: VIZ.estado.good, label: "Cobertura holgada" },
-    sin_partidos: { bg: "#F1F3F5", fg: N.ink40, dot: N.ink40, label: "Sin partidos este finde" },
-  }[estado];
-}
-function BadgeCobertura({ estado }) {
-  const c = coloresCobertura(estado);
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2 py-0.5 shrink-0" style={{ background: c.bg, color: c.fg }}>
-      <span className="rounded-full" style={{ width: 7, height: 7, background: c.dot }} />
-      {c.label}
-    </span>
-  );
-}
+/* coloresCobertura/BadgeCobertura (variante clara) se retiraron el 6 ago 2026 al
+   quedar sin uso — su único consumidor era el Cuadro de Mando, que ahora pinta su
+   propia píldora de estado con la paleta oscura DARK.* (ver Dashboard() más abajo).
+   Si otra página necesita el badge de cobertura en claro, reconstruirlo desde
+   coloresForma()/Semaforo (mismo patrón) en vez de revivir esta versión sin uso. */
 function Avatar({ txt, T, size = 40 }) {
   return (
     <div className="rounded-full flex items-center justify-center font-semibold shrink-0"
@@ -286,13 +296,18 @@ function KpiCard({ eyebrow, valor, sub, T, tone, chip, icon: Icon }) {
    cabe en una sola columna del grid del Cuadro de Mando (Roberto, 30 jul 2026)
    en vez de las 6 columnas anchas de la versión completa. Mismo dato, mismo
    componente, solo cambia la orientación de la rejilla. */
-function HeatmapIntrasemanal({ data, compacto = false }) {
+function HeatmapIntrasemanal({ data, compacto = false, dark = false }) {
   const [hover, setHover] = useState(null);
   const max = Math.max(1, ...data.celdas.map((c) => c.partidos));
   const franjaCorta = (f) => f.replace(/\s*\(.*\)/, "");
   const diaCorto = (d) => d.slice(0, 1);
+  /* variante oscura solo para el Cuadro de Mando (dark=true) — el resto de
+     usos de este componente (si los hubiera en el futuro) siguen claros por
+     defecto, no se toca el comportamiento existente. */
+  const colTexto = dark ? DARK.ink40 : N.ink40;
+  const colTextoFuerte = dark ? DARK.ink70 : N.ink70;
   const colorPara = (v) => {
-    if (v === 0) return N.paper;
+    if (v === 0) return dark ? DARK.surface : N.paper;
     const idx = Math.min(VIZ.secuencialAzul.length - 1, Math.floor((v / max) * VIZ.secuencialAzul.length));
     return VIZ.secuencialAzul[idx];
   };
@@ -314,7 +329,7 @@ function HeatmapIntrasemanal({ data, compacto = false }) {
             <tr>
               <th></th>
               {columnas.map((c) => (
-                <th key={c} className="text-[9px] font-medium px-1 pb-1 whitespace-nowrap" style={{ color: N.ink40 }}>
+                <th key={c} className="text-[9px] font-medium px-1 pb-1 whitespace-nowrap" style={{ color: colTexto }}>
                   {compacto ? diaCorto(c) : franjaCorta(c)}
                 </th>
               ))}
@@ -323,7 +338,7 @@ function HeatmapIntrasemanal({ data, compacto = false }) {
           <tbody>
             {filas.map((fila) => (
               <tr key={fila}>
-                <td className="text-[10px] pr-2 text-right whitespace-nowrap" style={{ color: N.ink70 }}>
+                <td className="text-[10px] pr-2 text-right whitespace-nowrap" style={{ color: colTextoFuerte }}>
                   {compacto ? franjaCorta(fila) : fila}
                 </td>
                 {columnas.map((col) => {
@@ -332,7 +347,7 @@ function HeatmapIntrasemanal({ data, compacto = false }) {
                   return (
                     <td key={col} onMouseEnter={() => setHover(etiquetaHover(fila, col))} onMouseLeave={() => setHover(null)}
                       className="rounded text-center align-middle cursor-default" style={{ width: cellW, height: cellH, background: colorPara(v) }}>
-                      <span className="text-[10px] font-mono tabular-nums" style={{ color: claro ? "#FFF" : N.ink70 }}>{v}</span>
+                      <span className="text-[10px] font-mono tabular-nums" style={{ color: claro ? "#FFF" : colTextoFuerte }}>{v}</span>
                     </td>
                   );
                 })}
@@ -342,20 +357,129 @@ function HeatmapIntrasemanal({ data, compacto = false }) {
         </table>
       </div>
       <div className={`flex ${compacto ? "flex-col items-start" : "items-center justify-between"} mt-3 flex-wrap gap-2`}>
-        <div className="text-xs" style={{ color: N.ink70 }}>
+        <div className="text-xs" style={{ color: colTextoFuerte }}>
           {hover ? <><b>{hover.dia}</b> · {hover.franja}: <span className="font-mono">{hover.v}</span> partidos</> : "Pasa el ratón por una celda para ver el detalle"}
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px]" style={{ color: N.ink40 }}>menos</span>
+          <span className="text-[10px]" style={{ color: colTexto }}>menos</span>
           {VIZ.secuencialAzul.map((c, i) => <span key={i} className="rounded-sm" style={{ width: 14, height: 8, background: c }} />)}
-          <span className="text-[10px]" style={{ color: N.ink40 }}>más</span>
+          <span className="text-[10px]" style={{ color: colTexto }}>más</span>
         </div>
       </div>
     </div>
   );
 }
 
-function Dashboard({ T, irArbitros }) {
+/* ---- dial semicircular de escala fija (spec 001 §30/FR-010-012) ----
+   Un anillo cerrado sin escala fija hace mala comparación de segmentos
+   reñidos (el ojo compara mal ángulos/áreas sin ancla externa); el dial
+   semicircular con marcas 0/mitad/escala da una regla de referencia fija,
+   igual que un gráfico de barras vence a uno circular con valores reñidos.
+   Todo el texto (número hero, dos líneas de contexto, marcas de escala) vive
+   DENTRO del propio <svg>, en las mismas coordenadas polares que el arco —
+   nunca superpuesto con márgenes CSS calculados sin poder verlos renderizados
+   (lección de la ronda de revisión visual, decisiones-producto.md §32). */
+function polarPoint(cx, cy, r, angleDeg) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+}
+function arcoDial(cx, cy, r, a0, a1) {
+  const p0 = polarPoint(cx, cy, r, a0);
+  const p1 = polarPoint(cx, cy, r, a1);
+  return `M ${p0.x} ${p0.y} A ${r} ${r} 0 0 1 ${p1.x} ${p1.y}`;
+}
+function GaugeSemicircular({ segments, scale = 200, heroValue, heroColor, heroMain, heroSubTag, heroSubTagColor, heroSub }) {
+  const cx = 170, cy = 196, r = 140, sw = 26, gap = 1.6;
+  const angleFor = (v) => 180 - (v / scale) * 180;
+  /* sumas acumuladas calculadas de forma declarativa (sin reasignar ninguna
+     variable durante el render) — el propio Next.js de este proyecto lo exige
+     como error de lint, no aviso, ver webapp/AGENTS.md. */
+  const totalesAcumulados = segments.map((_, i) => segments.slice(0, i + 1).reduce((s, x) => s + x.value, 0));
+  const arcos = segments.map((seg, i) => {
+    const v0 = i === 0 ? 0 : totalesAcumulados[i - 1];
+    const v1 = totalesAcumulados[i];
+    const a0 = angleFor(v0) - (v0 > 0 ? gap / 2 : 0);
+    const a1 = angleFor(v1) + (v1 < scale ? gap / 2 : 0);
+    return { d: arcoDial(cx, cy, r, a0, a1), color: seg.color, key: seg.key };
+  });
+  const ticks = [0, scale / 2, scale].map((v) => {
+    const rad = (angleFor(v) * Math.PI) / 180;
+    const pInner = { x: cx + (r + sw / 2 + 2) * Math.cos(rad), y: cy - (r + sw / 2 + 2) * Math.sin(rad) };
+    const pOuter = { x: cx + (r + sw / 2 + 8) * Math.cos(rad), y: cy - (r + sw / 2 + 8) * Math.sin(rad) };
+    const pLabel = { x: cx + (r + sw / 2 + 13) * Math.cos(rad), y: cy - (r + sw / 2 + 13) * Math.sin(rad) };
+    const anchor = v === 0 ? "end" : v === scale ? "start" : "middle";
+    return { v, pInner, pOuter, pLabel, anchor };
+  });
+
+  return (
+    <svg viewBox="0 0 340 210" style={{ width: "100%", maxWidth: 300, display: "block", margin: "0 auto", overflow: "visible" }}>
+      <path d={arcoDial(cx, cy, r, 180, 0)} fill="none" stroke="rgba(237,247,240,.07)" strokeWidth={sw} />
+      {arcos.map((a) => (
+        <path key={a.key} d={a.d} fill="none" stroke={a.color} strokeWidth={sw} strokeLinecap="round" />
+      ))}
+      {ticks.map((t) => (
+        <React.Fragment key={t.v}>
+          <line x1={t.pInner.x} y1={t.pInner.y} x2={t.pOuter.x} y2={t.pOuter.y} stroke="rgba(244,248,245,.4)" strokeWidth="1.5" />
+          <text x={t.pLabel.x} y={t.pLabel.y} textAnchor={t.anchor} dominantBaseline="middle" fill="rgba(244,248,245,.55)" fontSize="13" fontFamily="var(--font-geist-mono), monospace">{t.v}</text>
+        </React.Fragment>
+      ))}
+      {heroValue !== undefined && (
+        <>
+          <text x={cx} y={136} textAnchor="middle" fontWeight="700" fontSize="52" fill={heroColor || "#f8fbf8"}
+            style={{ fontFamily: "var(--font-rajdhani), 'Arial Narrow', sans-serif", filter: `drop-shadow(0 0 6px ${heroColor || "#f8fbf8"}77)` }}>
+            {heroValue}
+          </text>
+          {heroMain && <text x={cx} y={161} textAnchor="middle" fontSize="15" fill="#cbdace">{heroMain}</text>}
+          {heroSub && (
+            <text x={cx} y={183} textAnchor="middle" fontSize="12" fill="#93ab9b">
+              {heroSubTag && <tspan fill={heroSubTagColor || "#93ab9b"} fontWeight="700">{heroSubTag} · </tspan>}
+              {heroSub}
+            </text>
+          )}
+        </>
+      )}
+    </svg>
+  );
+}
+
+/* ---- piezas oscuras SOLO para el Cuadro de Mando — no se exportan ni se
+   usan en ninguna otra página, para no afectar al resto de la app. ---- */
+function DarkPanel({ title, sub, right, children, accent }) {
+  return (
+    <section style={{ background: DARK.surface, borderTop: `2px solid ${accent || DARK.line24}` }}>
+      <div className="flex items-start justify-between gap-2.5 px-5 py-4 flex-wrap">
+        <div>
+          <div className="text-[13.5px] font-semibold" style={{ color: DARK.ink }}>{title}</div>
+          {sub && <div className="text-[11.5px] mt-0.5" style={{ color: DARK.ink40 }}>{sub}</div>}
+        </div>
+        {right}
+      </div>
+      <div className="px-5 pb-5">{children}</div>
+    </section>
+  );
+}
+function DarkTag({ real }) {
+  return (
+    <span className="text-[11.5px] font-semibold inline-flex items-center gap-1" style={{ color: real ? DARK.accent : DARK.synth }}>
+      <span className="rounded-full" style={{ width: 6, height: 6, background: real ? DARK.accent : DARK.synth }} />
+      {real ? "real" : "sintético"}
+    </span>
+  );
+}
+function DarkStat({ eyebrow, valor, sub, valorColor }) {
+  return (
+    <div>
+      <div className="text-[11.5px] uppercase tracking-[0.14em] font-semibold" style={{ color: DARK.ink40 }}>{eyebrow}</div>
+      <div className="font-mono text-[28px] font-semibold leading-none mt-1" style={{ color: valorColor || DARK.ink }}>{valor}</div>
+      {sub && <div className="text-[12.5px] mt-1.5 leading-snug" style={{ color: DARK.ink40 }}>{sub}</div>}
+    </div>
+  );
+}
+
+/* Sin T: esta página adopta siempre la paleta oscura DARK.* (dirección "Cuarto
+   árbitro", decisiones-producto.md §30-32) — no depende del tenant/tema como el
+   resto de la app. */
+function Dashboard({ irArbitros }) {
   const cv = agregadosReales.equidad_carga.coeficiente_variacion;
   const cvTono = cv >= 0.8 ? "bad" : cv >= 0.5 ? "warn" : "ok";
   const cvTexto = cv >= 0.8 ? "muy desigual" : cv >= 0.5 ? "desigual" : "equilibrada";
@@ -466,112 +590,84 @@ function Dashboard({ T, irArbitros }) {
   }, []);
   const maxEtiqueta = Math.max(1, ...etiquetasNotas.map(([, n]) => n));
 
+  const disponibilidadTexto = disponibilidadEstado === "cargando" ? "cargando disponibilidad…" : "disponibilidad no disponible";
+  const disponibilidadGaugeSegments = disponibilidadEstado === "listo" && bajasPorMotivo ? [
+    { key: "disp", value: disponiblesEsteCiclo, color: DARK.good },
+    { key: "baja", value: bajasPorMotivo.baja, color: DARK.warning },
+    { key: "lesion", value: bajasPorMotivo.lesion, color: DARK.serious },
+    { key: "urgencia", value: bajasPorMotivo.urgencia, color: DARK.critical },
+    { key: "festivo", value: bajasPorMotivo.festivo, color: DARK.ink40 },
+  ] : [];
+
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <KpiCard T={T} icon={Users} chip={0} eyebrow="Árbitros activos" valor={nf(agregadosReales.total_arbitros_activos_adulta)}
-          sub="categoría adulta, temporada 25/26 — dato real" />
-        <KpiCard T={T} icon={Calendar} chip={3} eyebrow="Partidos temporada" valor={nf(agregadosReales.total_partidos_categoria_adulta)}
-          sub={`de ${nf(agregadosReales.total_partidos_temporada)} incl. fútbol base — dato real`} />
-        <KpiCard T={T} icon={Scale} eyebrow="Equidad de carga" tone={cvTono} valor={cv.toFixed(2)}
-          sub={`carga ${cvTexto} entre árbitros (CV) — dato real`} />
-        <KpiCard T={T} icon={Trophy} chip={2} eyebrow="Equipos con dato real" valor={nf(EQUIPOS.length)}
-          sub="categoría adulta, ver página Equipos · real" />
-      </div>
+    <div className="rounded-lg overflow-hidden" style={{
+      background: "radial-gradient(ellipse 1100px 620px at 50% -6%, #123322 0%, transparent 60%), "
+        + `radial-gradient(ellipse 1400px 900px at 50% 10%, ${DARK.pitch} 0%, ${DARK.pitchDeep} 72%)`,
+    }}>
+      <div className="p-5 sm:p-7 space-y-6">
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <KpiCard T={T} icon={Users} chip={6} eyebrow="Árbitros disponibles (este ciclo)" valor={disponiblesEsteCiclo ?? "—"}
-          sub={disponiblesEsteCiclo != null ? `de ${ARBITROS.length} expedientes de trabajo · real` : "cargando…"} />
-        <KpiCard T={T} icon={AlertCircle} tone={bajasPorMotivo?.total > 0 ? "warn" : undefined}
-          eyebrow="Árbitros no disponibles (este ciclo)" valor={bajasPorMotivo ? bajasPorMotivo.total : "—"}
-          sub={bajasPorMotivo ? `lesión ${bajasPorMotivo.lesion} · baja ${bajasPorMotivo.baja} · urgencia ${bajasPorMotivo.urgencia} · festivo ${bajasPorMotivo.festivo} · real` : "cargando…"} />
-        <KpiCard T={T} icon={FileText} chip={5} eyebrow="Informes por árbitro (temporada)" valor={informesStats.media.toFixed(1)}
-          sub={`rango ${informesStats.min}-${informesStats.max}, ${nf(informesStats.total)} en total · real`} />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard T={T} icon={Gauge} chip={4} eyebrow="Score fiable (valoraciones)" valor={`${bandasFiabilidad.fiable}/${bandasFiabilidad.total}`}
-          sub="4+ informes, shrinkage 100% propio (B.1) · real" />
-        <KpiCard T={T} icon={TrendingDown} tone="warn" eyebrow="Árbitros irregulares" valor={`${formaCounts.ambar}/${ARBITROS.length}`}
-          sub="estado de forma ámbar · sintético" />
-        <KpiCard T={T} icon={AlertTriangle} tone="bad" eyebrow="Árbitros en seguimiento" valor={`${formaCounts.rojo}/${ARBITROS.length}`}
-          sub="estado de forma rojo (umbral propio, sin validar) · sintético" />
-        <KpiCard T={T} icon={TrendingUp} chip={6} eyebrow="Mejorando" valor={`${ratioMejorando}/${ARBITROS.length}`}
-          sub="anotación de mejora + tendencia positiva · sintético" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 space-y-5">
-          <Panel title={`Partidos de la jornada por categoría · ${cicloActivo.finDeSemana}`} right={<span className="text-[11px]" style={{ color: N.ink40 }}>{cicloActivo.partidos.length} partidos · real</span>}>
-            <ResponsiveContainer width="100%" height={Math.max(140, partidosJornadaPorCategoria.length * 44)}>
-              <BarChart data={partidosJornadaPorCategoria} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="2 4" stroke={N.rule} horizontal={false} />
-                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: N.ink70 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }} formatter={(v) => [v, "Partidos"]} />
-                <Bar dataKey="partidos" radius={[0, 3, 3, 0]}>
-                  {partidosJornadaPorCategoria.map((c, i) => <Cell key={c.categoria} fill={VIZ.pastel[i % VIZ.pastel.length]} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Panel>
-
-          <Panel
-            title={`Cobertura por categoría · ${cicloActivo.finDeSemana}`}
-            right={
-              disponibilidadEstado !== "listo" ? (
-                <span className="text-[11px]" style={{ color: N.ink40 }}>
-                  {disponibilidadEstado === "cargando" ? "cargando disponibilidad…" : "disponibilidad no disponible"}
-                </span>
-              ) : categoriasEnRiesgo.length > 0 ? (
-                <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: VIZ.estado.critical }}>
-                  <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
-                </span>
-              ) : (
-                <span className="text-[11px] font-medium flex items-center gap-1" style={{ color: VIZ.estado.good }}>
-                  <Check size={12} /> sin alertas de cobertura
-                </span>
-              )
-            }
-          >
+        {/* ---- Cobertura por categoría: hero de la página (US1/P1 — la razón de ser
+             de este dashboard, spec 001 SC-001 exige verla en <10s sin filtrar) ---- */}
+        <div>
+          <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
+            <div className="text-[15px] font-semibold" style={{ color: DARK.ink }}>Cobertura por categoría · {cicloActivo.finDeSemana}</div>
+            {disponibilidadEstado !== "listo" ? (
+              <span className="text-[12px]" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</span>
+            ) : categoriasEnRiesgo.length > 0 ? (
+              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.critical }}>
+                <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
+              </span>
+            ) : (
+              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.good }}>
+                <Check size={12} /> sin alertas de cobertura
+              </span>
+            )}
+          </div>
+          <DarkPanel accent={categoriasEnRiesgo.length > 0 ? DARK.critical : DARK.line24}>
             {disponibilidadEstado === "cargando" ? (
-              <p className="text-xs" style={{ color: N.ink40 }}>Cargando disponibilidad real del ciclo…</p>
+              <p className="text-xs" style={{ color: DARK.ink40 }}>Cargando disponibilidad real del ciclo…</p>
             ) : disponibilidadEstado === "error" ? (
-              <p className="text-xs rounded px-3 py-2" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>
+              <p className="text-xs rounded px-3 py-2" style={{ color: DARK.critical, background: DARK.criticalT }}>
                 No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
               </p>
             ) : (
               <>
                 {cobertura.datasetDisponibilidadVacio && (
-                  <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: VIZ.estado.critical, borderColor: VIZ.estado.criticalT, background: VIZ.estado.criticalT }}>
+                  <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: DARK.critical, borderColor: DARK.criticalT, background: DARK.criticalT }}>
                     No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
                   </p>
                 )}
                 {categoriasConPartidos.length === 0 ? (
-                  <p className="text-xs" style={{ color: N.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
+                  <p className="text-xs" style={{ color: DARK.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
                 ) : (
                   <>
                     <ResponsiveContainer width="100%" height={Math.max(140, categoriasConPartidos.length * 48)}>
                       <BarChart data={categoriasConPartidos} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="2 4" stroke={N.rule} horizontal={false} />
-                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
-                        <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: N.ink70 }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }}
+                        <CartesianGrid strokeDasharray="2 4" stroke={DARK.line12} horizontal={false} />
+                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: DARK.ink40 }} axisLine={false} tickLine={false} />
+                        <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: DARK.ink70 }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${DARK.line24}`, fontSize: 12, background: DARK.surfaceRaised, color: DARK.ink }}
                           formatter={(v, name) => [v, name === "totalDisponibles" ? "Disponibles" : "A designar"]} />
-                        <Legend wrapperStyle={{ fontSize: 11 }} formatter={(value) => value === "totalDisponibles" ? "Disponibles" : "A designar"} />
-                        <Bar dataKey="partidosADesignar" fill={N.ink40} radius={[0, 3, 3, 0]} barSize={11} />
+                        <Legend wrapperStyle={{ fontSize: 11, color: DARK.ink70 }} formatter={(value) => value === "totalDisponibles" ? "Disponibles" : "A designar"} />
+                        <Bar dataKey="partidosADesignar" fill={DARK.line24} radius={[0, 3, 3, 0]} barSize={11} />
                         <Bar dataKey="totalDisponibles" radius={[0, 3, 3, 0]} barSize={11}>
                           {categoriasConPartidos.map((c) => (
-                            <Cell key={c.categoria} fill={c.estado === "riesgo" ? VIZ.estado.critical : c.estado === "ajustado" ? VIZ.estado.warning : VIZ.estado.good} />
+                            <Cell key={c.categoria} fill={c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good} />
                           ))}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                     <div className="space-y-1.5 mt-3">
                       {categoriasConPartidos.map((c) => (
-                        <div key={c.categoria} className="flex items-center justify-between text-[11px]" style={{ color: N.ink40 }}>
+                        <div key={c.categoria} className="flex items-center justify-between text-[11.5px]" style={{ color: DARK.ink40 }}>
                           <span>{c.categoria}: {c.disponiblesCategoriaPropia} propia + {c.disponiblesCategoriaInferior} inferior</span>
-                          <BadgeCobertura estado={c.estado} />
+                          <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2 py-0.5 shrink-0" style={{
+                            background: c.estado === "riesgo" ? DARK.criticalT : c.estado === "ajustado" ? DARK.warningT : DARK.goodT,
+                            color: c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good,
+                          }}>
+                            <span className="rounded-full" style={{ width: 6, height: 6, background: "currentColor" }} />
+                            {c.estado === "riesgo" ? "En riesgo" : c.estado === "ajustado" ? "Ajustado, sin margen" : "Cobertura holgada"}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -579,90 +675,235 @@ function Dashboard({ T, irArbitros }) {
                 )}
               </>
             )}
-            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
+            <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
               “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
             </p>
-          </Panel>
-
-          <Panel title="Categorías con más volumen (temporada completa, dato real)">
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={agregadosReales.distribucion_categorias.slice(0, 8)} margin={{ top: 4, right: 10, left: -10, bottom: 40 }}>
-                <CartesianGrid strokeDasharray="2 4" stroke={N.rule} vertical={false} />
-                <XAxis dataKey="competicion" tick={{ fontSize: 10, fill: N.ink40 }} axisLine={{ stroke: N.rule }} tickLine={false} angle={-30} textAnchor="end" interval={0} height={70} />
-                <YAxis tick={{ fontSize: 11, fill: N.ink40 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${N.rule}`, fontSize: 12 }} formatter={(v) => [v, "Partidos"]} />
-                <Bar dataKey="partidos" radius={[3, 3, 0, 0]}>
-                  {agregadosReales.distribucion_categorias.slice(0, 8).map((c, i) => <Cell key={c.competicion} fill={VIZ.pastel[i % VIZ.pastel.length]} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Panel>
+          </DarkPanel>
         </div>
 
-        <div className="space-y-5">
-          <Panel title="Carga de partidos por franja horaria" right={<span className="text-[11px]" style={{ color: N.ink40 }}>{nf(HEATMAP_INTRASEMANAL.total_partidos)} · real</span>}>
-            <HeatmapIntrasemanal data={HEATMAP_INTRASEMANAL} compacto />
-            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
-              Cuándo se juega (todas las categorías), no disponibilidad individual — anticipa en qué franjas hace falta más cobertura.
-            </p>
-          </Panel>
+        {/* ---- Comité en un vistazo: los dos gauges (US4/P2, FR-010/011/012) ---- */}
+        <div>
+          <div className="text-[13px] font-semibold" style={{ color: DARK.ink }}>Comité en un vistazo</div>
+          <div className="text-[12px] mb-3" style={{ color: DARK.ink40 }}>Dos preguntas de negocio distintas — rendimiento y disponibilidad operativa — nunca combinadas en un solo indicador.</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <DarkPanel title="Estado de forma del comité" right={<DarkTag real={false} />}>
+              <div className="rounded-md py-5 px-2" style={{
+                background: `radial-gradient(120% 160% at 50% 118%, rgba(255,92,92,.16) 0%, rgba(255,92,92,0) 45%), radial-gradient(130% 150% at 50% 105%, ${DARK.surfaceRaised} 0%, ${DARK.surface} 60%)`,
+              }}>
+                <GaugeSemicircular
+                  scale={ARBITROS.length}
+                  segments={[
+                    { key: "verde", value: formaCounts.verde, color: DARK.good },
+                    { key: "ambar", value: formaCounts.ambar, color: DARK.warning },
+                    { key: "rojo", value: formaCounts.rojo, color: DARK.critical },
+                  ]}
+                  heroValue={formaCounts.rojo}
+                  heroColor={DARK.critical}
+                  heroMain="en seguimiento ahora mismo"
+                  heroSubTag="sintético"
+                  heroSubTagColor={DARK.synth}
+                  heroSub={`de ${ARBITROS.length} expedientes`}
+                />
+                <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mt-1 text-[12.5px]" style={{ color: DARK.ink70 }}>
+                  <span className="inline-flex items-center gap-1.5"><span className="rounded-full" style={{ width: 8, height: 8, background: DARK.good }} />En forma <b className="font-mono" style={{ color: DARK.ink }}>{formaCounts.verde}</b></span>
+                  <span className="inline-flex items-center gap-1.5"><span className="rounded-full" style={{ width: 8, height: 8, background: DARK.warning }} />Irregular <b className="font-mono" style={{ color: DARK.ink }}>{formaCounts.ambar}</b></span>
+                  <span className="inline-flex items-center gap-1.5"><span className="rounded-full" style={{ width: 8, height: 8, background: DARK.critical }} />Seguimiento <b className="font-mono" style={{ color: DARK.ink }}>{formaCounts.rojo}</b></span>
+                </div>
+              </div>
+              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+                Semáforo <code>estadoForma()</code> — media móvil de 5 informes + tendencia, umbral propio (7.0 / 8.0). No es la alerta B.4 de <code>kpis.md</code> (caída ≥1,5 pts / sobrecarga &gt;130% / inactividad &gt;4 semanas): si preguntan “¿esto salta por sobrecarga?”, la respuesta es no.
+              </p>
+            </DarkPanel>
 
-          <Panel title={`Alertas de forma · ${totalAlertas} de ${ARBITROS.length}`} right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ambar }}><Info size={11} /> sintético</span>}>
-            <div className="flex items-center gap-4 mb-4 pb-4 border-b" style={{ borderColor: N.rule }}>
-              <div className="font-mono text-4xl tabular-nums" style={{ color: formaCounts.rojo > 0 ? VIZ.estado.critical : VIZ.estado.good }}>{formaCounts.rojo}</div>
-              <div className="text-xs" style={{ color: N.ink70 }}>necesitan seguimiento ahora mismo — de {ARBITROS.length} expedientes de trabajo</div>
-            </div>
-            {alertasForma.length === 0 ? (
-              <p className="text-xs" style={{ color: N.ink40 }}>Sin alertas activas.</p>
-            ) : (
-              <div className="space-y-2.5">
-                {alertasForma.map(({ a, est }) => (
-                  <div key={a.id} className="flex items-center justify-between rounded border p-2.5" style={{ borderColor: N.rule }}>
-                    <div>
-                      <div className="text-sm font-semibold" style={{ color: N.ink }}>{a.n}</div>
-                      <div className="text-xs" style={{ color: N.ink70 }}>{a.cat} · {a.loc}</div>
+            <DarkPanel title="Disponibilidad del comité" right={<DarkTag real />}>
+              {disponibilidadEstado !== "listo" ? (
+                <p className="text-xs py-8 text-center" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</p>
+              ) : (
+                <div className="rounded-md py-5 px-2" style={{
+                  background: `radial-gradient(120% 160% at 50% 118%, rgba(52,225,155,.14) 0%, rgba(52,225,155,0) 45%), radial-gradient(130% 150% at 50% 105%, ${DARK.surfaceRaised} 0%, ${DARK.surface} 60%)`,
+                }}>
+                  <GaugeSemicircular
+                    scale={ARBITROS.length}
+                    segments={disponibilidadGaugeSegments}
+                    heroValue={disponiblesEsteCiclo}
+                    heroColor={DARK.good}
+                    heroMain="disponibles este ciclo"
+                    heroSubTag="real"
+                    heroSubTagColor={DARK.accent}
+                    heroSub={`de ${ARBITROS.length} expedientes`}
+                  />
+                  <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${DARK.line16}` }}>
+                    <div className="flex justify-between text-[11px] mb-2" style={{ color: DARK.ink40 }}>
+                      <span>Desglose de los {bajasPorMotivo.total} no disponibles, por motivo real</span>
                     </div>
-                    <Semaforo estado={est} size="lg" />
+                    <div className="flex h-3.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,.08)" }}>
+                      {[
+                        { v: bajasPorMotivo.baja, c: VIZ.pastel[1] },
+                        { v: bajasPorMotivo.lesion, c: VIZ.pastel[3] },
+                        { v: bajasPorMotivo.urgencia, c: VIZ.pastel[4] },
+                        { v: bajasPorMotivo.festivo, c: VIZ.pastel[5] },
+                      ].map((s, i) => bajasPorMotivo.total > 0 && s.v > 0 ? (
+                        <div key={i} style={{ width: `${(s.v / bajasPorMotivo.total) * 100}%`, background: s.c }} />
+                      ) : null)}
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2.5 text-[11.5px]" style={{ color: DARK.ink70 }}>
+                      <span className="inline-flex items-center gap-1.5"><span className="rounded-sm" style={{ width: 8, height: 8, background: VIZ.pastel[1] }} />Baja <b className="font-mono" style={{ color: DARK.ink }}>{bajasPorMotivo.baja}</b></span>
+                      <span className="inline-flex items-center gap-1.5"><span className="rounded-sm" style={{ width: 8, height: 8, background: VIZ.pastel[3] }} />Lesión <b className="font-mono" style={{ color: DARK.ink }}>{bajasPorMotivo.lesion}</b></span>
+                      <span className="inline-flex items-center gap-1.5"><span className="rounded-sm" style={{ width: 8, height: 8, background: VIZ.pastel[4] }} />Urgencia <b className="font-mono" style={{ color: DARK.ink }}>{bajasPorMotivo.urgencia}</b></span>
+                      <span className="inline-flex items-center gap-1.5"><span className="rounded-sm" style={{ width: 8, height: 8, background: VIZ.pastel[5] }} />Festivo <b className="font-mono" style={{ color: DARK.ink }}>{bajasPorMotivo.festivo}</b></span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+                Declaraciones vigentes del ciclo activo (<code>specs/002-disponibilidad-arbitro</code>). Los motivos se colorean con la paleta de identidad, no con el semáforo — no hay un motivo “peor” que otro, solo distinto.
+              </p>
+            </DarkPanel>
+          </div>
+        </div>
+
+        {/* ---- KPIs: dos universos, etiquetados explícitamente para no leerse como el mismo dato ---- */}
+        <div>
+          <div className="flex items-baseline gap-2.5 mb-3 flex-wrap">
+            <div className="text-[13px] font-bold" style={{ color: DARK.ink }}>Panorama FFCV</div>
+            <div className="text-[11.5px]" style={{ color: DARK.ink40 }}>temporada completa · {nf(agregadosReales.total_arbitros_activos_adulta)} activos — universo distinto a la plantilla de trabajo de abajo</div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            {[
+              { eyebrow: "Árbitros activos", valor: nf(agregadosReales.total_arbitros_activos_adulta), sub: `${nf(agregadosReales.total_arbitros_activos_adulta)} en toda la FFCV · temporada completa — real` },
+              { eyebrow: "Partidos temporada", valor: nf(agregadosReales.total_partidos_categoria_adulta), sub: `de ${nf(agregadosReales.total_partidos_temporada)} incl. fútbol base — real` },
+              { eyebrow: "Equipos con dato real", valor: nf(EQUIPOS.length), sub: "categoría adulta, ver página Equipos · real" },
+              { eyebrow: "Equidad de carga (CV)", valor: cv.toFixed(2), sub: `carga ${cvTexto} entre árbitros — real`, valorColor: cvTono === "bad" ? DARK.critical : cvTono === "warn" ? DARK.warning : DARK.good },
+            ].map((s) => (
+              <div key={s.eyebrow} className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+                <DarkStat {...s} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-baseline gap-2.5 mb-3 flex-wrap">
+            <div className="text-[13px] font-bold" style={{ color: DARK.ink }}>Plantilla operativa de este comité</div>
+            <div className="text-[11.5px]" style={{ color: DARK.ink40 }}>{ARBITROS.length} expedientes de trabajo activos este ciclo — no es un recorte de “Panorama FFCV”, es el otro universo</div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+              <DarkStat eyebrow="Informes por árbitro" valor={informesStats.media.toFixed(1)} sub={`rango ${informesStats.min}-${informesStats.max}, ${nf(informesStats.total)} en total · real`} />
+            </div>
+            <div className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+              <DarkStat eyebrow="Score B.1 fiable (4+ informes)" valor={`${bandasFiabilidad.fiable}/${bandasFiabilidad.total}`} sub="árbitros con ranking fiable (shrinkage 100% propio) · real" />
+            </div>
+            <div className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+              <DarkStat eyebrow="Mejorando esta temporada" valor={`${ratioMejorando}/${ARBITROS.length}`} sub="anotación de mejora + tendencia positiva · sintético" />
+            </div>
+          </div>
+        </div>
+
+        {/* ---- rejilla de apoyo ---- */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2 space-y-5">
+            <DarkPanel title="Partidos de la jornada por categoría" sub={cicloActivo.finDeSemana} right={<span className="text-[11.5px]" style={{ color: DARK.ink40 }}>{cicloActivo.partidos.length} partidos · real</span>}>
+              <ResponsiveContainer width="100%" height={Math.max(140, partidosJornadaPorCategoria.length * 44)}>
+                <BarChart data={partidosJornadaPorCategoria} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="2 4" stroke={DARK.line12} horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: DARK.ink40 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: DARK.ink70 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${DARK.line24}`, fontSize: 12, background: DARK.surfaceRaised, color: DARK.ink }} formatter={(v) => [v, "Partidos"]} />
+                  <Bar dataKey="partidos" radius={[0, 3, 3, 0]}>
+                    {partidosJornadaPorCategoria.map((c, i) => <Cell key={c.categoria} fill={VIZ.pastel[i % VIZ.pastel.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </DarkPanel>
+
+            <DarkPanel title="Categorías con más volumen" sub="todas las competiciones FFCV (incl. juvenil/veteranos/futsal) — universo distinto a las 5 categorías adultas de la plantilla" right={<DarkTag real />}>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={agregadosReales.distribucion_categorias.slice(0, 8)} margin={{ top: 4, right: 10, left: -10, bottom: 40 }}>
+                  <CartesianGrid strokeDasharray="2 4" stroke={DARK.line12} vertical={false} />
+                  <XAxis dataKey="competicion" tick={{ fontSize: 10, fill: DARK.ink40 }} axisLine={{ stroke: DARK.line16 }} tickLine={false} angle={-30} textAnchor="end" interval={0} height={70} />
+                  <YAxis tick={{ fontSize: 11, fill: DARK.ink40 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${DARK.line24}`, fontSize: 12, background: DARK.surfaceRaised, color: DARK.ink }} formatter={(v) => [v, "Partidos"]} />
+                  <Bar dataKey="partidos" radius={[3, 3, 0, 0]}>
+                    {agregadosReales.distribucion_categorias.slice(0, 8).map((c, i) => <Cell key={c.competicion} fill={VIZ.pastel[i % VIZ.pastel.length]} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </DarkPanel>
+          </div>
+
+          <div className="space-y-5">
+            <DarkPanel title="Carga de partidos por franja horaria" right={<span className="text-[11.5px]" style={{ color: DARK.ink40 }}>{nf(HEATMAP_INTRASEMANAL.total_partidos)} · real</span>}>
+              <HeatmapIntrasemanal data={HEATMAP_INTRASEMANAL} compacto dark />
+              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+                Cuándo se juega (todas las categorías), no disponibilidad individual — anticipa en qué franjas hace falta más cobertura.
+              </p>
+            </DarkPanel>
+
+            <DarkPanel title="Alertas de forma" sub={`${totalAlertas} de ${ARBITROS.length} · no es el indicador B.4 de kpis.md — es el semáforo estadoForma() con umbral propio 7.0/8.0, ya visible en el gauge de arriba`} right={<DarkTag real={false} />}>
+              {alertasForma.length === 0 ? (
+                <p className="text-xs" style={{ color: DARK.ink40 }}>Sin alertas activas.</p>
+              ) : (
+                <div className="space-y-2.5">
+                  {alertasForma.map(({ a, est }) => (
+                    <div key={a.id} className="flex items-center justify-between rounded p-2.5" style={{ background: DARK.line06 }}>
+                      <div>
+                        <div className="text-sm font-semibold" style={{ color: DARK.ink }}>{a.n}</div>
+                        <div className="text-xs" style={{ color: DARK.ink40 }}>{a.cat} · {a.loc}</div>
+                      </div>
+                      <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2.5 py-1" style={{
+                        background: est.color === "rojo" ? DARK.criticalT : est.color === "ambar" ? DARK.warningT : DARK.goodT,
+                        color: est.color === "rojo" ? DARK.critical : est.color === "ambar" ? DARK.warning : DARK.good,
+                      }}>
+                        <span className="rounded-full" style={{ width: 6, height: 6, background: "currentColor" }} />
+                        {est.etiqueta}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+                Basado en el semáforo de forma sobre los {ARBITROS.length} expedientes de trabajo — sintético hasta tener informes reales del comité.
+              </p>
+              <button onClick={irArbitros} className="mt-3 text-xs font-medium flex items-center gap-1" style={{ color: DARK.accent }}>
+                Ver en Árbitros <ChevronRight size={13} />
+              </button>
+            </DarkPanel>
+
+            <DarkPanel title="Incidencias más frecuentes" sub="proxy sobre etiquetas de anotaciones de seguimiento" right={<DarkTag real={false} />}>
+              <div className="space-y-2">
+                {etiquetasNotas.map(([etiqueta, n], i) => (
+                  <div key={etiqueta} className="flex items-center gap-2.5">
+                    <span className="text-xs w-24 shrink-0 capitalize" style={{ color: DARK.ink70 }}>{etiqueta}</span>
+                    <div className="flex-1 rounded-full h-2" style={{ background: DARK.line06 }}>
+                      <div className="h-2 rounded-full" style={{ width: `${(n / maxEtiqueta) * 100}%`, background: VIZ.pastel[i % VIZ.pastel.length] }} />
+                    </div>
+                    <span className="text-xs font-mono tabular-nums w-6 text-right" style={{ color: DARK.ink }}>{n}</span>
                   </div>
                 ))}
               </div>
-            )}
-            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
-              Basado en el semáforo de forma sobre los 200 expedientes de trabajo — sintético hasta tener informes reales del comité.
-            </p>
-            <button onClick={irArbitros} className="mt-3 text-xs font-medium flex items-center gap-1" style={{ color: T.primary }}>
-              Ver en Árbitros <ChevronRight size={13} />
-            </button>
-          </Panel>
-
-          <Panel title="Incidencias más frecuentes" right={<span className="text-[11px] flex items-center gap-1" style={{ color: N.ambar }}><Info size={11} /> sintético</span>}>
-            <div className="space-y-2">
-              {etiquetasNotas.map(([etiqueta, n], i) => (
-                <div key={etiqueta} className="flex items-center gap-2.5">
-                  <span className="text-xs w-24 shrink-0 capitalize" style={{ color: N.ink70 }}>{etiqueta}</span>
-                  <div className="flex-1 rounded-full h-2" style={{ background: N.paper }}>
-                    <div className="h-2 rounded-full" style={{ width: `${(n / maxEtiqueta) * 100}%`, background: VIZ.pastel[i % VIZ.pastel.length] }} />
-                  </div>
-                  <span className="text-xs font-mono tabular-nums w-6 text-right" style={{ color: N.ink }}>{n}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-[11px] mt-3 pt-3 border-t" style={{ color: N.ink40, borderColor: N.rule }}>
-              Proxy sobre etiquetas de anotaciones de seguimiento — no hay todavía un registro de incidencias independiente. «Disciplinaria» no aparece porque hoy no hay ninguna anotación con esa etiqueta en los 200 expedientes, no es un error.
-            </p>
-          </Panel>
-
-          <Panel title="Insights">
-            <div className="space-y-3 text-sm" style={{ color: N.ink70 }}>
-              <p>
-                <span className="font-semibold" style={{ color: N.ink }}>Reparto de carga muy desigual: </span>
-                el árbitro con más partidos dirige {agregadosReales.equidad_carga.max_partidos}, el de menos solo {agregadosReales.equidad_carga.min_partidos}. Media {agregadosReales.equidad_carga.media_partidos_por_arbitro} partidos/árbitro. <span className="text-[11px]" style={{ color: N.ambar }}>· real</span>
+              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+                No hay todavía un registro de incidencias independiente. «Disciplinaria» no aparece porque hoy no hay ninguna anotación con esa etiqueta en los {ARBITROS.length} expedientes, no es un error.
               </p>
-              <p>
-                <span className="font-semibold" style={{ color: N.ink }}>{formaCounts.rojo} de {ARBITROS.length} árbitros</span> están en «necesita seguimiento» por caída de nota o tendencia descendente en sus últimos informes — umbral propio, todavía sin validar con el comité. <span className="text-[11px]" style={{ color: N.ambar }}>· sintético</span>
-              </p>
-            </div>
-          </Panel>
+            </DarkPanel>
+
+            <DarkPanel title="Insights" sub="vista previa — no se recorta" accent={DARK.accentDeep} right={
+              <span className="text-[10.5px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full" style={{ color: DARK.accent, background: "rgba(127,212,255,.10)", border: `1px solid rgba(127,212,255,.28)` }}>
+                Vista previa
+              </span>
+            }>
+              <p className="text-[11.5px] italic mb-3.5" style={{ color: DARK.ink40 }}>Hoy: síntesis honesta de los datos ya calculados en los paneles de arriba. Próximamente: patrones que la IA cruce entre KPIs y que a simple vista no se ven.</p>
+              <div className="space-y-3 text-sm" style={{ color: DARK.ink70 }}>
+                <p>
+                  <span className="font-semibold" style={{ color: DARK.ink }}>Reparto de carga muy desigual: </span>
+                  el árbitro con más partidos dirige {agregadosReales.equidad_carga.max_partidos}, el de menos solo {agregadosReales.equidad_carga.min_partidos}. Media {agregadosReales.equidad_carga.media_partidos_por_arbitro} partidos/árbitro. <span className="text-[11px] font-semibold" style={{ color: DARK.accent }}>· real</span>
+                </p>
+                <p>
+                  <span className="font-semibold" style={{ color: DARK.ink }}>{formaCounts.rojo} de {ARBITROS.length} árbitros</span> están en «necesita seguimiento» por caída de nota o tendencia descendente en sus últimos informes — umbral propio, todavía sin validar con el comité. <span className="text-[11px] font-semibold" style={{ color: DARK.synth }}>· sintético</span>
+                </p>
+              </div>
+            </DarkPanel>
+          </div>
         </div>
       </div>
     </div>
