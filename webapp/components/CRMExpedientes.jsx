@@ -41,20 +41,40 @@ import { validarAntelacionFestivo } from "../lib/reglaFestivo";
    v2/v3 como vistas previas bloqueadas (disclaimer visible).
 ================================================================ */
 
+/* Dirección "Cuarto árbitro" extendida a toda la app (8 ago 2026, ver
+   decisiones-producto.md) — antes solo vivía en el Cuadro de Mando (objeto
+   DARK, más abajo). `primary` cambia de rol: antes era superficie Y texto a
+   la vez (navy, funcionaba porque el resto de la app era clara); ahora un
+   fondo oscuro no puede llevar el mismo tono para texto/iconos que para
+   superficies sólidas (texto oscuro sobre fondo oscuro sería invisible), así
+   que se separan: `primary` = acento claro (texto/iconos/enlaces, la mayoría
+   de sus usos), `deep` = superficie estructural oscura (sidebar, botones
+   sólidos, la minoría de usos que pintaban fondo). */
 const THEMES = {
   ffcv: { nombre: "Federació de Futbol Comunitat Valenciana", corto: "FFCV", siglas: "FFCV",
-    primary: "#0C4C7C", deep: "#08375A", accent: "#F59B1E", tint: "#EAF2F8", accentTint: "#FEF3E2" },
+    primary: "#7fd4ff", deep: "#0a1712", accent: "#F59B1E", tint: "rgba(127,212,255,.12)", accentTint: "rgba(245,155,30,.14)" },
   fcf: { nombre: "Federació Catalana de Futbol", corto: "FCF", siglas: "FCF",
     primary: "#1B3F94", deep: "#132D6B", accent: "#D8232A", tint: "#ECEFF9", accentTint: "#FBEAEA" },
   rfaf: { nombre: "Real Federación Andaluza de Fútbol", corto: "RFAF", siglas: "RFAF",
     primary: "#0B6B4F", deep: "#07503B", accent: "#F0B323", tint: "#E9F4F0", accentTint: "#FDF4E0" },
 };
 
+/* N (neutros) recalibrados a la paleta oscura — mismo objeto, mismos nombres
+   de campo, así que todo lo que ya usaba N.card/N.paper/N.ink en cualquier
+   página hereda el cambio sin tocar esa página. verde/ambar/rojo alineados
+   con los valores ya validados por contraste en VIZ.estado (más abajo) y en
+   el Cuadro de Mando — antes eran tonos distintos y más apagados, pensados
+   para fondo claro. */
 const N = {
-  paper: "#F6F7F9", card: "#FFFFFF", ink: "#16202B", ink70: "#5A6672",
-  ink40: "#939CA6", rule: "#E1E5EA",
-  verde: "#2E7D5B", verdeT: "#E7F2EC", ambar: "#C88A1A", ambarT: "#FBF1DC",
-  rojo: "#C0392B", rojoT: "#FAE9E7", ta: "#E8C33C", tr: "#C0392B",
+  paper: "#0a1712", card: "#1b3524", ink: "#f8fbf8", ink70: "#cbdace",
+  ink40: "#93ab9b", rule: "rgba(237,247,240,.17)",
+  verde: "#34e19b", verdeT: "rgba(52,225,155,.14)", ambar: "#ffc24b", ambarT: "rgba(255,194,75,.14)",
+  rojo: "#ff5c5c", rojoT: "rgba(255,92,92,.16)", ta: "#ffc24b", tr: "#ff5c5c",
+  /* texto legible sobre ambarT ahora que ese fondo es oscuro-translúcido en vez
+     de un ámbar sólido claro — antes N.ambarInk (marrón oscuro, pensado para
+     fondo claro, ver BannerV2 y los avisos de "vista previa" repartidos por
+     la app). */
+  ambarInk: "#F2C879",
 };
 
 /* Paleta de dataviz (skill "dataviz"): categórica validada (CVD-safe, orden fijo,
@@ -64,7 +84,11 @@ const N = {
 const VIZ = {
   serie: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"],
   secuencialAzul: ["#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#1c5cab", "#0d366b"],
-  estado: { good: "#0ca30c", goodT: "#E7F2EC", warning: "#fab219", warningT: "#FBF1DC", serious: "#ec835a", seriousT: "#FBEAE3", critical: "#d03b3b", criticalT: "#FAE9E7" },
+  /* recalibrado para fondo oscuro (8 ago 2026) — mismo significado good/warning/
+     serious/critical, más luminancia porque un fondo oscuro exige colores más
+     claros para el mismo contraste percibido que sobre blanco (mismos valores
+     ya validados en el Cuadro de Mando, antes solo en el objeto DARK local). */
+  estado: { good: "#34e19b", goodT: "rgba(52,225,155,.14)", warning: "#ffc24b", warningT: "rgba(255,194,75,.14)", serious: "#ff9466", seriousT: "rgba(255,148,102,.14)", critical: "#ff5c5c", criticalT: "rgba(255,92,92,.16)" },
   /* Paleta pastel-viva (aprobada por Roberto 31 jul 2026, ver decisiones-producto.md) —
      para gráficos donde el color distingue CATEGORÍA (identidad), nunca donde distingue
      ESTADO. El semáforo de riesgo/estado de forma (VIZ.estado) no se toca ni se mezcla
@@ -189,7 +213,7 @@ function Eyebrow({ children }) {
 function Panel({ title, children, right }) {
   return (
     <section className="rounded-md border overflow-hidden" style={{ background: N.card, borderColor: N.rule }}>
-      <div className="flex items-center justify-between px-5 py-3 border-b flex-wrap gap-2" style={{ borderColor: N.rule, background: "#FBFCFD" }}>
+      <div className="flex items-center justify-between px-5 py-3 border-b flex-wrap gap-2" style={{ borderColor: N.rule, background: "rgba(255,255,255,.03)" }}>
         <Eyebrow>{title}</Eyebrow>{right}
       </div>
       <div className="p-5">{children}</div>
@@ -252,8 +276,8 @@ function BannerV2({ T, version = "Versión 2", texto }) {
     <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3 mb-5" style={{ borderColor: T.accent, background: T.accentTint }}>
       <Lock size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
       <div>
-        <div className="text-sm font-semibold" style={{ color: "#7A5A10" }}>Vista previa · {version}</div>
-        <p className="text-xs mt-0.5" style={{ color: "#7A5A10" }}>
+        <div className="text-sm font-semibold" style={{ color: N.ambarInk }}>Vista previa · {version}</div>
+        <p className="text-xs mt-0.5" style={{ color: N.ambarInk }}>
           {texto || "Esta función no está activa en la versión inicial. Antes hay que poblar la base de datos de expedientes: todo lo que ves aquí se construye sobre ella."}
         </p>
       </div>
@@ -606,82 +630,10 @@ function Dashboard({ irArbitros }) {
     }}>
       <div className="p-5 sm:p-7 space-y-6">
 
-        {/* ---- Cobertura por categoría: hero de la página (US1/P1 — la razón de ser
-             de este dashboard, spec 001 SC-001 exige verla en <10s sin filtrar) ---- */}
-        <div>
-          <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
-            <div className="text-[15px] font-semibold" style={{ color: DARK.ink }}>Cobertura por categoría · {cicloActivo.finDeSemana}</div>
-            {disponibilidadEstado !== "listo" ? (
-              <span className="text-[12px]" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</span>
-            ) : categoriasEnRiesgo.length > 0 ? (
-              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.critical }}>
-                <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
-              </span>
-            ) : (
-              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.good }}>
-                <Check size={12} /> sin alertas de cobertura
-              </span>
-            )}
-          </div>
-          <DarkPanel accent={categoriasEnRiesgo.length > 0 ? DARK.critical : DARK.line24}>
-            {disponibilidadEstado === "cargando" ? (
-              <p className="text-xs" style={{ color: DARK.ink40 }}>Cargando disponibilidad real del ciclo…</p>
-            ) : disponibilidadEstado === "error" ? (
-              <p className="text-xs rounded px-3 py-2" style={{ color: DARK.critical, background: DARK.criticalT }}>
-                No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
-              </p>
-            ) : (
-              <>
-                {cobertura.datasetDisponibilidadVacio && (
-                  <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: DARK.critical, borderColor: DARK.criticalT, background: DARK.criticalT }}>
-                    No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
-                  </p>
-                )}
-                {categoriasConPartidos.length === 0 ? (
-                  <p className="text-xs" style={{ color: DARK.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
-                ) : (
-                  <>
-                    <ResponsiveContainer width="100%" height={Math.max(140, categoriasConPartidos.length * 48)}>
-                      <BarChart data={categoriasConPartidos} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="2 4" stroke={DARK.line12} horizontal={false} />
-                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: DARK.ink40 }} axisLine={false} tickLine={false} />
-                        <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: DARK.ink70 }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${DARK.line24}`, fontSize: 12, background: DARK.surfaceRaised, color: DARK.ink }}
-                          formatter={(v, name) => [v, name === "totalDisponibles" ? "Disponibles" : "A designar"]} />
-                        <Legend wrapperStyle={{ fontSize: 11, color: DARK.ink70 }} formatter={(value) => value === "totalDisponibles" ? "Disponibles" : "A designar"} />
-                        <Bar dataKey="partidosADesignar" fill={DARK.line24} radius={[0, 3, 3, 0]} barSize={11} />
-                        <Bar dataKey="totalDisponibles" radius={[0, 3, 3, 0]} barSize={11}>
-                          {categoriasConPartidos.map((c) => (
-                            <Cell key={c.categoria} fill={c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                    <div className="space-y-1.5 mt-3">
-                      {categoriasConPartidos.map((c) => (
-                        <div key={c.categoria} className="flex items-center justify-between text-[11.5px]" style={{ color: DARK.ink40 }}>
-                          <span>{c.categoria}: {c.disponiblesCategoriaPropia} propia + {c.disponiblesCategoriaInferior} inferior</span>
-                          <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2 py-0.5 shrink-0" style={{
-                            background: c.estado === "riesgo" ? DARK.criticalT : c.estado === "ajustado" ? DARK.warningT : DARK.goodT,
-                            color: c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good,
-                          }}>
-                            <span className="rounded-full" style={{ width: 6, height: 6, background: "currentColor" }} />
-                            {c.estado === "riesgo" ? "En riesgo" : c.estado === "ajustado" ? "Ajustado, sin margen" : "Cobertura holgada"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-            <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
-              “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
-            </p>
-          </DarkPanel>
-        </div>
-
-        {/* ---- Comité en un vistazo: los dos gauges (US4/P2, FR-010/011/012) ---- */}
+        {/* ---- Comité en un vistazo: los dos gauges (US4/P2, FR-010/011/012) — primero,
+             Roberto pidió priorizar gauges+KPIs sobre Cobertura (8 ago 2026). SC-001 de la
+             spec (verla en <10s sin filtrar) se sigue cumpliendo: sin scroll ni filtro, no
+             exige ser el primer elemento del layout. ---- */}
         <div>
           <div className="text-[13px] font-semibold" style={{ color: DARK.ink }}>Comité en un vistazo</div>
           <div className="text-[12px] mb-3" style={{ color: DARK.ink40 }}>Dos preguntas de negocio distintas — rendimiento y disponibilidad operativa — nunca combinadas en un solo indicador.</div>
@@ -798,6 +750,82 @@ function Dashboard({ irArbitros }) {
               <DarkStat eyebrow="Mejorando esta temporada" valor={`${ratioMejorando}/${ARBITROS.length}`} sub="anotación de mejora + tendencia positiva · sintético" />
             </div>
           </div>
+        </div>
+
+        {/* ---- Cobertura por categoría (US1/P1) — sigue siendo la razón de ser del
+             dashboard y SC-001 exige verla sin filtrar, pero ya no es el primer
+             elemento: Roberto priorizó los gauges y KPIs por delante (8 ago 2026). ---- */}
+        <div>
+          <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
+            <div className="text-[15px] font-semibold" style={{ color: DARK.ink }}>Cobertura por categoría · {cicloActivo.finDeSemana}</div>
+            {disponibilidadEstado !== "listo" ? (
+              <span className="text-[12px]" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</span>
+            ) : categoriasEnRiesgo.length > 0 ? (
+              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.critical }}>
+                <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
+              </span>
+            ) : (
+              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.good }}>
+                <Check size={12} /> sin alertas de cobertura
+              </span>
+            )}
+          </div>
+          <DarkPanel accent={categoriasEnRiesgo.length > 0 ? DARK.critical : DARK.line24}>
+            {disponibilidadEstado === "cargando" ? (
+              <p className="text-xs" style={{ color: DARK.ink40 }}>Cargando disponibilidad real del ciclo…</p>
+            ) : disponibilidadEstado === "error" ? (
+              <p className="text-xs rounded px-3 py-2" style={{ color: DARK.critical, background: DARK.criticalT }}>
+                No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
+              </p>
+            ) : (
+              <>
+                {cobertura.datasetDisponibilidadVacio && (
+                  <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: DARK.critical, borderColor: DARK.criticalT, background: DARK.criticalT }}>
+                    No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
+                  </p>
+                )}
+                {categoriasConPartidos.length === 0 ? (
+                  <p className="text-xs" style={{ color: DARK.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
+                ) : (
+                  <>
+                    <ResponsiveContainer width="100%" height={Math.max(140, categoriasConPartidos.length * 48)}>
+                      <BarChart data={categoriasConPartidos} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="2 4" stroke={DARK.line12} horizontal={false} />
+                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: DARK.ink40 }} axisLine={false} tickLine={false} />
+                        <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: DARK.ink70 }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${DARK.line24}`, fontSize: 12, background: DARK.surfaceRaised, color: DARK.ink }}
+                          formatter={(v, name) => [v, name === "totalDisponibles" ? "Disponibles" : "A designar"]} />
+                        <Legend wrapperStyle={{ fontSize: 11, color: DARK.ink70 }} formatter={(value) => value === "totalDisponibles" ? "Disponibles" : "A designar"} />
+                        <Bar dataKey="partidosADesignar" fill={DARK.line24} radius={[0, 3, 3, 0]} barSize={11} />
+                        <Bar dataKey="totalDisponibles" radius={[0, 3, 3, 0]} barSize={11}>
+                          {categoriasConPartidos.map((c) => (
+                            <Cell key={c.categoria} fill={c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                    <div className="space-y-1.5 mt-3">
+                      {categoriasConPartidos.map((c) => (
+                        <div key={c.categoria} className="flex items-center justify-between text-[11.5px]" style={{ color: DARK.ink40 }}>
+                          <span>{c.categoria}: {c.disponiblesCategoriaPropia} propia + {c.disponiblesCategoriaInferior} inferior</span>
+                          <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2 py-0.5 shrink-0" style={{
+                            background: c.estado === "riesgo" ? DARK.criticalT : c.estado === "ajustado" ? DARK.warningT : DARK.goodT,
+                            color: c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good,
+                          }}>
+                            <span className="rounded-full" style={{ width: 6, height: 6, background: "currentColor" }} />
+                            {c.estado === "riesgo" ? "En riesgo" : c.estado === "ajustado" ? "Ajustado, sin margen" : "Cobertura holgada"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+            <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+              “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
+            </p>
+          </DarkPanel>
         </div>
 
         {/* ---- rejilla de apoyo ---- */}
@@ -963,7 +991,7 @@ function Listado({ T, onPick }) {
     return c;
   }, []);
 
-  const selectStyle = { borderColor: N.rule, color: N.ink70, background: "#FFF" };
+  const selectStyle = { borderColor: N.rule, color: N.ink70, background: N.card };
 
   return (
     <div className="space-y-5">
@@ -1003,7 +1031,7 @@ function Listado({ T, onPick }) {
               <option value="8">Media ≥ 8,0</option>
               <option value="7">Media ≥ 7,0</option>
             </select>
-            <div className="flex items-center gap-2 rounded border px-2 py-1 bg-white" style={{ borderColor: N.rule }}>
+            <div className="flex items-center gap-2 rounded border px-2 py-1" style={{ borderColor: N.rule, background: N.card }}>
               <Search size={13} style={{ color: N.ink40 }} />
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Nombre o licencia"
                 className="text-xs outline-none w-36 bg-transparent" style={{ color: N.ink }} />
@@ -1025,7 +1053,7 @@ function Listado({ T, onPick }) {
               {espacioArriba > 0 && <tr aria-hidden="true"><td colSpan={7} style={{ height: espacioArriba, padding: 0, border: 0 }} /></tr>}
               {filasVisibles.map(({ a, est, tot, ultima }) => (
                 <tr key={a.id} onClick={() => onPick(a)} style={{ borderColor: N.rule, height: FILA_ALTURA }}
-                  className="cursor-pointer border-b hover:bg-slate-50 transition-colors">
+                  className="cursor-pointer border-b hover:bg-[rgba(255,255,255,.04)] transition-colors">
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-3">
                       <Avatar txt={a.foto} T={T} size={36} />
@@ -1105,7 +1133,7 @@ function HistorialPartidos({ a, T }) {
 
       {enVentana.length > 0 && (
         <div className="grid grid-cols-3 gap-3 mb-4 rounded p-3" style={{ background: N.paper }}>
-          {[["Partidos en ventana", enVentana.length, N.ink], ["Amarillas", resumen.am, "#B08D14"], ["Rojas", resumen.ro, N.rojo]].map(([l, v, col]) => (
+          {[["Partidos en ventana", enVentana.length, N.ink], ["Amarillas", resumen.am, "#E8C33C"], ["Rojas", resumen.ro, N.rojo]].map(([l, v, col]) => (
             <div key={l}>
               <div className="text-[9px] uppercase tracking-[0.1em] mb-0.5" style={{ color: N.ink40 }}>{l}</div>
               <div className="font-mono text-lg font-semibold tabular-nums" style={{ color: col }}>{v}</div>
@@ -1128,7 +1156,7 @@ function HistorialPartidos({ a, T }) {
                 {!h.esCategoriaPrincipal && <span className="text-[10px] rounded px-1.5 py-0.5" style={{ background: N.paper, color: N.ink40 }}>{h.competicion}</span>}
                 {(h.amarillas > 0 || h.rojas > 0) && (
                   <span className="font-mono text-[11px] flex items-center gap-1.5">
-                    {h.amarillas > 0 && <span style={{ color: "#B08D14" }}>{h.amarillas}TA</span>}
+                    {h.amarillas > 0 && <span style={{ color: "#E8C33C" }}>{h.amarillas}TA</span>}
                     {h.rojas > 0 && <span style={{ color: N.rojo }}>{h.rojas}TR</span>}
                   </span>
                 )}
@@ -1309,14 +1337,14 @@ function Ficha({ T, a, back }) {
         </div>
       </div>
 
-      <div className="rounded-md overflow-hidden" style={{ background: T.primary }}>
+      <div className="rounded-md overflow-hidden" style={{ background: T.deep }}>
         <div className="p-6 flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <Avatar txt={a.foto} T={{ tint: "#FFFFFF", primary: T.primary }} size={60} />
             <div>
               <div className="font-mono text-[11px] tracking-[0.2em] mb-1" style={{ color: T.accent }}>LICENCIA {a.lic}</div>
               <h2 className="text-2xl font-semibold text-white leading-tight">{a.n}</h2>
-              <div className="text-xs mt-1.5" style={{ color: "#B7CBDD" }}>{a.cat} · {a.loc} · {a.edad} años · {a.temp} temporadas · {a.altura} cm</div>
+              <div className="text-xs mt-1.5" style={{ color: N.ink70 }}>{a.cat} · {a.loc} · {a.edad} años · {a.temp} temporadas · {a.altura} cm</div>
               <div className="flex items-center gap-4 mt-2 text-xs flex-wrap">
                 <a href={`tel:${a.telefono.replace(/\s/g, "")}`} className="flex items-center gap-1.5 hover:underline" style={{ color: "#FFF" }}>
                   <Phone size={12} style={{ color: T.accent }} /> {a.telefono}
@@ -1327,7 +1355,7 @@ function Ficha({ T, a, back }) {
               </div>
             </div>
           </div>
-          <div style={{ background: "#FFFFFF", borderRadius: 8, padding: "12px 18px" }}>
+          <div style={{ background: N.card, borderRadius: 8, padding: "12px 18px" }}>
             <div className="text-[10px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Estado de forma actual</div>
             <Semaforo estado={est} size="lg" />
             <div className="text-[11px] mt-1.5" style={{ color: N.ink70 }}>media 5 últimos: <span className="font-mono font-semibold">{est.media.toFixed(2)}</span></div>
@@ -1369,7 +1397,7 @@ function Ficha({ T, a, back }) {
                     <tr key={h.temp} className="border-b" style={{ borderColor: N.rule, background: i === 0 ? T.tint : "transparent" }}>
                       <td className="px-3 py-2.5 font-medium" style={{ color: N.ink }}>{h.temp}{i === 0 && <span className="ml-2 text-[10px]" style={{ color: T.primary }}>actual</span>}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums">{h.part}</td>
-                      <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: "#B08D14" }}>{h.am}</td>
+                      <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: "#E8C33C" }}>{h.am}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: N.tr }}>{h.ro}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: N.ink70 }}>{(h.am / h.part).toFixed(1)}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums font-semibold"
@@ -1411,7 +1439,7 @@ function Ficha({ T, a, back }) {
                 className="text-xs rounded border px-2 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
                 {Object.entries(ETIQUETA_NOTA).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
               </select>
-              <button onClick={addNota} disabled={guardandoNota} className="text-xs rounded px-3 py-2 text-white font-medium flex items-center gap-1.5 disabled:opacity-60" style={{ background: T.primary }}>
+              <button onClick={addNota} disabled={guardandoNota} className="text-xs rounded px-3 py-2 text-white font-medium flex items-center gap-1.5 disabled:opacity-60" style={{ background: T.deep }}>
                 <MessageSquarePlus size={14} /> {guardandoNota ? "Guardando…" : "Guardar"}
               </button>
             </div>
@@ -1424,16 +1452,16 @@ function Ficha({ T, a, back }) {
 
             {sugerenciaEmail && (
               <div className="rounded p-3 mb-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: T.accentTint }}>
-                <div className="text-xs" style={{ color: "#7A5A10" }}>
+                <div className="text-xs" style={{ color: N.ambarInk }}>
                   <span className="font-semibold">Sugerencia: </span>
                   {sugerenciaEmail === "felicitacion" ? "esta nota es positiva — ¿le envías un email de felicitación?" : "esta nota es de mejora — ¿le envías puntos de mejora por email?"}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <a href={mailtoHref(a.email, PLANTILLAS_EMAIL[sugerenciaEmail].asunto(a), PLANTILLAS_EMAIL[sugerenciaEmail].cuerpo(a))}
-                    className="text-xs rounded px-2.5 py-1 font-medium text-white flex items-center gap-1" style={{ background: T.primary }}>
+                    className="text-xs rounded px-2.5 py-1 font-medium text-white flex items-center gap-1" style={{ background: T.deep }}>
                     <Send size={11} /> Redactar email
                   </a>
-                  <button onClick={() => setSugerenciaEmail(null)} className="text-xs" style={{ color: "#7A5A10" }}>Descartar</button>
+                  <button onClick={() => setSugerenciaEmail(null)} className="text-xs" style={{ color: N.ambarInk }}>Descartar</button>
                 </div>
               </div>
             )}
@@ -1452,7 +1480,7 @@ function Ficha({ T, a, back }) {
                   const et = ETIQUETA_NOTA[nt.etiqueta] || ETIQUETA_NOTA.seguimiento;
                   const fecha = new Date(nt.creadoEn).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" });
                   return (
-                    <div key={nt.id ?? i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.fuente === "real" ? T.tint : "#FFF" }}>
+                    <div key={nt.id ?? i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.fuente === "real" ? T.tint : N.card }}>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-xs font-semibold" style={{ color: T.primary }}>{nt.autor}</span>
                         <span className="text-[11px] font-mono" style={{ color: N.ink40 }}>{fecha}</span>
@@ -1481,7 +1509,7 @@ function Ficha({ T, a, back }) {
                     <input type="file" accept="application/pdf" onChange={(e) => setArchivoJustificante(e.target.files?.[0] ?? null)}
                       className="text-xs" style={{ color: N.ink70 }} />
                     <button onClick={justificarBaja} disabled={!archivoJustificante || guardandoJustificante}
-                      className="text-[11px] rounded px-2.5 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+                      className="text-[11px] rounded px-2.5 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.deep }}>
                       {guardandoJustificante ? "Adjuntando…" : "Adjuntar justificante"}
                     </button>
                   </div>
@@ -1522,13 +1550,13 @@ function Ficha({ T, a, back }) {
               )}
               <button onClick={declarar}
                 disabled={guardandoDisponibilidad || Boolean(antelacionFestivo && !antelacionFestivo.valido)}
-                className="text-xs rounded px-3 py-2 text-white font-medium disabled:opacity-60" style={{ background: T.primary }}>
+                className="text-xs rounded px-3 py-2 text-white font-medium disabled:opacity-60" style={{ background: T.deep }}>
                 {guardandoDisponibilidad ? "Guardando…" : "Declarar"}
               </button>
             </div>
 
             {antelacionFestivo && !antelacionFestivo.valido && (
-              <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: "#7A5A10", background: N.ambarT }}>
+              <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: N.ambarInk, background: N.ambarT }}>
                 Un festivo solicitado necesita al menos 15 días de antelación (hay {antelacionFestivo.diasAntelacion}).
               </p>
             )}
@@ -1556,7 +1584,7 @@ function Ficha({ T, a, back }) {
                   const fecha = new Date(d.fechaDeclaracion).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" });
                   const noJustificada = d.motivo === "baja" && d.justificada === false;
                   return (
-                    <div key={d.id} className="rounded border p-2.5 text-xs" style={{ borderColor: noJustificada ? "#F0C9C2" : N.rule, background: noJustificada ? N.rojoT : "#FFF" }}>
+                    <div key={d.id} className="rounded border p-2.5 text-xs" style={{ borderColor: noJustificada ? N.rojo : N.rule, background: noJustificada ? N.rojoT : N.card }}>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium" style={{ color: N.ink }}>{TIPO_DISPONIBILIDAD[d.tipo]?.label ?? d.tipo}</span>
                         {d.motivo && <span style={{ color: N.ink70 }}>· {MOTIVO_INDISPONIBILIDAD[d.motivo]?.label ?? d.motivo}</span>}
@@ -1604,7 +1632,7 @@ function Ficha({ T, a, back }) {
             <div className="flex flex-col gap-1.5">
               {Object.entries(PLANTILLAS_EMAIL).map(([k, p]) => (
                 <a key={k} href={mailtoHref(a.email, p.asunto(a), p.cuerpo(a))}
-                  className="text-xs rounded border px-3 py-2 flex items-center gap-2 hover:bg-slate-50 transition-colors" style={{ borderColor: N.rule, color: N.ink }}>
+                  className="text-xs rounded border px-3 py-2 flex items-center gap-2 hover:bg-[rgba(255,255,255,.04)] transition-colors" style={{ borderColor: N.rule, color: N.ink }}>
                   <Send size={12} style={{ color: T.primary }} /> {p.etiqueta}
                 </a>
               ))}
@@ -1764,7 +1792,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
 
   return (
     <>
-      <tr className="border-b cursor-pointer hover:bg-slate-50" style={{ borderColor: N.rule }} onClick={onToggle}>
+      <tr className="border-b cursor-pointer hover:bg-[rgba(255,255,255,.04)]" style={{ borderColor: N.rule }} onClick={onToggle}>
         <td className="px-3 py-3">
           <div className="font-medium" style={{ color: N.ink }}>{partido.equipoLocal} – {partido.equipoVisitante}</div>
           <div className="text-xs" style={{ color: N.ink40 }}>{partido.categoriaMinima} · {partido.localidad} · {partido.fecha}</div>
@@ -1824,7 +1852,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
         <tr>
           <td colSpan={4} className="px-3 pb-4" style={{ background: N.paper }}>
             {motivoRevision.length > 0 && !decisionVigente && (
-              <div className="rounded p-2.5 mb-3 text-xs" style={{ background: N.ambarT, color: "#7A5A10" }}>
+              <div className="rounded p-2.5 mb-3 text-xs" style={{ background: N.ambarT, color: N.ambarInk }}>
                 {motivoRevision.map((m, i) => <div key={i}>· {m}</div>)}
               </div>
             )}
@@ -1841,7 +1869,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
             ) : (
               <div className="space-y-1.5">
                 {alternativas.map(({ arbitro, score, coste }) => (
-                  <div key={arbitro.id} className="text-xs rounded border p-2" style={{ borderColor: N.rule, background: "#FFF" }}>
+                  <div key={arbitro.id} className="text-xs rounded border p-2" style={{ borderColor: N.rule, background: N.card }}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Avatar txt={arbitro.foto} T={T} size={22} />
@@ -1862,7 +1890,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
                             placeholder="Motivo del cambio (obligatorio)…" autoFocus
                             className="flex-1 text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink }} />
                           <button onClick={(e) => confirmarAlternativa(e, arbitro.id)} disabled={!motivoTexto.trim() || guardandoId === arbitro.id}
-                            className="text-[11px] rounded px-2 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+                            className="text-[11px] rounded px-2 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.deep }}>
                             {guardandoId === arbitro.id ? "Guardando…" : "Guardar"}
                           </button>
                           <button onClick={cancelarMotivo} className="text-[11px]" style={{ color: N.ink40 }}>Cancelar</button>
@@ -1936,7 +1964,7 @@ function DesignacionInteligente({ T, onIrAPartido }) {
           </p>
           <div className="space-y-2">
             {situacionesSensibles.map((r) => (
-              <div key={r.partido.id} className="rounded border p-3 flex items-start justify-between gap-3 flex-wrap cursor-pointer hover:bg-slate-50"
+              <div key={r.partido.id} className="rounded border p-3 flex items-start justify-between gap-3 flex-wrap cursor-pointer hover:bg-[rgba(255,255,255,.04)]"
                 style={{ borderColor: N.rule }} onClick={() => (onIrAPartido ? onIrAPartido(r.partido.id) : setExpandidoId(r.partido.id))}>
                 <div>
                   <div className="text-sm font-medium" style={{ color: N.ink }}>{r.partido.equipoLocal} – {r.partido.equipoVisitante}</div>
@@ -1954,8 +1982,8 @@ function DesignacionInteligente({ T, onIrAPartido }) {
       <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: T.accent, background: T.accentTint }}>
         <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
         <div>
-          <div className="text-sm font-semibold" style={{ color: "#7A5A10" }}>Motor v0 — asignación por lote, no operativo todavía</div>
-          <p className="text-xs mt-0.5" style={{ color: "#7A5A10" }}>
+          <div className="text-sm font-semibold" style={{ color: N.ambarInk }}>Motor v0 — asignación por lote, no operativo todavía</div>
+          <p className="text-xs mt-0.5" style={{ color: N.ambarInk }}>
             Procesa toda la jornada a la vez (evita que el mismo árbitro salga sugerido en dos partidos simultáneos), con
             filtro duro real, score B.1 con shrinkage, y coste desglosado (tarifas.md). B.3, A.5 y la optimización global
             (húngaro sobre toda la jornada en vez de greedy por categoría) siguen pendientes — ver decisiones-producto.md.
@@ -1965,7 +1993,7 @@ function DesignacionInteligente({ T, onIrAPartido }) {
 
       <Panel title="Ciclo de asignación" right={
         <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); setVigentesDisponibilidad(null); }}
-          className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
+          className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: N.card }}>
           {ciclosAsignacion.map((c) => <option key={c.id} value={c.id}>{c.etiqueta}</option>)}
         </select>
       }>
@@ -2096,7 +2124,7 @@ function ListadoEquipos({ T, onPick }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-md border p-3 flex items-center gap-2 text-xs" style={{ borderColor: N.rule, background: "#FAFAF9", color: N.ink70 }}>
+      <div className="rounded-md border p-3 flex items-center gap-2 text-xs" style={{ borderColor: N.rule, background: "rgba(255,255,255,.03)", color: N.ink70 }}>
         <Info size={13} style={{ color: N.ink40 }} />
         {EQUIPOS.length} equipos sobre {nf(agregadosReales.total_partidos_categoria_adulta)} partidos reales de la temporada 25/26
         (ffcv_public_data/) — sin sanciones disciplinarias ni titulares más frecuentes: no hay alineaciones en el scraping, solo goles y tarjetas.
@@ -2104,16 +2132,16 @@ function ListadoEquipos({ T, onPick }) {
       <Panel title={`Equipos · ${filtrados.length} de ${EQUIPOS.length}`} right={
         <div className="flex gap-2">
           <select value={cat} onChange={(e) => setCat(e.target.value)}
-            className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
+            className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: N.card }}>
             {categorias.map((c) => <option key={c}>{c}</option>)}
           </select>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar equipo…"
-            className="text-xs rounded border px-2 py-1.5 outline-none w-40" style={{ borderColor: N.rule, color: N.ink }} />
+            className="text-xs rounded border px-2 py-1.5 outline-none w-40" style={{ borderColor: N.rule, color: N.ink, background: N.card }} />
         </div>
       }>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {filtrados.slice(0, 60).map((e) => (
-            <button key={e.id} onClick={() => onPick(e)} className="text-left rounded border p-4 hover:bg-slate-50 transition-colors" style={{ borderColor: N.rule }}>
+            <button key={e.id} onClick={() => onPick(e)} className="text-left rounded border p-4 hover:bg-[rgba(255,255,255,.04)] transition-colors" style={{ borderColor: N.rule }}>
               <div className="flex items-start justify-between gap-2">
                 <div className="text-sm font-medium" style={{ color: N.ink }}>{e.nombre}</div>
                 <Trophy size={14} style={{ color: N.ink40 }} />
@@ -2162,7 +2190,7 @@ function FichaEquipo({ T, equipo: e, back }) {
         <ChevronRight size={13} style={{ transform: "rotate(180deg)" }} /> Volver a equipos
       </button>
 
-      <div className="rounded-md overflow-hidden" style={{ background: T.primary }}>
+      <div className="rounded-md overflow-hidden" style={{ background: T.deep }}>
         <div className="p-5 flex items-center gap-4">
           <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.15)" }}>
             <Trophy size={22} style={{ color: "#FFF" }} />
@@ -2175,7 +2203,7 @@ function FichaEquipo({ T, equipo: e, back }) {
         <div className="h-1" style={{ background: T.accent }} />
       </div>
 
-      <div className="rounded border px-3 py-2 flex items-center gap-2 text-[11px]" style={{ borderColor: N.rule, color: N.ink40, background: "#FAFAF9" }}>
+      <div className="rounded border px-3 py-2 flex items-center gap-2 text-[11px]" style={{ borderColor: N.rule, color: N.ink40, background: "rgba(255,255,255,.03)" }}>
         <Info size={12} />
 Datos generados el {equiposRealesData.generado} a partir de {equiposRealesData.fuente}. Se actualizan cuando se relance el scraper tras cada jornada que publique la FFCV — cadencia real (¿miércoles?) pendiente de confirmar, no asumida.
       </div>
@@ -2271,7 +2299,7 @@ function SelectorEquipo({ label, value, onChange, opciones = EQUIPOS }) {
     <div className="flex-1 min-w-[200px]">
       <label className="text-[10px] uppercase tracking-[0.14em] font-semibold block mb-1" style={{ color: N.ink40 }}>{label}</label>
       <select value={value?.id ?? ""} onChange={(e) => onChange(opciones.find((eq) => eq.id === e.target.value) ?? null)}
-        className="w-full text-sm rounded border px-3 py-2 outline-none" style={{ borderColor: N.rule, color: N.ink, background: "#FFF" }}>
+        className="w-full text-sm rounded border px-3 py-2 outline-none" style={{ borderColor: N.rule, color: N.ink, background: N.card }}>
         <option value="">Elegir equipo…</option>
         {opciones.map((e) => <option key={e.id} value={e.id}>{e.nombre} · {e.categoria}</option>)}
       </select>
@@ -2305,9 +2333,9 @@ function InsightsCruce({ local, visitante }) {
   ) : (
     <div className="space-y-2.5">
       {insights.map((texto, i) => (
-        <div key={i} className="rounded border p-3 flex items-start gap-2.5" style={{ borderColor: "#F59B1E", background: "#FEF3E2" }}>
+        <div key={i} className="rounded border p-3 flex items-start gap-2.5" style={{ borderColor: "#F59B1E", background: N.ambarT }}>
           <Goal size={14} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
-          <p className="text-sm" style={{ color: "#7A5A10" }}>{texto}</p>
+          <p className="text-sm" style={{ color: N.ambarInk }}>{texto}</p>
         </div>
       ))}
     </div>
@@ -2444,8 +2472,8 @@ function VistaPartidos({ T, partidoDestacadoId, onConsumirDestacado }) {
       <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: T.accent, background: T.accentTint }}>
         <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
         <div>
-          <div className="text-sm font-semibold" style={{ color: "#7A5A10" }}>Prepartido con dato real + heurística propia</div>
-          <p className="text-xs mt-0.5" style={{ color: "#7A5A10" }}>
+          <div className="text-sm font-semibold" style={{ color: N.ambarInk }}>Prepartido con dato real + heurística propia</div>
+          <p className="text-xs mt-0.5" style={{ color: N.ambarInk }}>
             Los KPIs de cada equipo son reales (ffcv_public_data/). Los insights de cruce son una <b>heurística propia del
             equipo de producto, sin validar todavía con el comité</b> — se leen como probabilidad, no como certeza.
           </p>
@@ -2486,7 +2514,7 @@ function VistaPartidos({ T, partidoDestacadoId, onConsumirDestacado }) {
           <div className="space-y-2">
             {filasFiltradas.map((f) => (
               <div key={f.partido.id} onClick={() => setPartidoSelManual(f)}
-                className="rounded border p-3 flex items-center justify-between gap-3 flex-wrap cursor-pointer hover:bg-slate-50" style={{ borderColor: N.rule }}>
+                className="rounded border p-3 flex items-center justify-between gap-3 flex-wrap cursor-pointer hover:bg-[rgba(255,255,255,.04)]" style={{ borderColor: N.rule }}>
                 <div>
                   <div className="text-sm font-medium" style={{ color: N.ink }}>{f.partido.equipoLocal} – {f.partido.equipoVisitante}</div>
                   <div className="text-xs mt-0.5" style={{ color: N.ink40 }}>{f.partido.categoriaMinima} · {f.partido.fecha} · {f.cicloEtiqueta}</div>
@@ -2532,7 +2560,7 @@ function VistaIA({ T }) {
       <Panel title="Ejemplo · consulta al asistente">
         <div className="space-y-3 max-w-2xl opacity-90">
           <div className="flex justify-end">
-            <div className="rounded-lg px-4 py-2.5 text-sm max-w-[80%]" style={{ background: T.primary, color: "#FFF" }}>
+            <div className="rounded-lg px-4 py-2.5 text-sm max-w-[80%]" style={{ background: T.deep, color: "#FFF" }}>
               ¿Qué árbitros de Preferente están en forma y tienen menos de 3 fines de semana de indisponibilidad?
             </div>
           </div>
@@ -2644,7 +2672,7 @@ function VistaSeguimientoOperativo({ T }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: N.rule, background: "#FAFAF9" }}>
+      <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: N.rule, background: "rgba(255,255,255,.03)" }}>
         <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ink40 }} />
         <div>
           <div className="text-sm font-semibold" style={{ color: N.ink }}>Control interno, no una vista de producto</div>
@@ -2855,7 +2883,7 @@ export default function CRMExpedientes() {
       return (
         <button key={n.id} onClick={() => ir(n.id)} title={n.label}
           className="w-full flex items-center justify-center rounded px-2 py-2.5 transition-colors"
-          style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : "#A9C3D8" }}>
+          style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : N.ink70 }}>
           <n.icon size={16} />
         </button>
       );
@@ -2863,11 +2891,11 @@ export default function CRMExpedientes() {
     return (
       <button key={n.id} onClick={() => ir(n.id)}
         className="w-full flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors"
-        style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : "#A9C3D8", boxShadow: on ? `inset 3px 0 0 ${T.accent}` : "none" }}>
+        style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : N.ink70, boxShadow: on ? `inset 3px 0 0 ${T.accent}` : "none" }}>
         <n.icon size={tamañoIcono} />
         <span className="flex-1 text-left">{n.label}</span>
         {futuro && <>
-          <span className="text-[9px] font-mono rounded px-1 py-0.5" style={{ background: "rgba(255,255,255,0.1)", color: "#8FA9BF" }}>{n.v}</span>
+          <span className="text-[9px] font-mono rounded px-1 py-0.5" style={{ background: "rgba(255,255,255,0.1)", color: N.ink40 }}>{n.v}</span>
           <Lock size={10} />
         </>}
       </button>
@@ -2877,36 +2905,36 @@ export default function CRMExpedientes() {
   return (
     <div className="min-h-screen font-sans" style={{ background: N.paper, color: N.ink }}>
       <div className="flex">
-        <aside className={`${colapsado ? "w-16" : "w-56"} shrink-0 min-h-screen hidden md:flex flex-col transition-[width] duration-150`} style={{ background: T.primary }}>
+        <aside className={`${colapsado ? "w-16" : "w-56"} shrink-0 min-h-screen hidden md:flex flex-col transition-[width] duration-150`} style={{ background: T.deep }}>
           <div className={`p-5 flex items-center ${colapsado ? "justify-center" : "gap-3"} border-b`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
             <Escudo T={T} />
             {!colapsado && (
               <div className="min-w-0">
                 <div className="text-white text-base font-semibold leading-none">Colegial</div>
-                <div className="text-[10px] mt-1 truncate" style={{ color: "#A9C3D8" }}>Comité Técnico · {T.corto}</div>
+                <div className="text-[10px] mt-1 truncate" style={{ color: N.ink70 }}>Comité Técnico · {T.corto}</div>
               </div>
             )}
           </div>
           <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
             {navV1.map((n) => <BotonNav key={n.id} n={n} />)}
             <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: "#6C8AA5" }}>Próximas versiones</div>}
+              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Próximas versiones</div>}
               {navFuturo.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} futuro />)}
             </div>
             <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: "#6C8AA5" }}>Sistema</div>}
+              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Sistema</div>}
               {navSistema.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} />)}
             </div>
           </nav>
           <div className="p-2 border-t" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
             <button onClick={() => setColapsado(!colapsado)} title={colapsado ? "Expandir menú" : "Plegar menú"}
               className="w-full flex items-center justify-center gap-2 rounded px-3 py-2 text-xs transition-colors"
-              style={{ color: "#A9C3D8" }}
+              style={{ color: N.ink70 }}
               onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
               {colapsado ? <ChevronsRight size={15} /> : <><ChevronsLeft size={15} /> Plegar menú</>}
             </button>
-            {!colapsado && <p className="text-[9px] leading-snug px-3 mt-2" style={{ color: "#7B9BB5" }}>Datos sintéticos. Ningún colegiado real.</p>}
+            {!colapsado && <p className="text-[9px] leading-snug px-3 mt-2" style={{ color: N.ink40 }}>Datos sintéticos. Ningún colegiado real.</p>}
           </div>
         </aside>
 
@@ -2921,7 +2949,7 @@ export default function CRMExpedientes() {
             <div className="flex md:hidden gap-1 flex-wrap">
               {todosLosItems.map((n) => (
                 <button key={n.id} onClick={() => ir(n.id)} className="text-xs rounded border px-2 py-1"
-                  style={{ borderColor: N.rule, background: vista === n.id ? T.primary : "#FFF", color: vista === n.id ? "#FFF" : N.ink70 }}>{n.label}</button>
+                  style={{ borderColor: N.rule, background: vista === n.id ? T.deep : N.card, color: vista === n.id ? "#FFF" : N.ink70 }}>{n.label}</button>
               ))}
             </div>
           </header>
