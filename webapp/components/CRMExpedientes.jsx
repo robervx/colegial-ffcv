@@ -2976,7 +2976,7 @@ function FormularioDecision({ T, onCancelar, onCreada }) {
                   className="text-xs rounded-full px-3 py-1.5 border transition-colors"
                   style={{
                     borderColor: nivel === op.id ? T.primary : N.rule,
-                    background: nivel === op.id ? T.tint : "#FFF",
+                    background: nivel === op.id ? T.tint : N.card,
                     color: nivel === op.id ? T.primary : N.ink70,
                   }}>
                   {op.label}
@@ -3693,7 +3693,7 @@ function ListaDecisiones({ T, onAbrir, onNueva, onNuevaCampana }) {
               const infoEstado = ESTADO_REVISION_INFO[d.estadoRevision] ?? ESTADO_REVISION_INFO.plazo_no_cumplido;
               return (
                 <button key={d.id} onClick={() => onAbrir(d.id, d.tipo)}
-                  className="w-full text-left rounded border p-3 transition-colors hover:bg-gray-50" style={{ borderColor: N.rule }}>
+                  className="w-full text-left rounded border p-3 transition-colors hover:bg-[rgba(255,255,255,.04)]" style={{ borderColor: N.rule }}>
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <span className="text-sm font-medium" style={{ color: N.ink }}>{d.titulo}</span>
                     <div className="flex items-center gap-2">
