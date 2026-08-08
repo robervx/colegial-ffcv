@@ -12,7 +12,7 @@ import {
   MessageSquarePlus, Wallet, Bot, Check, AlertTriangle, Send,
   Route, Info, Phone, Mail, Dumbbell, BookOpen,
   MailCheck, UserCog, Trophy, Swords, Goal,
-  Gauge, Settings, ChevronsLeft, ChevronsRight,
+  Gauge, Settings, ChevronsLeft, ChevronsRight, ListChecks,
 } from "lucide-react";
 import agregadosReales from "../data/agregados-reales.json";
 import localidadesGeo from "../data/localidades-geo.json";
@@ -34,6 +34,18 @@ import {
 } from "../lib/disponibilidadRepo";
 import { calcularPatronImplicacion } from "../lib/patronImplicacion";
 import { validarAntelacionFestivo } from "../lib/reglaFestivo";
+import {
+  registrarDecision as registrarDecisionComite,
+  obtenerDecision as obtenerDecisionComite,
+  listarDecisiones,
+  revisarImpacto,
+  derivarEstadoRevision,
+  registrarFaseCampana,
+  confirmarCorteAscenso,
+} from "../lib/decisionesRepo";
+import { resolverObjetivoArbitros } from "../lib/resolverObjetivoDecision";
+import { construirSnapshot } from "../lib/snapshotArbitro";
+import { clasificarCandidatos, calcularCorte } from "../lib/clasificacionAscenso";
 
 /* ================================================================
    COLEGIAL · CRM de expedientes arbitrales — versión 1 ampliada
@@ -2834,6 +2846,913 @@ function VistaGlosario({ T }) {
   );
 }
 
+/* ===================== Gestión y seguimiento de decisiones (spec 007-gestion-decisiones-comite) =====================
+   Página nueva: registrar decisiones/acciones/políticas del comité (árbitro, categoría
+   completa o grupo dentro de una categoría) con una foto del estado relevante en ese
+   momento, y revisar más adelante si el impacto estimado se cumplió — mecánica tipo
+   Football Manager, ver spec.md. NO tiene control de acceso propio todavía (FR-012):
+   mismo criterio sin cuentas de la Fase 1 de rollout que el resto del prototipo
+   (docs/decisiones-producto.md §22), hasta que 004-roles-permisos exista. */
+
+const TIPOS_DECISION = {
+  accion_motivacion: "Acción de motivación/seguimiento",
+  campana_ascenso: "Campaña de ascenso",
+};
+
+const METRICA_LABELS = {
+  estado_forma: "Estado de forma",
+  disponibilidad_vigente: "Disponibilidad vigente",
+  num_informes: "Informes acumulados",
+  ultima_prueba_fisica: "Última prueba física",
+  ultimo_examen_teorico: "Último examen teórico",
+};
+
+function valorMetricaLegible(clave, campo) {
+  if (!campo || campo.valor == null) return "—";
+  const v = campo.valor;
+  if (clave === "estado_forma") return `${v.media.toFixed(1)} (${v.color})`;
+  if (clave === "disponibilidad_vigente") return v.motivo ? `${v.tipo} · ${v.motivo}` : v.tipo;
+  if (clave === "num_informes") return String(v);
+  if (clave === "ultima_prueba_fisica" || clave === "ultimo_examen_teorico") return `${v.nota} (${v.fecha})`;
+  return JSON.stringify(v);
+}
+
+function FormularioDecision({ T, onCancelar, onCreada }) {
+  const [nivel, setNivel] = useState("arbitro");
+  const [arbitroId, setArbitroId] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [seleccionIds, setSeleccionIds] = useState([]);
+  const [filtroEstadoForma, setFiltroEstadoForma] = useState("todos");
+  const [titulo, setTitulo] = useState("");
+  const [estimacionImpacto, setEstimacionImpacto] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState(null);
+
+  const cicloActivo = ciclosAsignacion[0];
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState("cargando");
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentesDisponibilidad(resultado.vigentesPorArbitro);
+        setDisponibilidadEstado("listo");
+      } else {
+        setDisponibilidadEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [cicloActivo.id]);
+
+  const categoriasReales = CATEGORIAS.filter((c) => c !== "Todas");
+  const arbitrosDeCategoria = categoria ? ARBITROS.filter((a) => a.cat === categoria) : [];
+  const arbitrosFiltrados = filtroEstadoForma === "todos"
+    ? arbitrosDeCategoria
+    : arbitrosDeCategoria.filter((a) => estadoForma(a.forma).color === filtroEstadoForma);
+
+  const toggleSeleccion = (id) => {
+    setSeleccionIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError(null);
+
+    if (!titulo.trim()) { setError("Escribe un título para la decisión."); return; }
+    if (!estimacionImpacto.trim()) { setError("Escribe qué esperas conseguir con esta decisión."); return; }
+    if (disponibilidadEstado !== "listo") {
+      setError("Esperando a cargar la disponibilidad vigente — vuelve a intentarlo en un momento.");
+      return;
+    }
+
+    const resuelto = resolverObjetivoArbitros(
+      { nivel, categoria, arbitroId: arbitroId ? Number(arbitroId) : null, seleccionIds },
+      ARBITROS
+    );
+    if (!resuelto.valido) { setError(resuelto.motivoRechazo); return; }
+
+    setGuardando(true);
+    const snapshots = resuelto.arbitroIds.map((id) => {
+      const arbitro = ARBITROS.find((a) => a.id === id);
+      const contexto = {
+        estadoForma: estadoForma(arbitro.forma),
+        disponibilidadVigente: vigentesDisponibilidad.get(id) ?? null,
+      };
+      return { arbitroId: id, metricas: construirSnapshot(arbitro, contexto) };
+    });
+
+    const resultado = await registrarDecisionComite({
+      tipo: "accion_motivacion",
+      titulo: titulo.trim(),
+      objetivoNivel: nivel,
+      objetivoCategoria: nivel === "arbitro" ? null : categoria,
+      objetivoArbitroIds: resuelto.arbitroIds,
+      estimacionImpacto: estimacionImpacto.trim(),
+      autor: "Comité",
+      snapshots,
+    });
+    setGuardando(false);
+
+    if (!resultado.ok) { setError(resultado.error); return; }
+    onCreada(resultado.decision.id);
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <button onClick={onCancelar} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Cancelar</button>
+      <Panel title="Nueva decisión · acción de motivación/seguimiento">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-[10px] uppercase tracking-[0.14em] font-semibold block mb-1.5" style={{ color: N.ink40 }}>Objetivo</label>
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { id: "arbitro", label: "Un árbitro" },
+                { id: "categoria", label: "Categoría completa" },
+                { id: "grupo_categoria", label: "Grupo dentro de una categoría" },
+              ].map((op) => (
+                <button key={op.id} type="button" onClick={() => { setNivel(op.id); setSeleccionIds([]); }}
+                  className="text-xs rounded-full px-3 py-1.5 border transition-colors"
+                  style={{
+                    borderColor: nivel === op.id ? T.primary : N.rule,
+                    background: nivel === op.id ? T.tint : "#FFF",
+                    color: nivel === op.id ? T.primary : N.ink70,
+                  }}>
+                  {op.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {nivel === "arbitro" && (
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Árbitro</label>
+              <select value={arbitroId} onChange={(e) => setArbitroId(e.target.value)}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir árbitro…</option>
+                {ARBITROS.map((a) => <option key={a.id} value={a.id}>{a.n} · {a.cat}</option>)}
+              </select>
+            </div>
+          )}
+
+          {(nivel === "categoria" || nivel === "grupo_categoria") && (
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Categoría</label>
+              <select value={categoria} onChange={(e) => { setCategoria(e.target.value); setSeleccionIds([]); }}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir categoría…</option>
+                {categoriasReales.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          )}
+
+          {nivel === "grupo_categoria" && categoria && (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-medium" style={{ color: N.ink70 }}>Árbitros de {categoria}</label>
+                <select value={filtroEstadoForma} onChange={(e) => setFiltroEstadoForma(e.target.value)}
+                  className="text-xs rounded border px-2 py-1" style={{ borderColor: N.rule, color: N.ink70 }}>
+                  <option value="todos">Todos los estados</option>
+                  <option value="rojo">Solo en seguimiento</option>
+                  <option value="ambar">Solo irregulares</option>
+                  <option value="verde">Solo en forma</option>
+                </select>
+              </div>
+              <div className="max-h-56 overflow-y-auto rounded border divide-y" style={{ borderColor: N.rule }}>
+                {arbitrosFiltrados.length === 0 && (
+                  <p className="text-xs p-3" style={{ color: N.ink40 }}>Ningún árbitro de esta categoría coincide con el filtro.</p>
+                )}
+                {arbitrosFiltrados.map((a) => (
+                  <label key={a.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer" style={{ color: N.ink }}>
+                    <input type="checkbox" checked={seleccionIds.includes(a.id)} onChange={() => toggleSeleccion(a.id)} />
+                    {a.n}
+                    <Semaforo estado={estadoForma(a.forma)} />
+                  </label>
+                ))}
+              </div>
+              <p className="text-[11px] mt-1" style={{ color: N.ink40 }}>{seleccionIds.length} seleccionado(s)</p>
+            </div>
+          )}
+
+          <div>
+            <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Título</label>
+            <input value={titulo} onChange={(e) => setTitulo(e.target.value)}
+              placeholder="p. ej. Email de reactivación a árbitros en seguimiento"
+              className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>
+              ¿Qué esperas conseguir? (estimación cualitativa del comité, no una cifra calculada — FR-004)
+            </label>
+            <textarea value={estimacionImpacto} onChange={(e) => setEstimacionImpacto(e.target.value)} rows={3}
+              placeholder="p. ej. Que el árbitro sienta seguimiento del comité y su estado de forma mejore en los próximos meses"
+              className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+          </div>
+
+          {error && (
+            <p className="text-xs rounded px-3 py-2" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{error}</p>
+          )}
+
+          <div className="flex gap-2">
+            <button type="submit" disabled={guardando}
+              className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+              {guardando ? "Guardando…" : "Registrar decisión"}
+            </button>
+            <button type="button" onClick={onCancelar} className="text-xs rounded px-4 py-2 font-medium" style={{ color: N.ink70 }}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Panel>
+    </div>
+  );
+}
+
+const COMPARACION_INFO = {
+  mejora: { label: "Mejora", color: VIZ.estado.good },
+  empeora: { label: "Empeora", color: VIZ.estado.critical },
+  sin_cambio: { label: "Sin cambio", color: N.ink40 },
+  no_comparable: { label: "No comparable", color: N.ink40 },
+};
+
+/* Agrupa las filas de revisiones_impacto por revisado_en (todas las filas de
+   una misma llamada a revisarImpacto comparten el mismo timestamp — now() es
+   estable dentro de una sola sentencia de inserción en Postgres) — cada grupo
+   es una "ronda" de revisión, puede haber varias sobre la misma decisión (T023). */
+function agruparRevisionesPorRonda(revisiones) {
+  const porRonda = new Map();
+  for (const r of revisiones) {
+    if (!porRonda.has(r.revisadoEn)) porRonda.set(r.revisadoEn, []);
+    porRonda.get(r.revisadoEn).push(r);
+  }
+  return [...porRonda.entries()].sort((a, b) => new Date(b[0]) - new Date(a[0]));
+}
+
+function DetalleDecision({ T, decisionId, onVolver }) {
+  const [estado, setEstado] = useState("cargando"); // cargando | listo | error
+  const [decision, setDecision] = useState(null);
+  const [snapshots, setSnapshots] = useState([]);
+  const [revisiones, setRevisiones] = useState([]);
+  const [revisando, setRevisando] = useState(false);
+  const [errorRevision, setErrorRevision] = useState(null);
+
+  const cicloActivo = ciclosAsignacion[0];
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState("cargando");
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerDecisionComite(decisionId).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setDecision(resultado.decision);
+        setSnapshots(resultado.snapshots);
+        setRevisiones(resultado.revisiones);
+        setEstado("listo");
+      } else {
+        setEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [decisionId]);
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentesDisponibilidad(resultado.vigentesPorArbitro);
+        setDisponibilidadEstado("listo");
+      } else {
+        setDisponibilidadEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [cicloActivo.id]);
+
+  if (estado === "cargando") return <p className="text-sm" style={{ color: N.ink40 }}>Cargando decisión…</p>;
+  if (estado === "error" || !decision) {
+    return (
+      <div>
+        <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver</button>
+        <p className="text-sm" style={{ color: VIZ.estado.critical }}>No se pudo cargar esta decisión.</p>
+      </div>
+    );
+  }
+
+  const nombrePorId = new Map(ARBITROS.map((a) => [a.id, a.n]));
+  const objetivoTexto = decision.objetivoNivel === "arbitro"
+    ? "árbitro individual"
+    : decision.objetivoNivel === "categoria"
+      ? `toda la categoría ${decision.objetivoCategoria}`
+      : `grupo de ${decision.objetivoCategoria}`;
+
+  const estadoRevision = derivarEstadoRevision({
+    creadoEn: decision.creadoEn,
+    plazoRevisionMeses: decision.plazoRevisionMeses,
+    tieneRevision: revisiones.length > 0,
+  });
+  const rondas = agruparRevisionesPorRonda(revisiones);
+
+  async function handleRevisar() {
+    setErrorRevision(null);
+    if (disponibilidadEstado !== "listo") {
+      setErrorRevision("Esperando a cargar la disponibilidad vigente — vuelve a intentarlo en un momento.");
+      return;
+    }
+    setRevisando(true);
+
+    const metricasActualesPorArbitroId = {};
+    for (const s of snapshots) {
+      const arbitro = ARBITROS.find((a) => a.id === s.arbitroId);
+      if (!arbitro) {
+        // árbitro ya no activo en el dataset — se omite, decisionesRepo lo marca
+        // no_comparable con motivo "árbitro no activo" (Edge Case de spec.md).
+        continue;
+      }
+      const contexto = {
+        estadoForma: estadoForma(arbitro.forma),
+        disponibilidadVigente: vigentesDisponibilidad.get(arbitro.id) ?? null,
+      };
+      metricasActualesPorArbitroId[s.arbitroId] = construirSnapshot(arbitro, contexto);
+    }
+
+    const resultado = await revisarImpacto(decisionId, {
+      metricasActualesPorArbitroId,
+      revisadoPor: "Comité",
+    });
+    setRevisando(false);
+
+    if (!resultado.ok) { setErrorRevision(resultado.error); return; }
+    setRevisiones((prev) => [...resultado.revisiones, ...prev]);
+  }
+
+  return (
+    <div>
+      <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver a decisiones</button>
+      <Panel title={TIPOS_DECISION[decision.tipo] ?? decision.tipo}
+        right={<span className="text-xs" style={{ color: N.ink40 }}>{new Date(decision.creadoEn).toLocaleDateString("es-ES")}</span>}>
+        <h2 className="text-lg font-semibold mb-1" style={{ color: N.ink }}>{decision.titulo}</h2>
+        <p className="text-xs mb-3" style={{ color: N.ink40 }}>
+          Objetivo: {objetivoTexto} · {decision.objetivoArbitroIds.length} árbitro(s) afectado(s)
+        </p>
+        <div className="rounded border p-3 mb-4" style={{ borderColor: N.rule, background: N.paper }}>
+          <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-1" style={{ color: N.ink40 }}>
+            Impacto esperado (estimación cualitativa del comité)
+          </div>
+          <p className="text-sm" style={{ color: N.ink }}>{decision.estimacionImpacto}</p>
+        </div>
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Foto del estado en el momento de decidir
+        </div>
+        <div className="space-y-3 mb-4">
+          {snapshots.map((s) => (
+            <div key={s.arbitroId} className="rounded border p-3" style={{ borderColor: N.rule }}>
+              <div className="text-sm font-medium mb-2" style={{ color: N.ink }}>{nombrePorId.get(s.arbitroId) ?? `Árbitro #${s.arbitroId}`}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {Object.entries(s.metricas).map(([clave, campo]) => (
+                  <div key={clave} className="text-xs flex items-center justify-between gap-2 rounded px-2 py-1.5" style={{ background: N.paper }}>
+                    <span style={{ color: N.ink70 }}>{METRICA_LABELS[clave] ?? clave}</span>
+                    <span className="font-mono" style={{ color: N.ink }}>
+                      {valorMetricaLegible(clave, campo)}
+                      <span className="ml-1.5" style={{ color: campo.fuente === "real" ? T.primary : N.ink40 }}>· {campo.fuente}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="border-t pt-4" style={{ borderColor: N.rule }}>
+          <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+            <div className="text-[10px] uppercase tracking-[0.14em] font-semibold" style={{ color: N.ink40 }}>
+              Revisión de impacto
+            </div>
+            <button onClick={handleRevisar} disabled={revisando}
+              className="text-xs rounded px-3 py-1.5 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+              {revisando ? "Revisando…" : "Revisar impacto ahora"}
+            </button>
+          </div>
+          {estadoRevision === "plazo_no_cumplido" && (
+            <p className="text-xs mb-3" style={{ color: N.ink40 }}>
+              El plazo típico de revisión ({decision.plazoRevisionMeses} meses) todavía no se ha cumplido — puedes
+              revisar igualmente, es solo una referencia, no un bloqueo.
+            </p>
+          )}
+          {errorRevision && (
+            <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{errorRevision}</p>
+          )}
+          {rondas.length === 0 && (
+            <p className="text-sm" style={{ color: N.ink40 }}>Todavía no se ha revisado el impacto de esta decisión.</p>
+          )}
+          <div className="space-y-4">
+            {rondas.map(([revisadoEn, filas]) => (
+              <div key={revisadoEn}>
+                <div className="text-xs font-medium mb-2" style={{ color: N.ink70 }}>
+                  Revisión del {new Date(revisadoEn).toLocaleDateString("es-ES")}
+                </div>
+                <p className="text-[11px] mb-2 italic" style={{ color: N.ink40 }}>
+                  Correlación temporal, no una relación de causa-efecto confirmada — otras decisiones o factores
+                  pueden haber influido en el mismo periodo.
+                </p>
+                <div className="space-y-2">
+                  {filas.map((r) => (
+                    <div key={r.id} className="rounded border p-3" style={{ borderColor: N.rule }}>
+                      <div className="text-sm font-medium mb-2" style={{ color: N.ink }}>
+                        {nombrePorId.get(r.arbitroId) ?? `Árbitro #${r.arbitroId}`}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {Object.entries(r.comparacion).map(([clave, direccion]) => {
+                          const info = COMPARACION_INFO[direccion] ?? COMPARACION_INFO.no_comparable;
+                          return (
+                            <div key={clave} className="text-xs flex items-center justify-between gap-2 rounded px-2 py-1.5" style={{ background: N.paper }}>
+                              <span style={{ color: N.ink70 }}>{METRICA_LABELS[clave] ?? clave}</span>
+                              <span className="font-mono font-medium" style={{ color: info.color }}>{info.label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+function FormularioCampana({ T, onCancelar, onCreada }) {
+  const [categoriaOrigen, setCategoriaOrigen] = useState("");
+  const [categoriaDestino, setCategoriaDestino] = useState("");
+  const [seleccionIds, setSeleccionIds] = useState([]);
+  const [estimacionImpacto, setEstimacionImpacto] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState(null);
+
+  const cicloActivo = ciclosAsignacion[0];
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState("cargando");
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentesDisponibilidad(resultado.vigentesPorArbitro);
+        setDisponibilidadEstado("listo");
+      } else {
+        setDisponibilidadEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [cicloActivo.id]);
+
+  const categoriasReales = CATEGORIAS.filter((c) => c !== "Todas");
+  const arbitrosDeCategoria = categoriaOrigen ? ARBITROS.filter((a) => a.cat === categoriaOrigen) : [];
+
+  const toggleSeleccion = (id) => {
+    setSeleccionIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError(null);
+
+    if (!categoriaOrigen || !categoriaDestino) { setError("Elige categoría de origen y de destino."); return; }
+    if (seleccionIds.length === 0) { setError("Selecciona al menos un candidato."); return; }
+    if (!estimacionImpacto.trim()) { setError("Escribe qué esperas conseguir con esta campaña."); return; }
+    if (disponibilidadEstado !== "listo") {
+      setError("Esperando a cargar la disponibilidad vigente — vuelve a intentarlo en un momento.");
+      return;
+    }
+
+    setGuardando(true);
+    const snapshots = seleccionIds.map((id) => {
+      const arbitro = ARBITROS.find((a) => a.id === id);
+      const contexto = {
+        estadoForma: estadoForma(arbitro.forma),
+        disponibilidadVigente: vigentesDisponibilidad.get(id) ?? null,
+      };
+      return { arbitroId: id, metricas: construirSnapshot(arbitro, contexto) };
+    });
+
+    const resultado = await registrarDecisionComite({
+      tipo: "campana_ascenso",
+      titulo: `Campaña de ascenso: ${categoriaOrigen} → ${categoriaDestino}`,
+      objetivoNivel: "grupo_categoria",
+      objetivoCategoria: categoriaOrigen,
+      objetivoArbitroIds: seleccionIds,
+      estimacionImpacto: estimacionImpacto.trim(),
+      autor: "Comité",
+      detalle: {
+        categoria_origen: categoriaOrigen,
+        categoria_destino: categoriaDestino,
+        candidatos: seleccionIds.map((id) => ({ arbitroId: id, notaTeorica: null, notaFisica: null })),
+        plazas_disponibles: null,
+        corte_confirmado: false,
+        ascendidos_arbitro_ids: [],
+      },
+      snapshots,
+    });
+    setGuardando(false);
+
+    if (!resultado.ok) { setError(resultado.error); return; }
+    onCreada(resultado.decision.id);
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <button onClick={onCancelar} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Cancelar</button>
+      <Panel title="Nueva campaña de ascenso">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Categoría de origen</label>
+              <select value={categoriaOrigen} onChange={(e) => { setCategoriaOrigen(e.target.value); setSeleccionIds([]); }}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir categoría…</option>
+                {categoriasReales.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Categoría de destino</label>
+              <select value={categoriaDestino} onChange={(e) => setCategoriaDestino(e.target.value)}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir categoría…</option>
+                {categoriasReales.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {categoriaOrigen && (
+            <div>
+              <label className="text-xs font-medium block mb-1.5" style={{ color: N.ink70 }}>Candidatos de {categoriaOrigen}</label>
+              <div className="max-h-56 overflow-y-auto rounded border divide-y" style={{ borderColor: N.rule }}>
+                {arbitrosDeCategoria.map((a) => (
+                  <label key={a.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer" style={{ color: N.ink }}>
+                    <input type="checkbox" checked={seleccionIds.includes(a.id)} onChange={() => toggleSeleccion(a.id)} />
+                    {a.n}
+                  </label>
+                ))}
+              </div>
+              <p className="text-[11px] mt-1" style={{ color: N.ink40 }}>{seleccionIds.length} candidato(s) seleccionado(s)</p>
+            </div>
+          )}
+
+          <div>
+            <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>¿Qué esperas conseguir con esta campaña?</label>
+            <textarea value={estimacionImpacto} onChange={(e) => setEstimacionImpacto(e.target.value)} rows={2}
+              placeholder="p. ej. Reforzar la categoría superior con árbitros preparados y detectar talento"
+              className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+          </div>
+
+          {error && (
+            <p className="text-xs rounded px-3 py-2" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{error}</p>
+          )}
+
+          <div className="flex gap-2">
+            <button type="submit" disabled={guardando}
+              className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+              {guardando ? "Creando…" : "Crear campaña"}
+            </button>
+            <button type="button" onClick={onCancelar} className="text-xs rounded px-4 py-2 font-medium" style={{ color: N.ink70 }}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Panel>
+    </div>
+  );
+}
+
+function DetalleCampana({ T, decisionId, onVolver }) {
+  const [estado, setEstado] = useState("cargando"); // cargando | listo | error
+  const [decision, setDecision] = useState(null);
+  const [notas, setNotas] = useState({});
+  const [guardandoNotas, setGuardandoNotas] = useState(false);
+  const [errorNotas, setErrorNotas] = useState(null);
+  const [plazas, setPlazas] = useState("");
+  const [confirmando, setConfirmando] = useState(false);
+  const [errorConfirmar, setErrorConfirmar] = useState(null);
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerDecisionComite(decisionId).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setDecision(resultado.decision);
+        const candidatos = resultado.decision.detalle?.candidatos ?? [];
+        const notasIniciales = {};
+        for (const c of candidatos) {
+          notasIniciales[c.arbitroId] = { notaTeorica: c.notaTeorica ?? "", notaFisica: c.notaFisica ?? "" };
+        }
+        setNotas(notasIniciales);
+        setPlazas(resultado.decision.detalle?.plazas_disponibles ?? "");
+        setEstado("listo");
+      } else {
+        setEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [decisionId]);
+
+  if (estado === "cargando") return <p className="text-sm" style={{ color: N.ink40 }}>Cargando campaña…</p>;
+  if (estado === "error" || !decision) {
+    return (
+      <div>
+        <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver</button>
+        <p className="text-sm" style={{ color: VIZ.estado.critical }}>No se pudo cargar esta campaña.</p>
+      </div>
+    );
+  }
+
+  const campanaId = decision.id; // identidad estable = campana_id de la primera fase
+  const detalle = decision.detalle ?? {};
+  const corteConfirmado = Boolean(detalle.corte_confirmado);
+  const candidatos = detalle.candidatos ?? [];
+  const nombrePorId = new Map(ARBITROS.map((a) => [a.id, a.n]));
+
+  const candidatosConNotasActuales = candidatos.map((c) => ({
+    arbitroId: c.arbitroId,
+    notaTeorica: notas[c.arbitroId]?.notaTeorica === "" || notas[c.arbitroId]?.notaTeorica == null ? null : Number(notas[c.arbitroId].notaTeorica),
+    notaFisica: notas[c.arbitroId]?.notaFisica === "" || notas[c.arbitroId]?.notaFisica == null ? null : Number(notas[c.arbitroId].notaFisica),
+  }));
+  const { candidatosOrdenados, candidatosIncompletos } = clasificarCandidatos(candidatosConNotasActuales);
+  const plazasNum = plazas === "" ? 0 : Number(plazas);
+  const { dentroDeCorte } = calcularCorte(candidatosOrdenados, plazasNum);
+
+  async function handleGuardarNotas() {
+    setErrorNotas(null);
+    setGuardandoNotas(true);
+    const candidatosActualizados = candidatos.map((c) => ({
+      arbitroId: c.arbitroId,
+      notaTeorica: notas[c.arbitroId]?.notaTeorica === "" || notas[c.arbitroId]?.notaTeorica == null ? null : Number(notas[c.arbitroId].notaTeorica),
+      notaFisica: notas[c.arbitroId]?.notaFisica === "" || notas[c.arbitroId]?.notaFisica == null ? null : Number(notas[c.arbitroId].notaFisica),
+    }));
+    const resultado = await registrarFaseCampana(campanaId, { candidatos: candidatosActualizados });
+    setGuardandoNotas(false);
+    if (!resultado.ok) { setErrorNotas(resultado.error); return; }
+    setDecision(resultado.decision);
+  }
+
+  async function handleConfirmarCorte() {
+    setErrorConfirmar(null);
+    if (plazas === "" || Number(plazas) < 0) {
+      setErrorConfirmar("Introduce un número de plazas válido (0 o mayor).");
+      return;
+    }
+    setConfirmando(true);
+    const resultado = await confirmarCorteAscenso(campanaId, { plazasDisponibles: Number(plazas) });
+    setConfirmando(false);
+    if (!resultado.ok) { setErrorConfirmar(resultado.motivoRechazo); return; }
+    setDecision(resultado.decision);
+  }
+
+  return (
+    <div>
+      <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver a decisiones</button>
+      <Panel title="Campaña de ascenso"
+        right={<span className="text-xs" style={{ color: N.ink40 }}>{new Date(decision.creadoEn).toLocaleDateString("es-ES")}</span>}>
+        <h2 className="text-lg font-semibold mb-1" style={{ color: N.ink }}>{decision.titulo}</h2>
+        <p className="text-xs mb-4" style={{ color: N.ink40 }}>
+          {detalle.categoria_origen} &rarr; {detalle.categoria_destino} · {candidatos.length} candidato(s)
+          {corteConfirmado && <span className="ml-2 font-semibold" style={{ color: VIZ.estado.good }}>· corte confirmado</span>}
+        </p>
+
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Notas de pruebas <span className="normal-case font-normal">(sintéticas mientras no haya dato real del comité)</span>
+        </div>
+        <div className="rounded border overflow-hidden mb-3" style={{ borderColor: N.rule }}>
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: N.paper }}>
+                <th className="text-left px-3 py-2 font-medium" style={{ color: N.ink70 }}>Candidato</th>
+                <th className="text-left px-3 py-2 font-medium" style={{ color: N.ink70 }}>Nota teórica</th>
+                <th className="text-left px-3 py-2 font-medium" style={{ color: N.ink70 }}>Nota física</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidatos.map((c) => (
+                <tr key={c.arbitroId} className="border-t" style={{ borderColor: N.rule }}>
+                  <td className="px-3 py-2" style={{ color: N.ink }}>{nombrePorId.get(c.arbitroId) ?? `#${c.arbitroId}`}</td>
+                  <td className="px-3 py-2">
+                    <input type="number" min="0" max="10" step="0.1" disabled={corteConfirmado}
+                      value={notas[c.arbitroId]?.notaTeorica ?? ""}
+                      onChange={(e) => setNotas((prev) => ({ ...prev, [c.arbitroId]: { ...prev[c.arbitroId], notaTeorica: e.target.value } }))}
+                      className="w-20 text-sm rounded border px-2 py-1 disabled:opacity-60" style={{ borderColor: N.rule, color: N.ink }} />
+                  </td>
+                  <td className="px-3 py-2">
+                    <input type="number" min="0" max="10" step="0.1" disabled={corteConfirmado}
+                      value={notas[c.arbitroId]?.notaFisica ?? ""}
+                      onChange={(e) => setNotas((prev) => ({ ...prev, [c.arbitroId]: { ...prev[c.arbitroId], notaFisica: e.target.value } }))}
+                      className="w-20 text-sm rounded border px-2 py-1 disabled:opacity-60" style={{ borderColor: N.rule, color: N.ink }} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {errorNotas && (
+          <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{errorNotas}</p>
+        )}
+        {!corteConfirmado && (
+          <button onClick={handleGuardarNotas} disabled={guardandoNotas}
+            className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60 mb-6" style={{ background: T.primary }}>
+            {guardandoNotas ? "Guardando…" : "Guardar notas"}
+          </button>
+        )}
+
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Clasificación {corteConfirmado ? "" : "en vivo (previsualización)"}
+        </div>
+        <div className="rounded border overflow-hidden mb-3" style={{ borderColor: N.rule }}>
+          {candidatosOrdenados.length === 0 && (
+            <p className="text-xs p-3" style={{ color: N.ink40 }}>Ningún candidato tiene todavía las dos notas registradas.</p>
+          )}
+          {candidatosOrdenados.map((c, i) => {
+            const dentro = corteConfirmado
+              ? (detalle.ascendidos_arbitro_ids ?? []).includes(c.arbitroId)
+              : dentroDeCorte.includes(c.arbitroId);
+            return (
+              <div key={c.arbitroId} className="flex items-center justify-between px-3 py-2 border-t first:border-t-0" style={{ borderColor: N.rule }}>
+                <span className="text-sm" style={{ color: N.ink }}>{i + 1}. {nombrePorId.get(c.arbitroId) ?? `#${c.arbitroId}`}</span>
+                <span className="text-xs flex items-center gap-2">
+                  <span className="font-mono" style={{ color: N.ink70 }}>{c.notaFinal.toFixed(1)}</span>
+                  {dentro && (
+                    <span className="rounded-full px-2 py-0.5 font-medium" style={{ background: VIZ.estado.goodT, color: VIZ.estado.good }}>
+                      {corteConfirmado ? "Ascendido" : "Dentro del corte"}
+                    </span>
+                  )}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        {candidatosIncompletos.length > 0 && (
+          <p className="text-[11px] mb-4" style={{ color: N.ink40 }}>
+            Sin ambas notas todavía, fuera de la clasificación: {candidatosIncompletos.map((c) => nombrePorId.get(c.arbitroId) ?? `#${c.arbitroId}`).join(", ")}
+          </p>
+        )}
+
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Plazas y confirmación del corte
+        </div>
+        {corteConfirmado ? (
+          <p className="text-sm" style={{ color: VIZ.estado.good }}>
+            Corte confirmado con {detalle.plazas_disponibles} plaza(s) — campaña inmutable, resultado basado en pruebas sintéticas.
+          </p>
+        ) : (
+          <div className="flex items-end gap-3 flex-wrap">
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Plazas disponibles</label>
+              <input type="number" min="0" value={plazas} onChange={(e) => setPlazas(e.target.value)}
+                className="w-24 text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+            </div>
+            <button onClick={handleConfirmarCorte} disabled={confirmando}
+              className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60" style={{ background: T.accent }}>
+              {confirmando ? "Confirmando…" : "Confirmar corte"}
+            </button>
+          </div>
+        )}
+        {errorConfirmar && (
+          <p className="text-xs rounded px-3 py-2 mt-3" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{errorConfirmar}</p>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+/* Componente propio (no solo un bloque dentro de VistaDecisiones) para poder
+   remontarlo con key={} al volver de crear/ver una decisión — el remonte
+   reinicia estadoLista a "cargando" de forma natural, sin llamar a setState
+   de forma síncrona dentro del efecto (regla de Next.js 16, ver webapp/AGENTS.md). */
+const ESTADO_REVISION_INFO = {
+  pendiente: { label: "Pendiente de revisión", bg: VIZ.estado.warningT, fg: VIZ.estado.warning },
+  plazo_no_cumplido: { label: "Plazo no cumplido", bg: N.paper, fg: N.ink40 },
+  revisada: { label: "Revisada", bg: VIZ.estado.goodT, fg: VIZ.estado.good },
+};
+
+function ListaDecisiones({ T, onAbrir, onNueva, onNuevaCampana }) {
+  const [decisiones, setDecisiones] = useState(null);
+  const [estadoLista, setEstadoLista] = useState("cargando"); // cargando | listo | error
+  const [filtroTipo, setFiltroTipo] = useState("");
+
+  useEffect(() => {
+    let cancelado = false;
+    listarDecisiones({}).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setDecisiones(resultado.decisiones);
+        setEstadoLista("listo");
+      } else {
+        setEstadoLista("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, []);
+
+  const decisionesFiltradas = decisiones && filtroTipo ? decisiones.filter((d) => d.tipo === filtroTipo) : decisiones;
+
+  return (
+    <div>
+      <div className="flex justify-end mb-3 gap-2">
+        <button onClick={onNuevaCampana} className="text-xs rounded px-4 py-2 font-medium" style={{ border: `1px solid ${T.primary}`, color: T.primary }}>
+          + Campaña de ascenso
+        </button>
+        <button onClick={onNueva} className="text-xs rounded px-4 py-2 font-medium text-white" style={{ background: T.primary }}>
+          + Nueva decisión
+        </button>
+      </div>
+      <Panel title="Decisiones registradas"
+        right={
+          <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}
+            className="text-xs rounded border px-2 py-1" style={{ borderColor: N.rule, color: N.ink70 }}>
+            <option value="">Todos los tipos</option>
+            {Object.entries(TIPOS_DECISION).map(([valor, label]) => <option key={valor} value={valor}>{label}</option>)}
+          </select>
+        }>
+        {estadoLista === "cargando" && <p className="text-sm" style={{ color: N.ink40 }}>Cargando…</p>}
+        {estadoLista === "error" && (
+          <p className="text-sm" style={{ color: VIZ.estado.critical }}>No se pudieron cargar las decisiones. Recarga la página.</p>
+        )}
+        {estadoLista === "listo" && decisiones.length === 0 && (
+          <p className="text-sm" style={{ color: N.ink40 }}>Todavía no hay decisiones registradas.</p>
+        )}
+        {estadoLista === "listo" && decisiones.length > 0 && decisionesFiltradas.length === 0 && (
+          <p className="text-sm" style={{ color: N.ink40 }}>Ninguna decisión de este tipo todavía.</p>
+        )}
+        {estadoLista === "listo" && decisionesFiltradas?.length > 0 && (
+          <div className="space-y-2">
+            {decisionesFiltradas.map((d) => {
+              const infoEstado = ESTADO_REVISION_INFO[d.estadoRevision] ?? ESTADO_REVISION_INFO.plazo_no_cumplido;
+              return (
+                <button key={d.id} onClick={() => onAbrir(d.id, d.tipo)}
+                  className="w-full text-left rounded border p-3 transition-colors hover:bg-gray-50" style={{ borderColor: N.rule }}>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="text-sm font-medium" style={{ color: N.ink }}>{d.titulo}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] rounded-full px-2 py-0.5 font-medium" style={{ background: infoEstado.bg, color: infoEstado.fg }}>
+                        {infoEstado.label}
+                      </span>
+                      <span className="text-[11px]" style={{ color: N.ink40 }}>{TIPOS_DECISION[d.tipo] ?? d.tipo}</span>
+                    </div>
+                  </div>
+                  <div className="text-xs mt-1" style={{ color: N.ink40 }}>
+                    {new Date(d.creadoEn).toLocaleDateString("es-ES")} · {d.autor}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+function VistaDecisiones({ T }) {
+  const [sub, setSub] = useState("lista"); // lista | nueva | nueva_campana | detalle | detalle_campana
+  const [decisionSelId, setDecisionSelId] = useState(null);
+  const [listaKey, setListaKey] = useState(0);
+
+  const abrirDetalle = (id, tipo) => {
+    setDecisionSelId(id);
+    setSub(tipo === "campana_ascenso" ? "detalle_campana" : "detalle");
+  };
+  const volverALista = () => { setSub("lista"); setListaKey((k) => k + 1); };
+
+  if (sub === "nueva") {
+    return <FormularioDecision T={T} onCancelar={() => setSub("lista")} onCreada={(id) => abrirDetalle(id, "accion_motivacion")} />;
+  }
+  if (sub === "nueva_campana") {
+    return <FormularioCampana T={T} onCancelar={() => setSub("lista")} onCreada={(id) => abrirDetalle(id, "campana_ascenso")} />;
+  }
+  if (sub === "detalle" && decisionSelId) {
+    return <DetalleDecision key={decisionSelId} T={T} decisionId={decisionSelId} onVolver={volverALista} />;
+  }
+  if (sub === "detalle_campana" && decisionSelId) {
+    return <DetalleCampana key={decisionSelId} T={T} decisionId={decisionSelId} onVolver={volverALista} />;
+  }
+
+  return (
+    <div>
+      <p className="text-xs mb-4 max-w-2xl" style={{ color: N.ink40 }}>
+        Gestión de decisiones del comité sobre árbitros, categorías o grupos — registra una decisión con una foto de
+        su estado actual, y revisa más adelante si tuvo el efecto esperado. No tiene todavía control de acceso propio
+        (visible a quien entre al prototipo, mismo criterio sin cuentas de la Fase 1 de rollout que el resto de la
+        demo, hasta que exista <code>004-roles-permisos</code>).
+      </p>
+      <ListaDecisiones key={listaKey} T={T} onAbrir={abrirDetalle} onNueva={() => setSub("nueva")} onNuevaCampana={() => setSub("nueva_campana")} />
+    </div>
+  );
+}
+
 /* ------------------------------- shell ------------------------------- */
 export default function CRMExpedientes() {
   const [vista, setVista] = useState("dashboard");
@@ -2852,8 +3771,12 @@ export default function CRMExpedientes() {
     { id: "partidos", label: "Partidos", icon: Swords },
     { id: "designacion", label: "Designación", icon: Route },
   ];
-  /* Único hueco real que queda como vista previa bloqueada (v3, sin construir). */
+  /* "Próximas versiones": IA sigue bloqueada (v3, sin construir). "Decisiones" (spec 007,
+     6 ago 2026) es la primera página de management/gestión del comité que vive aquí —
+     funcionalidad real, sin candado, decisión explícita de Roberto de agrupar aquí este
+     tipo de páginas según se vayan construyendo. */
   const navFuturo = [
+    { id: "decisiones", label: "Decisiones", icon: ListChecks },
     { id: "ia", label: "Consultar con IA", icon: Sparkles, v: "v3" },
   ];
   /* Grupo aparte, deliberadamente menos vistoso (decisión 30 jul 2026): control interno
@@ -2871,7 +3794,7 @@ export default function CRMExpedientes() {
   const tituloVista = {
     dashboard: "Cuadro de Mando", arbitros: "Árbitros", equipos: "Equipos", partidos: "Partidos",
     designacion: "Designación inteligente", roles: "Configuración", economico: "Seguimiento operativo",
-    glosario: "Glosario y gobernanza", ia: "Consultar con IA",
+    glosario: "Glosario y gobernanza", ia: "Consultar con IA", decisiones: "Decisiones",
   };
   const todosLosItems = [...navV1, ...navFuturo, ...navSistema];
 
@@ -2917,7 +3840,7 @@ export default function CRMExpedientes() {
             {navV1.map((n) => <BotonNav key={n.id} n={n} />)}
             <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
               {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Próximas versiones</div>}
-              {navFuturo.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} futuro />)}
+              {navFuturo.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} futuro={Boolean(n.v)} />)}
             </div>
             <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
               {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Sistema</div>}
@@ -2962,6 +3885,7 @@ export default function CRMExpedientes() {
           {vista === "economico" && <VistaSeguimientoOperativo T={T} />}
           {vista === "glosario" && <VistaGlosario T={T} />}
           {vista === "ia" && <VistaIA T={T} />}
+          {vista === "decisiones" && <VistaDecisiones T={T} />}
         </main>
       </div>
     </div>
