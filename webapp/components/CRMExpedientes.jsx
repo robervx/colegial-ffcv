@@ -12,7 +12,7 @@ import {
   MessageSquarePlus, Wallet, Bot, Check, AlertTriangle, Send,
   Route, Info, Phone, Mail, Dumbbell, BookOpen,
   MailCheck, UserCog, Trophy, Swords, Goal,
-  Gauge, Settings, ChevronsLeft, ChevronsRight,
+  Gauge, Settings, ChevronsLeft, ChevronsRight, ListChecks,
 } from "lucide-react";
 import agregadosReales from "../data/agregados-reales.json";
 import localidadesGeo from "../data/localidades-geo.json";
@@ -34,6 +34,18 @@ import {
 } from "../lib/disponibilidadRepo";
 import { calcularPatronImplicacion } from "../lib/patronImplicacion";
 import { validarAntelacionFestivo } from "../lib/reglaFestivo";
+import {
+  registrarDecision as registrarDecisionComite,
+  obtenerDecision as obtenerDecisionComite,
+  listarDecisiones,
+  revisarImpacto,
+  derivarEstadoRevision,
+  registrarFaseCampana,
+  confirmarCorteAscenso,
+} from "../lib/decisionesRepo";
+import { resolverObjetivoArbitros } from "../lib/resolverObjetivoDecision";
+import { construirSnapshot } from "../lib/snapshotArbitro";
+import { clasificarCandidatos, calcularCorte } from "../lib/clasificacionAscenso";
 
 /* ================================================================
    COLEGIAL · CRM de expedientes arbitrales — versión 1 ampliada
@@ -41,20 +53,40 @@ import { validarAntelacionFestivo } from "../lib/reglaFestivo";
    v2/v3 como vistas previas bloqueadas (disclaimer visible).
 ================================================================ */
 
+/* Dirección "Cuarto árbitro" extendida a toda la app (8 ago 2026, ver
+   decisiones-producto.md) — antes solo vivía en el Cuadro de Mando (objeto
+   DARK, más abajo). `primary` cambia de rol: antes era superficie Y texto a
+   la vez (navy, funcionaba porque el resto de la app era clara); ahora un
+   fondo oscuro no puede llevar el mismo tono para texto/iconos que para
+   superficies sólidas (texto oscuro sobre fondo oscuro sería invisible), así
+   que se separan: `primary` = acento claro (texto/iconos/enlaces, la mayoría
+   de sus usos), `deep` = superficie estructural oscura (sidebar, botones
+   sólidos, la minoría de usos que pintaban fondo). */
 const THEMES = {
   ffcv: { nombre: "Federació de Futbol Comunitat Valenciana", corto: "FFCV", siglas: "FFCV",
-    primary: "#0C4C7C", deep: "#08375A", accent: "#F59B1E", tint: "#EAF2F8", accentTint: "#FEF3E2" },
+    primary: "#7fd4ff", deep: "#0d1f16", accent: "#F59B1E", tint: "rgba(127,212,255,.12)", accentTint: "rgba(245,155,30,.14)" },
   fcf: { nombre: "Federació Catalana de Futbol", corto: "FCF", siglas: "FCF",
     primary: "#1B3F94", deep: "#132D6B", accent: "#D8232A", tint: "#ECEFF9", accentTint: "#FBEAEA" },
   rfaf: { nombre: "Real Federación Andaluza de Fútbol", corto: "RFAF", siglas: "RFAF",
     primary: "#0B6B4F", deep: "#07503B", accent: "#F0B323", tint: "#E9F4F0", accentTint: "#FDF4E0" },
 };
 
+/* N (neutros) recalibrados a la paleta oscura — mismo objeto, mismos nombres
+   de campo, así que todo lo que ya usaba N.card/N.paper/N.ink en cualquier
+   página hereda el cambio sin tocar esa página. verde/ambar/rojo alineados
+   con los valores ya validados por contraste en VIZ.estado (más abajo) y en
+   el Cuadro de Mando — antes eran tonos distintos y más apagados, pensados
+   para fondo claro. */
 const N = {
-  paper: "#F6F7F9", card: "#FFFFFF", ink: "#16202B", ink70: "#5A6672",
-  ink40: "#939CA6", rule: "#E1E5EA",
-  verde: "#2E7D5B", verdeT: "#E7F2EC", ambar: "#C88A1A", ambarT: "#FBF1DC",
-  rojo: "#C0392B", rojoT: "#FAE9E7", ta: "#E8C33C", tr: "#C0392B",
+  paper: "#0d1f16", card: "#244530", ink: "#f8fbf8", ink70: "#cbdace",
+  ink40: "#93ab9b", rule: "rgba(237,247,240,.17)",
+  verde: "#34e19b", verdeT: "rgba(52,225,155,.14)", ambar: "#ffc24b", ambarT: "rgba(255,194,75,.14)",
+  rojo: "#ff5c5c", rojoT: "rgba(255,92,92,.16)", ta: "#ffc24b", tr: "#ff5c5c",
+  /* texto legible sobre ambarT ahora que ese fondo es oscuro-translúcido en vez
+     de un ámbar sólido claro — antes N.ambarInk (marrón oscuro, pensado para
+     fondo claro, ver BannerV2 y los avisos de "vista previa" repartidos por
+     la app). */
+  ambarInk: "#F2C879",
 };
 
 /* Paleta de dataviz (skill "dataviz"): categórica validada (CVD-safe, orden fijo,
@@ -64,7 +96,11 @@ const N = {
 const VIZ = {
   serie: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"],
   secuencialAzul: ["#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#1c5cab", "#0d366b"],
-  estado: { good: "#0ca30c", goodT: "#E7F2EC", warning: "#fab219", warningT: "#FBF1DC", serious: "#ec835a", seriousT: "#FBEAE3", critical: "#d03b3b", criticalT: "#FAE9E7" },
+  /* recalibrado para fondo oscuro (8 ago 2026) — mismo significado good/warning/
+     serious/critical, más luminancia porque un fondo oscuro exige colores más
+     claros para el mismo contraste percibido que sobre blanco (mismos valores
+     ya validados en el Cuadro de Mando, antes solo en el objeto DARK local). */
+  estado: { good: "#34e19b", goodT: "rgba(52,225,155,.14)", warning: "#ffc24b", warningT: "rgba(255,194,75,.14)", serious: "#ff9466", seriousT: "rgba(255,148,102,.14)", critical: "#ff5c5c", criticalT: "rgba(255,92,92,.16)" },
   /* Paleta pastel-viva (aprobada por Roberto 31 jul 2026, ver decisiones-producto.md) —
      para gráficos donde el color distingue CATEGORÍA (identidad), nunca donde distingue
      ESTADO. El semáforo de riesgo/estado de forma (VIZ.estado) no se toca ni se mezcla
@@ -73,19 +109,17 @@ const VIZ = {
   pastelSoft: ["#E3F1FC", "#FFEEE6", "#E1F9F5", "#EFEBFE", "#FDEBF3", "#FEF3DE", "#E8F8EB"],
 };
 
-/* Paleta oscura "Cuarto árbitro" — SOLO para el lienzo del Cuadro de Mando
-   (aprobada por Roberto 4 ago 2026 tras dos rondas de revisión visual, ver
-   docs/decisiones-producto.md §30-32: campo de noche, líneas de campo como
-   estructura, círculo central alojando los dos gauges de estado de forma/
-   disponibilidad). El resto de la app (sidebar, Árbitros, Seguimiento
-   operativo, Equipos, Partidos...) sigue con N/THEMES/VIZ sin tocar —
-   Roberto pidió expresamente no rediseñar la app entera, solo esta página.
-   Los 4 colores de estado son una recalibración de VIZ.estado para fondo
-   oscuro (misma semántica good/warning/serious/critical, más luminancia
-   porque un fondo oscuro exige colores más claros para el mismo contraste
-   percibido que sobre blanco) — nunca se usan fuera de este lienzo. */
+/* Paleta oscura "Cuarto árbitro" — nació solo para el Cuadro de Mando (4 ago
+   2026, docs/decisiones-producto.md §30-32) y se extendió a toda la app el
+   8 ago 2026 (N/THEMES ya usan estos mismos tonos arriba). Este objeto DARK
+   se queda como está por los componentes bespoke del propio Cuadro de Mando
+   (GaugeSemicircular, DarkPanel, DarkStat) que necesitan más matices que los
+   4-5 tokens de N — pero ya no es "solo esta página", es la misma paleta que
+   N.paper/N.card en el resto de la app. Los 4 colores de estado son la misma
+   recalibración de VIZ.estado para fondo oscuro (más luminancia que sobre
+   blanco, para el mismo contraste percibido). */
 const DARK = {
-  pitchDeep: "#0a1712", pitch: "#13281d", surface: "#1b3524", surfaceRaised: "#22402c",
+  pitchDeep: "#0d1f16", pitch: "#17301f", surface: "#244530", surfaceRaised: "#2d5439",
   line06: "rgba(237,247,240,.10)", line12: "rgba(237,247,240,.17)", line16: "rgba(237,247,240,.21)",
   line24: "rgba(237,247,240,.32)", lineStrong: "rgba(237,247,240,.52)",
   ink: "#f8fbf8", ink70: "#cbdace", ink40: "#93ab9b",
@@ -189,7 +223,7 @@ function Eyebrow({ children }) {
 function Panel({ title, children, right }) {
   return (
     <section className="rounded-md border overflow-hidden" style={{ background: N.card, borderColor: N.rule }}>
-      <div className="flex items-center justify-between px-5 py-3 border-b flex-wrap gap-2" style={{ borderColor: N.rule, background: "#FBFCFD" }}>
+      <div className="flex items-center justify-between px-5 py-3 border-b flex-wrap gap-2" style={{ borderColor: N.rule, background: "rgba(255,255,255,.03)" }}>
         <Eyebrow>{title}</Eyebrow>{right}
       </div>
       <div className="p-5">{children}</div>
@@ -252,8 +286,8 @@ function BannerV2({ T, version = "Versión 2", texto }) {
     <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3 mb-5" style={{ borderColor: T.accent, background: T.accentTint }}>
       <Lock size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
       <div>
-        <div className="text-sm font-semibold" style={{ color: "#7A5A10" }}>Vista previa · {version}</div>
-        <p className="text-xs mt-0.5" style={{ color: "#7A5A10" }}>
+        <div className="text-sm font-semibold" style={{ color: N.ambarInk }}>Vista previa · {version}</div>
+        <p className="text-xs mt-0.5" style={{ color: N.ambarInk }}>
           {texto || "Esta función no está activa en la versión inicial. Antes hay que poblar la base de datos de expedientes: todo lo que ves aquí se construye sobre ella."}
         </p>
       </div>
@@ -606,82 +640,10 @@ function Dashboard({ irArbitros }) {
     }}>
       <div className="p-5 sm:p-7 space-y-6">
 
-        {/* ---- Cobertura por categoría: hero de la página (US1/P1 — la razón de ser
-             de este dashboard, spec 001 SC-001 exige verla en <10s sin filtrar) ---- */}
-        <div>
-          <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
-            <div className="text-[15px] font-semibold" style={{ color: DARK.ink }}>Cobertura por categoría · {cicloActivo.finDeSemana}</div>
-            {disponibilidadEstado !== "listo" ? (
-              <span className="text-[12px]" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</span>
-            ) : categoriasEnRiesgo.length > 0 ? (
-              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.critical }}>
-                <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
-              </span>
-            ) : (
-              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.good }}>
-                <Check size={12} /> sin alertas de cobertura
-              </span>
-            )}
-          </div>
-          <DarkPanel accent={categoriasEnRiesgo.length > 0 ? DARK.critical : DARK.line24}>
-            {disponibilidadEstado === "cargando" ? (
-              <p className="text-xs" style={{ color: DARK.ink40 }}>Cargando disponibilidad real del ciclo…</p>
-            ) : disponibilidadEstado === "error" ? (
-              <p className="text-xs rounded px-3 py-2" style={{ color: DARK.critical, background: DARK.criticalT }}>
-                No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
-              </p>
-            ) : (
-              <>
-                {cobertura.datasetDisponibilidadVacio && (
-                  <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: DARK.critical, borderColor: DARK.criticalT, background: DARK.criticalT }}>
-                    No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
-                  </p>
-                )}
-                {categoriasConPartidos.length === 0 ? (
-                  <p className="text-xs" style={{ color: DARK.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
-                ) : (
-                  <>
-                    <ResponsiveContainer width="100%" height={Math.max(140, categoriasConPartidos.length * 48)}>
-                      <BarChart data={categoriasConPartidos} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="2 4" stroke={DARK.line12} horizontal={false} />
-                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: DARK.ink40 }} axisLine={false} tickLine={false} />
-                        <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: DARK.ink70 }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${DARK.line24}`, fontSize: 12, background: DARK.surfaceRaised, color: DARK.ink }}
-                          formatter={(v, name) => [v, name === "totalDisponibles" ? "Disponibles" : "A designar"]} />
-                        <Legend wrapperStyle={{ fontSize: 11, color: DARK.ink70 }} formatter={(value) => value === "totalDisponibles" ? "Disponibles" : "A designar"} />
-                        <Bar dataKey="partidosADesignar" fill={DARK.line24} radius={[0, 3, 3, 0]} barSize={11} />
-                        <Bar dataKey="totalDisponibles" radius={[0, 3, 3, 0]} barSize={11}>
-                          {categoriasConPartidos.map((c) => (
-                            <Cell key={c.categoria} fill={c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                    <div className="space-y-1.5 mt-3">
-                      {categoriasConPartidos.map((c) => (
-                        <div key={c.categoria} className="flex items-center justify-between text-[11.5px]" style={{ color: DARK.ink40 }}>
-                          <span>{c.categoria}: {c.disponiblesCategoriaPropia} propia + {c.disponiblesCategoriaInferior} inferior</span>
-                          <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2 py-0.5 shrink-0" style={{
-                            background: c.estado === "riesgo" ? DARK.criticalT : c.estado === "ajustado" ? DARK.warningT : DARK.goodT,
-                            color: c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good,
-                          }}>
-                            <span className="rounded-full" style={{ width: 6, height: 6, background: "currentColor" }} />
-                            {c.estado === "riesgo" ? "En riesgo" : c.estado === "ajustado" ? "Ajustado, sin margen" : "Cobertura holgada"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-            <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
-              “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
-            </p>
-          </DarkPanel>
-        </div>
-
-        {/* ---- Comité en un vistazo: los dos gauges (US4/P2, FR-010/011/012) ---- */}
+        {/* ---- Comité en un vistazo: los dos gauges (US4/P2, FR-010/011/012) — primero,
+             Roberto pidió priorizar gauges+KPIs sobre Cobertura (8 ago 2026). SC-001 de la
+             spec (verla en <10s sin filtrar) se sigue cumpliendo: sin scroll ni filtro, no
+             exige ser el primer elemento del layout. ---- */}
         <div>
           <div className="text-[13px] font-semibold" style={{ color: DARK.ink }}>Comité en un vistazo</div>
           <div className="text-[12px] mb-3" style={{ color: DARK.ink40 }}>Dos preguntas de negocio distintas — rendimiento y disponibilidad operativa — nunca combinadas en un solo indicador.</div>
@@ -798,6 +760,82 @@ function Dashboard({ irArbitros }) {
               <DarkStat eyebrow="Mejorando esta temporada" valor={`${ratioMejorando}/${ARBITROS.length}`} sub="anotación de mejora + tendencia positiva · sintético" />
             </div>
           </div>
+        </div>
+
+        {/* ---- Cobertura por categoría (US1/P1) — sigue siendo la razón de ser del
+             dashboard y SC-001 exige verla sin filtrar, pero ya no es el primer
+             elemento: Roberto priorizó los gauges y KPIs por delante (8 ago 2026). ---- */}
+        <div>
+          <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
+            <div className="text-[15px] font-semibold" style={{ color: DARK.ink }}>Cobertura por categoría · {cicloActivo.finDeSemana}</div>
+            {disponibilidadEstado !== "listo" ? (
+              <span className="text-[12px]" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</span>
+            ) : categoriasEnRiesgo.length > 0 ? (
+              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.critical }}>
+                <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
+              </span>
+            ) : (
+              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.good }}>
+                <Check size={12} /> sin alertas de cobertura
+              </span>
+            )}
+          </div>
+          <DarkPanel accent={categoriasEnRiesgo.length > 0 ? DARK.critical : DARK.line24}>
+            {disponibilidadEstado === "cargando" ? (
+              <p className="text-xs" style={{ color: DARK.ink40 }}>Cargando disponibilidad real del ciclo…</p>
+            ) : disponibilidadEstado === "error" ? (
+              <p className="text-xs rounded px-3 py-2" style={{ color: DARK.critical, background: DARK.criticalT }}>
+                No se pudo cargar la disponibilidad real de este ciclo. Comprueba la conexión y recarga — no se muestra cobertura con datos incompletos.
+              </p>
+            ) : (
+              <>
+                {cobertura.datasetDisponibilidadVacio && (
+                  <p className="text-xs mb-3 rounded border px-3 py-2" style={{ color: DARK.critical, borderColor: DARK.criticalT, background: DARK.criticalT }}>
+                    No hay dataset de disponibilidad cargado — los 0 disponibles de abajo no significan cobertura completa, significan que falta el dato.
+                  </p>
+                )}
+                {categoriasConPartidos.length === 0 ? (
+                  <p className="text-xs" style={{ color: DARK.ink40 }}>Ninguna categoría tiene partidos programados este fin de semana.</p>
+                ) : (
+                  <>
+                    <ResponsiveContainer width="100%" height={Math.max(140, categoriasConPartidos.length * 48)}>
+                      <BarChart data={categoriasConPartidos} layout="vertical" margin={{ top: 4, right: 16, left: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="2 4" stroke={DARK.line12} horizontal={false} />
+                        <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: DARK.ink40 }} axisLine={false} tickLine={false} />
+                        <YAxis type="category" dataKey="categoria" width={110} tick={{ fontSize: 11, fill: DARK.ink70 }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ borderRadius: 4, border: `1px solid ${DARK.line24}`, fontSize: 12, background: DARK.surfaceRaised, color: DARK.ink }}
+                          formatter={(v, name) => [v, name === "totalDisponibles" ? "Disponibles" : "A designar"]} />
+                        <Legend wrapperStyle={{ fontSize: 11, color: DARK.ink70 }} formatter={(value) => value === "totalDisponibles" ? "Disponibles" : "A designar"} />
+                        <Bar dataKey="partidosADesignar" fill={DARK.line24} radius={[0, 3, 3, 0]} barSize={11} />
+                        <Bar dataKey="totalDisponibles" radius={[0, 3, 3, 0]} barSize={11}>
+                          {categoriasConPartidos.map((c) => (
+                            <Cell key={c.categoria} fill={c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                    <div className="space-y-1.5 mt-3">
+                      {categoriasConPartidos.map((c) => (
+                        <div key={c.categoria} className="flex items-center justify-between text-[11.5px]" style={{ color: DARK.ink40 }}>
+                          <span>{c.categoria}: {c.disponiblesCategoriaPropia} propia + {c.disponiblesCategoriaInferior} inferior</span>
+                          <span className="inline-flex items-center gap-1.5 rounded-full font-medium text-[11px] px-2 py-0.5 shrink-0" style={{
+                            background: c.estado === "riesgo" ? DARK.criticalT : c.estado === "ajustado" ? DARK.warningT : DARK.goodT,
+                            color: c.estado === "riesgo" ? DARK.critical : c.estado === "ajustado" ? DARK.warning : DARK.good,
+                          }}>
+                            <span className="rounded-full" style={{ width: 6, height: 6, background: "currentColor" }} />
+                            {c.estado === "riesgo" ? "En riesgo" : c.estado === "ajustado" ? "Ajustado, sin margen" : "Cobertura holgada"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+            <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+              “En riesgo” = disponibles &lt; partidos a designar. “Ajustado” = exactamente igual, sin margen. Los árbitros que también pitan categorías inferiores pueden aparecer disponibles en más de una categoría a la vez — si dos categorías comparten el mismo pool y ambas están en riesgo, ese pool no cubre a las dos a la vez.
+            </p>
+          </DarkPanel>
         </div>
 
         {/* ---- rejilla de apoyo ---- */}
@@ -963,7 +1001,7 @@ function Listado({ T, onPick }) {
     return c;
   }, []);
 
-  const selectStyle = { borderColor: N.rule, color: N.ink70, background: "#FFF" };
+  const selectStyle = { borderColor: N.rule, color: N.ink70, background: N.card };
 
   return (
     <div className="space-y-5">
@@ -1003,7 +1041,7 @@ function Listado({ T, onPick }) {
               <option value="8">Media ≥ 8,0</option>
               <option value="7">Media ≥ 7,0</option>
             </select>
-            <div className="flex items-center gap-2 rounded border px-2 py-1 bg-white" style={{ borderColor: N.rule }}>
+            <div className="flex items-center gap-2 rounded border px-2 py-1" style={{ borderColor: N.rule, background: N.card }}>
               <Search size={13} style={{ color: N.ink40 }} />
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Nombre o licencia"
                 className="text-xs outline-none w-36 bg-transparent" style={{ color: N.ink }} />
@@ -1025,7 +1063,7 @@ function Listado({ T, onPick }) {
               {espacioArriba > 0 && <tr aria-hidden="true"><td colSpan={7} style={{ height: espacioArriba, padding: 0, border: 0 }} /></tr>}
               {filasVisibles.map(({ a, est, tot, ultima }) => (
                 <tr key={a.id} onClick={() => onPick(a)} style={{ borderColor: N.rule, height: FILA_ALTURA }}
-                  className="cursor-pointer border-b hover:bg-slate-50 transition-colors">
+                  className="cursor-pointer border-b hover:bg-[rgba(255,255,255,.04)] transition-colors">
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-3">
                       <Avatar txt={a.foto} T={T} size={36} />
@@ -1105,7 +1143,7 @@ function HistorialPartidos({ a, T }) {
 
       {enVentana.length > 0 && (
         <div className="grid grid-cols-3 gap-3 mb-4 rounded p-3" style={{ background: N.paper }}>
-          {[["Partidos en ventana", enVentana.length, N.ink], ["Amarillas", resumen.am, "#B08D14"], ["Rojas", resumen.ro, N.rojo]].map(([l, v, col]) => (
+          {[["Partidos en ventana", enVentana.length, N.ink], ["Amarillas", resumen.am, "#E8C33C"], ["Rojas", resumen.ro, N.rojo]].map(([l, v, col]) => (
             <div key={l}>
               <div className="text-[9px] uppercase tracking-[0.1em] mb-0.5" style={{ color: N.ink40 }}>{l}</div>
               <div className="font-mono text-lg font-semibold tabular-nums" style={{ color: col }}>{v}</div>
@@ -1128,7 +1166,7 @@ function HistorialPartidos({ a, T }) {
                 {!h.esCategoriaPrincipal && <span className="text-[10px] rounded px-1.5 py-0.5" style={{ background: N.paper, color: N.ink40 }}>{h.competicion}</span>}
                 {(h.amarillas > 0 || h.rojas > 0) && (
                   <span className="font-mono text-[11px] flex items-center gap-1.5">
-                    {h.amarillas > 0 && <span style={{ color: "#B08D14" }}>{h.amarillas}TA</span>}
+                    {h.amarillas > 0 && <span style={{ color: "#E8C33C" }}>{h.amarillas}TA</span>}
                     {h.rojas > 0 && <span style={{ color: N.rojo }}>{h.rojas}TR</span>}
                   </span>
                 )}
@@ -1309,14 +1347,14 @@ function Ficha({ T, a, back }) {
         </div>
       </div>
 
-      <div className="rounded-md overflow-hidden" style={{ background: T.primary }}>
+      <div className="rounded-md overflow-hidden" style={{ background: T.deep }}>
         <div className="p-6 flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <Avatar txt={a.foto} T={{ tint: "#FFFFFF", primary: T.primary }} size={60} />
             <div>
               <div className="font-mono text-[11px] tracking-[0.2em] mb-1" style={{ color: T.accent }}>LICENCIA {a.lic}</div>
               <h2 className="text-2xl font-semibold text-white leading-tight">{a.n}</h2>
-              <div className="text-xs mt-1.5" style={{ color: "#B7CBDD" }}>{a.cat} · {a.loc} · {a.edad} años · {a.temp} temporadas · {a.altura} cm</div>
+              <div className="text-xs mt-1.5" style={{ color: N.ink70 }}>{a.cat} · {a.loc} · {a.edad} años · {a.temp} temporadas · {a.altura} cm</div>
               <div className="flex items-center gap-4 mt-2 text-xs flex-wrap">
                 <a href={`tel:${a.telefono.replace(/\s/g, "")}`} className="flex items-center gap-1.5 hover:underline" style={{ color: "#FFF" }}>
                   <Phone size={12} style={{ color: T.accent }} /> {a.telefono}
@@ -1327,7 +1365,7 @@ function Ficha({ T, a, back }) {
               </div>
             </div>
           </div>
-          <div style={{ background: "#FFFFFF", borderRadius: 8, padding: "12px 18px" }}>
+          <div style={{ background: N.card, borderRadius: 8, padding: "12px 18px" }}>
             <div className="text-[10px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Estado de forma actual</div>
             <Semaforo estado={est} size="lg" />
             <div className="text-[11px] mt-1.5" style={{ color: N.ink70 }}>media 5 últimos: <span className="font-mono font-semibold">{est.media.toFixed(2)}</span></div>
@@ -1369,7 +1407,7 @@ function Ficha({ T, a, back }) {
                     <tr key={h.temp} className="border-b" style={{ borderColor: N.rule, background: i === 0 ? T.tint : "transparent" }}>
                       <td className="px-3 py-2.5 font-medium" style={{ color: N.ink }}>{h.temp}{i === 0 && <span className="ml-2 text-[10px]" style={{ color: T.primary }}>actual</span>}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums">{h.part}</td>
-                      <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: "#B08D14" }}>{h.am}</td>
+                      <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: "#E8C33C" }}>{h.am}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: N.tr }}>{h.ro}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums" style={{ color: N.ink70 }}>{(h.am / h.part).toFixed(1)}</td>
                       <td className="px-3 py-2.5 font-mono text-xs tabular-nums font-semibold"
@@ -1411,7 +1449,7 @@ function Ficha({ T, a, back }) {
                 className="text-xs rounded border px-2 outline-none" style={{ borderColor: N.rule, color: N.ink70 }}>
                 {Object.entries(ETIQUETA_NOTA).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
               </select>
-              <button onClick={addNota} disabled={guardandoNota} className="text-xs rounded px-3 py-2 text-white font-medium flex items-center gap-1.5 disabled:opacity-60" style={{ background: T.primary }}>
+              <button onClick={addNota} disabled={guardandoNota} className="text-xs rounded px-3 py-2 text-white font-medium flex items-center gap-1.5 disabled:opacity-60" style={{ background: T.deep }}>
                 <MessageSquarePlus size={14} /> {guardandoNota ? "Guardando…" : "Guardar"}
               </button>
             </div>
@@ -1424,16 +1462,16 @@ function Ficha({ T, a, back }) {
 
             {sugerenciaEmail && (
               <div className="rounded p-3 mb-4 flex items-center justify-between gap-3 flex-wrap" style={{ background: T.accentTint }}>
-                <div className="text-xs" style={{ color: "#7A5A10" }}>
+                <div className="text-xs" style={{ color: N.ambarInk }}>
                   <span className="font-semibold">Sugerencia: </span>
                   {sugerenciaEmail === "felicitacion" ? "esta nota es positiva — ¿le envías un email de felicitación?" : "esta nota es de mejora — ¿le envías puntos de mejora por email?"}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <a href={mailtoHref(a.email, PLANTILLAS_EMAIL[sugerenciaEmail].asunto(a), PLANTILLAS_EMAIL[sugerenciaEmail].cuerpo(a))}
-                    className="text-xs rounded px-2.5 py-1 font-medium text-white flex items-center gap-1" style={{ background: T.primary }}>
+                    className="text-xs rounded px-2.5 py-1 font-medium text-white flex items-center gap-1" style={{ background: T.deep }}>
                     <Send size={11} /> Redactar email
                   </a>
-                  <button onClick={() => setSugerenciaEmail(null)} className="text-xs" style={{ color: "#7A5A10" }}>Descartar</button>
+                  <button onClick={() => setSugerenciaEmail(null)} className="text-xs" style={{ color: N.ambarInk }}>Descartar</button>
                 </div>
               </div>
             )}
@@ -1452,7 +1490,7 @@ function Ficha({ T, a, back }) {
                   const et = ETIQUETA_NOTA[nt.etiqueta] || ETIQUETA_NOTA.seguimiento;
                   const fecha = new Date(nt.creadoEn).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" });
                   return (
-                    <div key={nt.id ?? i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.fuente === "real" ? T.tint : "#FFF" }}>
+                    <div key={nt.id ?? i} className="rounded border p-3" style={{ borderColor: N.rule, background: i === 0 && nt.fuente === "real" ? T.tint : N.card }}>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-xs font-semibold" style={{ color: T.primary }}>{nt.autor}</span>
                         <span className="text-[11px] font-mono" style={{ color: N.ink40 }}>{fecha}</span>
@@ -1481,7 +1519,7 @@ function Ficha({ T, a, back }) {
                     <input type="file" accept="application/pdf" onChange={(e) => setArchivoJustificante(e.target.files?.[0] ?? null)}
                       className="text-xs" style={{ color: N.ink70 }} />
                     <button onClick={justificarBaja} disabled={!archivoJustificante || guardandoJustificante}
-                      className="text-[11px] rounded px-2.5 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+                      className="text-[11px] rounded px-2.5 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.deep }}>
                       {guardandoJustificante ? "Adjuntando…" : "Adjuntar justificante"}
                     </button>
                   </div>
@@ -1522,13 +1560,13 @@ function Ficha({ T, a, back }) {
               )}
               <button onClick={declarar}
                 disabled={guardandoDisponibilidad || Boolean(antelacionFestivo && !antelacionFestivo.valido)}
-                className="text-xs rounded px-3 py-2 text-white font-medium disabled:opacity-60" style={{ background: T.primary }}>
+                className="text-xs rounded px-3 py-2 text-white font-medium disabled:opacity-60" style={{ background: T.deep }}>
                 {guardandoDisponibilidad ? "Guardando…" : "Declarar"}
               </button>
             </div>
 
             {antelacionFestivo && !antelacionFestivo.valido && (
-              <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: "#7A5A10", background: N.ambarT }}>
+              <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: N.ambarInk, background: N.ambarT }}>
                 Un festivo solicitado necesita al menos 15 días de antelación (hay {antelacionFestivo.diasAntelacion}).
               </p>
             )}
@@ -1556,7 +1594,7 @@ function Ficha({ T, a, back }) {
                   const fecha = new Date(d.fechaDeclaracion).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "2-digit" });
                   const noJustificada = d.motivo === "baja" && d.justificada === false;
                   return (
-                    <div key={d.id} className="rounded border p-2.5 text-xs" style={{ borderColor: noJustificada ? "#F0C9C2" : N.rule, background: noJustificada ? N.rojoT : "#FFF" }}>
+                    <div key={d.id} className="rounded border p-2.5 text-xs" style={{ borderColor: noJustificada ? N.rojo : N.rule, background: noJustificada ? N.rojoT : N.card }}>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium" style={{ color: N.ink }}>{TIPO_DISPONIBILIDAD[d.tipo]?.label ?? d.tipo}</span>
                         {d.motivo && <span style={{ color: N.ink70 }}>· {MOTIVO_INDISPONIBILIDAD[d.motivo]?.label ?? d.motivo}</span>}
@@ -1604,7 +1642,7 @@ function Ficha({ T, a, back }) {
             <div className="flex flex-col gap-1.5">
               {Object.entries(PLANTILLAS_EMAIL).map(([k, p]) => (
                 <a key={k} href={mailtoHref(a.email, p.asunto(a), p.cuerpo(a))}
-                  className="text-xs rounded border px-3 py-2 flex items-center gap-2 hover:bg-slate-50 transition-colors" style={{ borderColor: N.rule, color: N.ink }}>
+                  className="text-xs rounded border px-3 py-2 flex items-center gap-2 hover:bg-[rgba(255,255,255,.04)] transition-colors" style={{ borderColor: N.rule, color: N.ink }}>
                   <Send size={12} style={{ color: T.primary }} /> {p.etiqueta}
                 </a>
               ))}
@@ -1764,7 +1802,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
 
   return (
     <>
-      <tr className="border-b cursor-pointer hover:bg-slate-50" style={{ borderColor: N.rule }} onClick={onToggle}>
+      <tr className="border-b cursor-pointer hover:bg-[rgba(255,255,255,.04)]" style={{ borderColor: N.rule }} onClick={onToggle}>
         <td className="px-3 py-3">
           <div className="font-medium" style={{ color: N.ink }}>{partido.equipoLocal} – {partido.equipoVisitante}</div>
           <div className="text-xs" style={{ color: N.ink40 }}>{partido.categoriaMinima} · {partido.localidad} · {partido.fecha}</div>
@@ -1824,7 +1862,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
         <tr>
           <td colSpan={4} className="px-3 pb-4" style={{ background: N.paper }}>
             {motivoRevision.length > 0 && !decisionVigente && (
-              <div className="rounded p-2.5 mb-3 text-xs" style={{ background: N.ambarT, color: "#7A5A10" }}>
+              <div className="rounded p-2.5 mb-3 text-xs" style={{ background: N.ambarT, color: N.ambarInk }}>
                 {motivoRevision.map((m, i) => <div key={i}>· {m}</div>)}
               </div>
             )}
@@ -1841,7 +1879,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
             ) : (
               <div className="space-y-1.5">
                 {alternativas.map(({ arbitro, score, coste }) => (
-                  <div key={arbitro.id} className="text-xs rounded border p-2" style={{ borderColor: N.rule, background: "#FFF" }}>
+                  <div key={arbitro.id} className="text-xs rounded border p-2" style={{ borderColor: N.rule, background: N.card }}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Avatar txt={arbitro.foto} T={T} size={22} />
@@ -1862,7 +1900,7 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
                             placeholder="Motivo del cambio (obligatorio)…" autoFocus
                             className="flex-1 text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink }} />
                           <button onClick={(e) => confirmarAlternativa(e, arbitro.id)} disabled={!motivoTexto.trim() || guardandoId === arbitro.id}
-                            className="text-[11px] rounded px-2 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+                            className="text-[11px] rounded px-2 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.deep }}>
                             {guardandoId === arbitro.id ? "Guardando…" : "Guardar"}
                           </button>
                           <button onClick={cancelarMotivo} className="text-[11px]" style={{ color: N.ink40 }}>Cancelar</button>
@@ -1936,7 +1974,7 @@ function DesignacionInteligente({ T, onIrAPartido }) {
           </p>
           <div className="space-y-2">
             {situacionesSensibles.map((r) => (
-              <div key={r.partido.id} className="rounded border p-3 flex items-start justify-between gap-3 flex-wrap cursor-pointer hover:bg-slate-50"
+              <div key={r.partido.id} className="rounded border p-3 flex items-start justify-between gap-3 flex-wrap cursor-pointer hover:bg-[rgba(255,255,255,.04)]"
                 style={{ borderColor: N.rule }} onClick={() => (onIrAPartido ? onIrAPartido(r.partido.id) : setExpandidoId(r.partido.id))}>
                 <div>
                   <div className="text-sm font-medium" style={{ color: N.ink }}>{r.partido.equipoLocal} – {r.partido.equipoVisitante}</div>
@@ -1954,8 +1992,8 @@ function DesignacionInteligente({ T, onIrAPartido }) {
       <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: T.accent, background: T.accentTint }}>
         <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
         <div>
-          <div className="text-sm font-semibold" style={{ color: "#7A5A10" }}>Motor v0 — asignación por lote, no operativo todavía</div>
-          <p className="text-xs mt-0.5" style={{ color: "#7A5A10" }}>
+          <div className="text-sm font-semibold" style={{ color: N.ambarInk }}>Motor v0 — asignación por lote, no operativo todavía</div>
+          <p className="text-xs mt-0.5" style={{ color: N.ambarInk }}>
             Procesa toda la jornada a la vez (evita que el mismo árbitro salga sugerido en dos partidos simultáneos), con
             filtro duro real, score B.1 con shrinkage, y coste desglosado (tarifas.md). B.3, A.5 y la optimización global
             (húngaro sobre toda la jornada en vez de greedy por categoría) siguen pendientes — ver decisiones-producto.md.
@@ -1965,7 +2003,7 @@ function DesignacionInteligente({ T, onIrAPartido }) {
 
       <Panel title="Ciclo de asignación" right={
         <select value={cicloId} onChange={(e) => { setCicloId(e.target.value); setExpandidoId(null); setVigentesDisponibilidad(null); }}
-          className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
+          className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: N.card }}>
           {ciclosAsignacion.map((c) => <option key={c.id} value={c.id}>{c.etiqueta}</option>)}
         </select>
       }>
@@ -2096,7 +2134,7 @@ function ListadoEquipos({ T, onPick }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-md border p-3 flex items-center gap-2 text-xs" style={{ borderColor: N.rule, background: "#FAFAF9", color: N.ink70 }}>
+      <div className="rounded-md border p-3 flex items-center gap-2 text-xs" style={{ borderColor: N.rule, background: "rgba(255,255,255,.03)", color: N.ink70 }}>
         <Info size={13} style={{ color: N.ink40 }} />
         {EQUIPOS.length} equipos sobre {nf(agregadosReales.total_partidos_categoria_adulta)} partidos reales de la temporada 25/26
         (ffcv_public_data/) — sin sanciones disciplinarias ni titulares más frecuentes: no hay alineaciones en el scraping, solo goles y tarjetas.
@@ -2104,16 +2142,16 @@ function ListadoEquipos({ T, onPick }) {
       <Panel title={`Equipos · ${filtrados.length} de ${EQUIPOS.length}`} right={
         <div className="flex gap-2">
           <select value={cat} onChange={(e) => setCat(e.target.value)}
-            className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: "#FFF" }}>
+            className="text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink70, background: N.card }}>
             {categorias.map((c) => <option key={c}>{c}</option>)}
           </select>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar equipo…"
-            className="text-xs rounded border px-2 py-1.5 outline-none w-40" style={{ borderColor: N.rule, color: N.ink }} />
+            className="text-xs rounded border px-2 py-1.5 outline-none w-40" style={{ borderColor: N.rule, color: N.ink, background: N.card }} />
         </div>
       }>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {filtrados.slice(0, 60).map((e) => (
-            <button key={e.id} onClick={() => onPick(e)} className="text-left rounded border p-4 hover:bg-slate-50 transition-colors" style={{ borderColor: N.rule }}>
+            <button key={e.id} onClick={() => onPick(e)} className="text-left rounded border p-4 hover:bg-[rgba(255,255,255,.04)] transition-colors" style={{ borderColor: N.rule }}>
               <div className="flex items-start justify-between gap-2">
                 <div className="text-sm font-medium" style={{ color: N.ink }}>{e.nombre}</div>
                 <Trophy size={14} style={{ color: N.ink40 }} />
@@ -2162,7 +2200,7 @@ function FichaEquipo({ T, equipo: e, back }) {
         <ChevronRight size={13} style={{ transform: "rotate(180deg)" }} /> Volver a equipos
       </button>
 
-      <div className="rounded-md overflow-hidden" style={{ background: T.primary }}>
+      <div className="rounded-md overflow-hidden" style={{ background: T.deep }}>
         <div className="p-5 flex items-center gap-4">
           <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.15)" }}>
             <Trophy size={22} style={{ color: "#FFF" }} />
@@ -2175,7 +2213,7 @@ function FichaEquipo({ T, equipo: e, back }) {
         <div className="h-1" style={{ background: T.accent }} />
       </div>
 
-      <div className="rounded border px-3 py-2 flex items-center gap-2 text-[11px]" style={{ borderColor: N.rule, color: N.ink40, background: "#FAFAF9" }}>
+      <div className="rounded border px-3 py-2 flex items-center gap-2 text-[11px]" style={{ borderColor: N.rule, color: N.ink40, background: "rgba(255,255,255,.03)" }}>
         <Info size={12} />
 Datos generados el {equiposRealesData.generado} a partir de {equiposRealesData.fuente}. Se actualizan cuando se relance el scraper tras cada jornada que publique la FFCV — cadencia real (¿miércoles?) pendiente de confirmar, no asumida.
       </div>
@@ -2271,7 +2309,7 @@ function SelectorEquipo({ label, value, onChange, opciones = EQUIPOS }) {
     <div className="flex-1 min-w-[200px]">
       <label className="text-[10px] uppercase tracking-[0.14em] font-semibold block mb-1" style={{ color: N.ink40 }}>{label}</label>
       <select value={value?.id ?? ""} onChange={(e) => onChange(opciones.find((eq) => eq.id === e.target.value) ?? null)}
-        className="w-full text-sm rounded border px-3 py-2 outline-none" style={{ borderColor: N.rule, color: N.ink, background: "#FFF" }}>
+        className="w-full text-sm rounded border px-3 py-2 outline-none" style={{ borderColor: N.rule, color: N.ink, background: N.card }}>
         <option value="">Elegir equipo…</option>
         {opciones.map((e) => <option key={e.id} value={e.id}>{e.nombre} · {e.categoria}</option>)}
       </select>
@@ -2305,9 +2343,9 @@ function InsightsCruce({ local, visitante }) {
   ) : (
     <div className="space-y-2.5">
       {insights.map((texto, i) => (
-        <div key={i} className="rounded border p-3 flex items-start gap-2.5" style={{ borderColor: "#F59B1E", background: "#FEF3E2" }}>
+        <div key={i} className="rounded border p-3 flex items-start gap-2.5" style={{ borderColor: "#F59B1E", background: N.ambarT }}>
           <Goal size={14} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
-          <p className="text-sm" style={{ color: "#7A5A10" }}>{texto}</p>
+          <p className="text-sm" style={{ color: N.ambarInk }}>{texto}</p>
         </div>
       ))}
     </div>
@@ -2444,8 +2482,8 @@ function VistaPartidos({ T, partidoDestacadoId, onConsumirDestacado }) {
       <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: T.accent, background: T.accentTint }}>
         <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ambar }} />
         <div>
-          <div className="text-sm font-semibold" style={{ color: "#7A5A10" }}>Prepartido con dato real + heurística propia</div>
-          <p className="text-xs mt-0.5" style={{ color: "#7A5A10" }}>
+          <div className="text-sm font-semibold" style={{ color: N.ambarInk }}>Prepartido con dato real + heurística propia</div>
+          <p className="text-xs mt-0.5" style={{ color: N.ambarInk }}>
             Los KPIs de cada equipo son reales (ffcv_public_data/). Los insights de cruce son una <b>heurística propia del
             equipo de producto, sin validar todavía con el comité</b> — se leen como probabilidad, no como certeza.
           </p>
@@ -2486,7 +2524,7 @@ function VistaPartidos({ T, partidoDestacadoId, onConsumirDestacado }) {
           <div className="space-y-2">
             {filasFiltradas.map((f) => (
               <div key={f.partido.id} onClick={() => setPartidoSelManual(f)}
-                className="rounded border p-3 flex items-center justify-between gap-3 flex-wrap cursor-pointer hover:bg-slate-50" style={{ borderColor: N.rule }}>
+                className="rounded border p-3 flex items-center justify-between gap-3 flex-wrap cursor-pointer hover:bg-[rgba(255,255,255,.04)]" style={{ borderColor: N.rule }}>
                 <div>
                   <div className="text-sm font-medium" style={{ color: N.ink }}>{f.partido.equipoLocal} – {f.partido.equipoVisitante}</div>
                   <div className="text-xs mt-0.5" style={{ color: N.ink40 }}>{f.partido.categoriaMinima} · {f.partido.fecha} · {f.cicloEtiqueta}</div>
@@ -2532,7 +2570,7 @@ function VistaIA({ T }) {
       <Panel title="Ejemplo · consulta al asistente">
         <div className="space-y-3 max-w-2xl opacity-90">
           <div className="flex justify-end">
-            <div className="rounded-lg px-4 py-2.5 text-sm max-w-[80%]" style={{ background: T.primary, color: "#FFF" }}>
+            <div className="rounded-lg px-4 py-2.5 text-sm max-w-[80%]" style={{ background: T.deep, color: "#FFF" }}>
               ¿Qué árbitros de Preferente están en forma y tienen menos de 3 fines de semana de indisponibilidad?
             </div>
           </div>
@@ -2644,7 +2682,7 @@ function VistaSeguimientoOperativo({ T }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: N.rule, background: "#FAFAF9" }}>
+      <div className="rounded-md border-2 border-dashed p-4 flex items-start gap-3" style={{ borderColor: N.rule, background: "rgba(255,255,255,.03)" }}>
         <Info size={18} className="mt-0.5 shrink-0" style={{ color: N.ink40 }} />
         <div>
           <div className="text-sm font-semibold" style={{ color: N.ink }}>Control interno, no una vista de producto</div>
@@ -2808,6 +2846,913 @@ function VistaGlosario({ T }) {
   );
 }
 
+/* ===================== Gestión y seguimiento de decisiones (spec 007-gestion-decisiones-comite) =====================
+   Página nueva: registrar decisiones/acciones/políticas del comité (árbitro, categoría
+   completa o grupo dentro de una categoría) con una foto del estado relevante en ese
+   momento, y revisar más adelante si el impacto estimado se cumplió — mecánica tipo
+   Football Manager, ver spec.md. NO tiene control de acceso propio todavía (FR-012):
+   mismo criterio sin cuentas de la Fase 1 de rollout que el resto del prototipo
+   (docs/decisiones-producto.md §22), hasta que 004-roles-permisos exista. */
+
+const TIPOS_DECISION = {
+  accion_motivacion: "Acción de motivación/seguimiento",
+  campana_ascenso: "Campaña de ascenso",
+};
+
+const METRICA_LABELS = {
+  estado_forma: "Estado de forma",
+  disponibilidad_vigente: "Disponibilidad vigente",
+  num_informes: "Informes acumulados",
+  ultima_prueba_fisica: "Última prueba física",
+  ultimo_examen_teorico: "Último examen teórico",
+};
+
+function valorMetricaLegible(clave, campo) {
+  if (!campo || campo.valor == null) return "—";
+  const v = campo.valor;
+  if (clave === "estado_forma") return `${v.media.toFixed(1)} (${v.color})`;
+  if (clave === "disponibilidad_vigente") return v.motivo ? `${v.tipo} · ${v.motivo}` : v.tipo;
+  if (clave === "num_informes") return String(v);
+  if (clave === "ultima_prueba_fisica" || clave === "ultimo_examen_teorico") return `${v.nota} (${v.fecha})`;
+  return JSON.stringify(v);
+}
+
+function FormularioDecision({ T, onCancelar, onCreada }) {
+  const [nivel, setNivel] = useState("arbitro");
+  const [arbitroId, setArbitroId] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [seleccionIds, setSeleccionIds] = useState([]);
+  const [filtroEstadoForma, setFiltroEstadoForma] = useState("todos");
+  const [titulo, setTitulo] = useState("");
+  const [estimacionImpacto, setEstimacionImpacto] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState(null);
+
+  const cicloActivo = ciclosAsignacion[0];
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState("cargando");
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentesDisponibilidad(resultado.vigentesPorArbitro);
+        setDisponibilidadEstado("listo");
+      } else {
+        setDisponibilidadEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [cicloActivo.id]);
+
+  const categoriasReales = CATEGORIAS.filter((c) => c !== "Todas");
+  const arbitrosDeCategoria = categoria ? ARBITROS.filter((a) => a.cat === categoria) : [];
+  const arbitrosFiltrados = filtroEstadoForma === "todos"
+    ? arbitrosDeCategoria
+    : arbitrosDeCategoria.filter((a) => estadoForma(a.forma).color === filtroEstadoForma);
+
+  const toggleSeleccion = (id) => {
+    setSeleccionIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError(null);
+
+    if (!titulo.trim()) { setError("Escribe un título para la decisión."); return; }
+    if (!estimacionImpacto.trim()) { setError("Escribe qué esperas conseguir con esta decisión."); return; }
+    if (disponibilidadEstado !== "listo") {
+      setError("Esperando a cargar la disponibilidad vigente — vuelve a intentarlo en un momento.");
+      return;
+    }
+
+    const resuelto = resolverObjetivoArbitros(
+      { nivel, categoria, arbitroId: arbitroId ? Number(arbitroId) : null, seleccionIds },
+      ARBITROS
+    );
+    if (!resuelto.valido) { setError(resuelto.motivoRechazo); return; }
+
+    setGuardando(true);
+    const snapshots = resuelto.arbitroIds.map((id) => {
+      const arbitro = ARBITROS.find((a) => a.id === id);
+      const contexto = {
+        estadoForma: estadoForma(arbitro.forma),
+        disponibilidadVigente: vigentesDisponibilidad.get(id) ?? null,
+      };
+      return { arbitroId: id, metricas: construirSnapshot(arbitro, contexto) };
+    });
+
+    const resultado = await registrarDecisionComite({
+      tipo: "accion_motivacion",
+      titulo: titulo.trim(),
+      objetivoNivel: nivel,
+      objetivoCategoria: nivel === "arbitro" ? null : categoria,
+      objetivoArbitroIds: resuelto.arbitroIds,
+      estimacionImpacto: estimacionImpacto.trim(),
+      autor: "Comité",
+      snapshots,
+    });
+    setGuardando(false);
+
+    if (!resultado.ok) { setError(resultado.error); return; }
+    onCreada(resultado.decision.id);
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <button onClick={onCancelar} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Cancelar</button>
+      <Panel title="Nueva decisión · acción de motivación/seguimiento">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-[10px] uppercase tracking-[0.14em] font-semibold block mb-1.5" style={{ color: N.ink40 }}>Objetivo</label>
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { id: "arbitro", label: "Un árbitro" },
+                { id: "categoria", label: "Categoría completa" },
+                { id: "grupo_categoria", label: "Grupo dentro de una categoría" },
+              ].map((op) => (
+                <button key={op.id} type="button" onClick={() => { setNivel(op.id); setSeleccionIds([]); }}
+                  className="text-xs rounded-full px-3 py-1.5 border transition-colors"
+                  style={{
+                    borderColor: nivel === op.id ? T.primary : N.rule,
+                    background: nivel === op.id ? T.tint : N.card,
+                    color: nivel === op.id ? T.primary : N.ink70,
+                  }}>
+                  {op.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {nivel === "arbitro" && (
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Árbitro</label>
+              <select value={arbitroId} onChange={(e) => setArbitroId(e.target.value)}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir árbitro…</option>
+                {ARBITROS.map((a) => <option key={a.id} value={a.id}>{a.n} · {a.cat}</option>)}
+              </select>
+            </div>
+          )}
+
+          {(nivel === "categoria" || nivel === "grupo_categoria") && (
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Categoría</label>
+              <select value={categoria} onChange={(e) => { setCategoria(e.target.value); setSeleccionIds([]); }}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir categoría…</option>
+                {categoriasReales.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          )}
+
+          {nivel === "grupo_categoria" && categoria && (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-medium" style={{ color: N.ink70 }}>Árbitros de {categoria}</label>
+                <select value={filtroEstadoForma} onChange={(e) => setFiltroEstadoForma(e.target.value)}
+                  className="text-xs rounded border px-2 py-1" style={{ borderColor: N.rule, color: N.ink70 }}>
+                  <option value="todos">Todos los estados</option>
+                  <option value="rojo">Solo en seguimiento</option>
+                  <option value="ambar">Solo irregulares</option>
+                  <option value="verde">Solo en forma</option>
+                </select>
+              </div>
+              <div className="max-h-56 overflow-y-auto rounded border divide-y" style={{ borderColor: N.rule }}>
+                {arbitrosFiltrados.length === 0 && (
+                  <p className="text-xs p-3" style={{ color: N.ink40 }}>Ningún árbitro de esta categoría coincide con el filtro.</p>
+                )}
+                {arbitrosFiltrados.map((a) => (
+                  <label key={a.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer" style={{ color: N.ink }}>
+                    <input type="checkbox" checked={seleccionIds.includes(a.id)} onChange={() => toggleSeleccion(a.id)} />
+                    {a.n}
+                    <Semaforo estado={estadoForma(a.forma)} />
+                  </label>
+                ))}
+              </div>
+              <p className="text-[11px] mt-1" style={{ color: N.ink40 }}>{seleccionIds.length} seleccionado(s)</p>
+            </div>
+          )}
+
+          <div>
+            <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Título</label>
+            <input value={titulo} onChange={(e) => setTitulo(e.target.value)}
+              placeholder="p. ej. Email de reactivación a árbitros en seguimiento"
+              className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>
+              ¿Qué esperas conseguir? (estimación cualitativa del comité, no una cifra calculada — FR-004)
+            </label>
+            <textarea value={estimacionImpacto} onChange={(e) => setEstimacionImpacto(e.target.value)} rows={3}
+              placeholder="p. ej. Que el árbitro sienta seguimiento del comité y su estado de forma mejore en los próximos meses"
+              className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+          </div>
+
+          {error && (
+            <p className="text-xs rounded px-3 py-2" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{error}</p>
+          )}
+
+          <div className="flex gap-2">
+            <button type="submit" disabled={guardando}
+              className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+              {guardando ? "Guardando…" : "Registrar decisión"}
+            </button>
+            <button type="button" onClick={onCancelar} className="text-xs rounded px-4 py-2 font-medium" style={{ color: N.ink70 }}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Panel>
+    </div>
+  );
+}
+
+const COMPARACION_INFO = {
+  mejora: { label: "Mejora", color: VIZ.estado.good },
+  empeora: { label: "Empeora", color: VIZ.estado.critical },
+  sin_cambio: { label: "Sin cambio", color: N.ink40 },
+  no_comparable: { label: "No comparable", color: N.ink40 },
+};
+
+/* Agrupa las filas de revisiones_impacto por revisado_en (todas las filas de
+   una misma llamada a revisarImpacto comparten el mismo timestamp — now() es
+   estable dentro de una sola sentencia de inserción en Postgres) — cada grupo
+   es una "ronda" de revisión, puede haber varias sobre la misma decisión (T023). */
+function agruparRevisionesPorRonda(revisiones) {
+  const porRonda = new Map();
+  for (const r of revisiones) {
+    if (!porRonda.has(r.revisadoEn)) porRonda.set(r.revisadoEn, []);
+    porRonda.get(r.revisadoEn).push(r);
+  }
+  return [...porRonda.entries()].sort((a, b) => new Date(b[0]) - new Date(a[0]));
+}
+
+function DetalleDecision({ T, decisionId, onVolver }) {
+  const [estado, setEstado] = useState("cargando"); // cargando | listo | error
+  const [decision, setDecision] = useState(null);
+  const [snapshots, setSnapshots] = useState([]);
+  const [revisiones, setRevisiones] = useState([]);
+  const [revisando, setRevisando] = useState(false);
+  const [errorRevision, setErrorRevision] = useState(null);
+
+  const cicloActivo = ciclosAsignacion[0];
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState("cargando");
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerDecisionComite(decisionId).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setDecision(resultado.decision);
+        setSnapshots(resultado.snapshots);
+        setRevisiones(resultado.revisiones);
+        setEstado("listo");
+      } else {
+        setEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [decisionId]);
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentesDisponibilidad(resultado.vigentesPorArbitro);
+        setDisponibilidadEstado("listo");
+      } else {
+        setDisponibilidadEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [cicloActivo.id]);
+
+  if (estado === "cargando") return <p className="text-sm" style={{ color: N.ink40 }}>Cargando decisión…</p>;
+  if (estado === "error" || !decision) {
+    return (
+      <div>
+        <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver</button>
+        <p className="text-sm" style={{ color: VIZ.estado.critical }}>No se pudo cargar esta decisión.</p>
+      </div>
+    );
+  }
+
+  const nombrePorId = new Map(ARBITROS.map((a) => [a.id, a.n]));
+  const objetivoTexto = decision.objetivoNivel === "arbitro"
+    ? "árbitro individual"
+    : decision.objetivoNivel === "categoria"
+      ? `toda la categoría ${decision.objetivoCategoria}`
+      : `grupo de ${decision.objetivoCategoria}`;
+
+  const estadoRevision = derivarEstadoRevision({
+    creadoEn: decision.creadoEn,
+    plazoRevisionMeses: decision.plazoRevisionMeses,
+    tieneRevision: revisiones.length > 0,
+  });
+  const rondas = agruparRevisionesPorRonda(revisiones);
+
+  async function handleRevisar() {
+    setErrorRevision(null);
+    if (disponibilidadEstado !== "listo") {
+      setErrorRevision("Esperando a cargar la disponibilidad vigente — vuelve a intentarlo en un momento.");
+      return;
+    }
+    setRevisando(true);
+
+    const metricasActualesPorArbitroId = {};
+    for (const s of snapshots) {
+      const arbitro = ARBITROS.find((a) => a.id === s.arbitroId);
+      if (!arbitro) {
+        // árbitro ya no activo en el dataset — se omite, decisionesRepo lo marca
+        // no_comparable con motivo "árbitro no activo" (Edge Case de spec.md).
+        continue;
+      }
+      const contexto = {
+        estadoForma: estadoForma(arbitro.forma),
+        disponibilidadVigente: vigentesDisponibilidad.get(arbitro.id) ?? null,
+      };
+      metricasActualesPorArbitroId[s.arbitroId] = construirSnapshot(arbitro, contexto);
+    }
+
+    const resultado = await revisarImpacto(decisionId, {
+      metricasActualesPorArbitroId,
+      revisadoPor: "Comité",
+    });
+    setRevisando(false);
+
+    if (!resultado.ok) { setErrorRevision(resultado.error); return; }
+    setRevisiones((prev) => [...resultado.revisiones, ...prev]);
+  }
+
+  return (
+    <div>
+      <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver a decisiones</button>
+      <Panel title={TIPOS_DECISION[decision.tipo] ?? decision.tipo}
+        right={<span className="text-xs" style={{ color: N.ink40 }}>{new Date(decision.creadoEn).toLocaleDateString("es-ES")}</span>}>
+        <h2 className="text-lg font-semibold mb-1" style={{ color: N.ink }}>{decision.titulo}</h2>
+        <p className="text-xs mb-3" style={{ color: N.ink40 }}>
+          Objetivo: {objetivoTexto} · {decision.objetivoArbitroIds.length} árbitro(s) afectado(s)
+        </p>
+        <div className="rounded border p-3 mb-4" style={{ borderColor: N.rule, background: N.paper }}>
+          <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-1" style={{ color: N.ink40 }}>
+            Impacto esperado (estimación cualitativa del comité)
+          </div>
+          <p className="text-sm" style={{ color: N.ink }}>{decision.estimacionImpacto}</p>
+        </div>
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Foto del estado en el momento de decidir
+        </div>
+        <div className="space-y-3 mb-4">
+          {snapshots.map((s) => (
+            <div key={s.arbitroId} className="rounded border p-3" style={{ borderColor: N.rule }}>
+              <div className="text-sm font-medium mb-2" style={{ color: N.ink }}>{nombrePorId.get(s.arbitroId) ?? `Árbitro #${s.arbitroId}`}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {Object.entries(s.metricas).map(([clave, campo]) => (
+                  <div key={clave} className="text-xs flex items-center justify-between gap-2 rounded px-2 py-1.5" style={{ background: N.paper }}>
+                    <span style={{ color: N.ink70 }}>{METRICA_LABELS[clave] ?? clave}</span>
+                    <span className="font-mono" style={{ color: N.ink }}>
+                      {valorMetricaLegible(clave, campo)}
+                      <span className="ml-1.5" style={{ color: campo.fuente === "real" ? T.primary : N.ink40 }}>· {campo.fuente}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="border-t pt-4" style={{ borderColor: N.rule }}>
+          <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+            <div className="text-[10px] uppercase tracking-[0.14em] font-semibold" style={{ color: N.ink40 }}>
+              Revisión de impacto
+            </div>
+            <button onClick={handleRevisar} disabled={revisando}
+              className="text-xs rounded px-3 py-1.5 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+              {revisando ? "Revisando…" : "Revisar impacto ahora"}
+            </button>
+          </div>
+          {estadoRevision === "plazo_no_cumplido" && (
+            <p className="text-xs mb-3" style={{ color: N.ink40 }}>
+              El plazo típico de revisión ({decision.plazoRevisionMeses} meses) todavía no se ha cumplido — puedes
+              revisar igualmente, es solo una referencia, no un bloqueo.
+            </p>
+          )}
+          {errorRevision && (
+            <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{errorRevision}</p>
+          )}
+          {rondas.length === 0 && (
+            <p className="text-sm" style={{ color: N.ink40 }}>Todavía no se ha revisado el impacto de esta decisión.</p>
+          )}
+          <div className="space-y-4">
+            {rondas.map(([revisadoEn, filas]) => (
+              <div key={revisadoEn}>
+                <div className="text-xs font-medium mb-2" style={{ color: N.ink70 }}>
+                  Revisión del {new Date(revisadoEn).toLocaleDateString("es-ES")}
+                </div>
+                <p className="text-[11px] mb-2 italic" style={{ color: N.ink40 }}>
+                  Correlación temporal, no una relación de causa-efecto confirmada — otras decisiones o factores
+                  pueden haber influido en el mismo periodo.
+                </p>
+                <div className="space-y-2">
+                  {filas.map((r) => (
+                    <div key={r.id} className="rounded border p-3" style={{ borderColor: N.rule }}>
+                      <div className="text-sm font-medium mb-2" style={{ color: N.ink }}>
+                        {nombrePorId.get(r.arbitroId) ?? `Árbitro #${r.arbitroId}`}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {Object.entries(r.comparacion).map(([clave, direccion]) => {
+                          const info = COMPARACION_INFO[direccion] ?? COMPARACION_INFO.no_comparable;
+                          return (
+                            <div key={clave} className="text-xs flex items-center justify-between gap-2 rounded px-2 py-1.5" style={{ background: N.paper }}>
+                              <span style={{ color: N.ink70 }}>{METRICA_LABELS[clave] ?? clave}</span>
+                              <span className="font-mono font-medium" style={{ color: info.color }}>{info.label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+function FormularioCampana({ T, onCancelar, onCreada }) {
+  const [categoriaOrigen, setCategoriaOrigen] = useState("");
+  const [categoriaDestino, setCategoriaDestino] = useState("");
+  const [seleccionIds, setSeleccionIds] = useState([]);
+  const [estimacionImpacto, setEstimacionImpacto] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState(null);
+
+  const cicloActivo = ciclosAsignacion[0];
+  const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
+  const [disponibilidadEstado, setDisponibilidadEstado] = useState("cargando");
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerVigentesDisponibilidadPorCiclo(cicloActivo.id).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setVigentesDisponibilidad(resultado.vigentesPorArbitro);
+        setDisponibilidadEstado("listo");
+      } else {
+        setDisponibilidadEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [cicloActivo.id]);
+
+  const categoriasReales = CATEGORIAS.filter((c) => c !== "Todas");
+  const arbitrosDeCategoria = categoriaOrigen ? ARBITROS.filter((a) => a.cat === categoriaOrigen) : [];
+
+  const toggleSeleccion = (id) => {
+    setSeleccionIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError(null);
+
+    if (!categoriaOrigen || !categoriaDestino) { setError("Elige categoría de origen y de destino."); return; }
+    if (seleccionIds.length === 0) { setError("Selecciona al menos un candidato."); return; }
+    if (!estimacionImpacto.trim()) { setError("Escribe qué esperas conseguir con esta campaña."); return; }
+    if (disponibilidadEstado !== "listo") {
+      setError("Esperando a cargar la disponibilidad vigente — vuelve a intentarlo en un momento.");
+      return;
+    }
+
+    setGuardando(true);
+    const snapshots = seleccionIds.map((id) => {
+      const arbitro = ARBITROS.find((a) => a.id === id);
+      const contexto = {
+        estadoForma: estadoForma(arbitro.forma),
+        disponibilidadVigente: vigentesDisponibilidad.get(id) ?? null,
+      };
+      return { arbitroId: id, metricas: construirSnapshot(arbitro, contexto) };
+    });
+
+    const resultado = await registrarDecisionComite({
+      tipo: "campana_ascenso",
+      titulo: `Campaña de ascenso: ${categoriaOrigen} → ${categoriaDestino}`,
+      objetivoNivel: "grupo_categoria",
+      objetivoCategoria: categoriaOrigen,
+      objetivoArbitroIds: seleccionIds,
+      estimacionImpacto: estimacionImpacto.trim(),
+      autor: "Comité",
+      detalle: {
+        categoria_origen: categoriaOrigen,
+        categoria_destino: categoriaDestino,
+        candidatos: seleccionIds.map((id) => ({ arbitroId: id, notaTeorica: null, notaFisica: null })),
+        plazas_disponibles: null,
+        corte_confirmado: false,
+        ascendidos_arbitro_ids: [],
+      },
+      snapshots,
+    });
+    setGuardando(false);
+
+    if (!resultado.ok) { setError(resultado.error); return; }
+    onCreada(resultado.decision.id);
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <button onClick={onCancelar} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Cancelar</button>
+      <Panel title="Nueva campaña de ascenso">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Categoría de origen</label>
+              <select value={categoriaOrigen} onChange={(e) => { setCategoriaOrigen(e.target.value); setSeleccionIds([]); }}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir categoría…</option>
+                {categoriasReales.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Categoría de destino</label>
+              <select value={categoriaDestino} onChange={(e) => setCategoriaDestino(e.target.value)}
+                className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }}>
+                <option value="">Elegir categoría…</option>
+                {categoriasReales.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {categoriaOrigen && (
+            <div>
+              <label className="text-xs font-medium block mb-1.5" style={{ color: N.ink70 }}>Candidatos de {categoriaOrigen}</label>
+              <div className="max-h-56 overflow-y-auto rounded border divide-y" style={{ borderColor: N.rule }}>
+                {arbitrosDeCategoria.map((a) => (
+                  <label key={a.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer" style={{ color: N.ink }}>
+                    <input type="checkbox" checked={seleccionIds.includes(a.id)} onChange={() => toggleSeleccion(a.id)} />
+                    {a.n}
+                  </label>
+                ))}
+              </div>
+              <p className="text-[11px] mt-1" style={{ color: N.ink40 }}>{seleccionIds.length} candidato(s) seleccionado(s)</p>
+            </div>
+          )}
+
+          <div>
+            <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>¿Qué esperas conseguir con esta campaña?</label>
+            <textarea value={estimacionImpacto} onChange={(e) => setEstimacionImpacto(e.target.value)} rows={2}
+              placeholder="p. ej. Reforzar la categoría superior con árbitros preparados y detectar talento"
+              className="w-full text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+          </div>
+
+          {error && (
+            <p className="text-xs rounded px-3 py-2" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{error}</p>
+          )}
+
+          <div className="flex gap-2">
+            <button type="submit" disabled={guardando}
+              className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60" style={{ background: T.primary }}>
+              {guardando ? "Creando…" : "Crear campaña"}
+            </button>
+            <button type="button" onClick={onCancelar} className="text-xs rounded px-4 py-2 font-medium" style={{ color: N.ink70 }}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </Panel>
+    </div>
+  );
+}
+
+function DetalleCampana({ T, decisionId, onVolver }) {
+  const [estado, setEstado] = useState("cargando"); // cargando | listo | error
+  const [decision, setDecision] = useState(null);
+  const [notas, setNotas] = useState({});
+  const [guardandoNotas, setGuardandoNotas] = useState(false);
+  const [errorNotas, setErrorNotas] = useState(null);
+  const [plazas, setPlazas] = useState("");
+  const [confirmando, setConfirmando] = useState(false);
+  const [errorConfirmar, setErrorConfirmar] = useState(null);
+
+  useEffect(() => {
+    let cancelado = false;
+    obtenerDecisionComite(decisionId).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setDecision(resultado.decision);
+        const candidatos = resultado.decision.detalle?.candidatos ?? [];
+        const notasIniciales = {};
+        for (const c of candidatos) {
+          notasIniciales[c.arbitroId] = { notaTeorica: c.notaTeorica ?? "", notaFisica: c.notaFisica ?? "" };
+        }
+        setNotas(notasIniciales);
+        setPlazas(resultado.decision.detalle?.plazas_disponibles ?? "");
+        setEstado("listo");
+      } else {
+        setEstado("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, [decisionId]);
+
+  if (estado === "cargando") return <p className="text-sm" style={{ color: N.ink40 }}>Cargando campaña…</p>;
+  if (estado === "error" || !decision) {
+    return (
+      <div>
+        <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver</button>
+        <p className="text-sm" style={{ color: VIZ.estado.critical }}>No se pudo cargar esta campaña.</p>
+      </div>
+    );
+  }
+
+  const campanaId = decision.id; // identidad estable = campana_id de la primera fase
+  const detalle = decision.detalle ?? {};
+  const corteConfirmado = Boolean(detalle.corte_confirmado);
+  const candidatos = detalle.candidatos ?? [];
+  const nombrePorId = new Map(ARBITROS.map((a) => [a.id, a.n]));
+
+  const candidatosConNotasActuales = candidatos.map((c) => ({
+    arbitroId: c.arbitroId,
+    notaTeorica: notas[c.arbitroId]?.notaTeorica === "" || notas[c.arbitroId]?.notaTeorica == null ? null : Number(notas[c.arbitroId].notaTeorica),
+    notaFisica: notas[c.arbitroId]?.notaFisica === "" || notas[c.arbitroId]?.notaFisica == null ? null : Number(notas[c.arbitroId].notaFisica),
+  }));
+  const { candidatosOrdenados, candidatosIncompletos } = clasificarCandidatos(candidatosConNotasActuales);
+  const plazasNum = plazas === "" ? 0 : Number(plazas);
+  const { dentroDeCorte } = calcularCorte(candidatosOrdenados, plazasNum);
+
+  async function handleGuardarNotas() {
+    setErrorNotas(null);
+    setGuardandoNotas(true);
+    const candidatosActualizados = candidatos.map((c) => ({
+      arbitroId: c.arbitroId,
+      notaTeorica: notas[c.arbitroId]?.notaTeorica === "" || notas[c.arbitroId]?.notaTeorica == null ? null : Number(notas[c.arbitroId].notaTeorica),
+      notaFisica: notas[c.arbitroId]?.notaFisica === "" || notas[c.arbitroId]?.notaFisica == null ? null : Number(notas[c.arbitroId].notaFisica),
+    }));
+    const resultado = await registrarFaseCampana(campanaId, { candidatos: candidatosActualizados });
+    setGuardandoNotas(false);
+    if (!resultado.ok) { setErrorNotas(resultado.error); return; }
+    setDecision(resultado.decision);
+  }
+
+  async function handleConfirmarCorte() {
+    setErrorConfirmar(null);
+    if (plazas === "" || Number(plazas) < 0) {
+      setErrorConfirmar("Introduce un número de plazas válido (0 o mayor).");
+      return;
+    }
+    setConfirmando(true);
+    const resultado = await confirmarCorteAscenso(campanaId, { plazasDisponibles: Number(plazas) });
+    setConfirmando(false);
+    if (!resultado.ok) { setErrorConfirmar(resultado.motivoRechazo); return; }
+    setDecision(resultado.decision);
+  }
+
+  return (
+    <div>
+      <button onClick={onVolver} className="text-xs mb-3" style={{ color: T.primary }}>&larr; Volver a decisiones</button>
+      <Panel title="Campaña de ascenso"
+        right={<span className="text-xs" style={{ color: N.ink40 }}>{new Date(decision.creadoEn).toLocaleDateString("es-ES")}</span>}>
+        <h2 className="text-lg font-semibold mb-1" style={{ color: N.ink }}>{decision.titulo}</h2>
+        <p className="text-xs mb-4" style={{ color: N.ink40 }}>
+          {detalle.categoria_origen} &rarr; {detalle.categoria_destino} · {candidatos.length} candidato(s)
+          {corteConfirmado && <span className="ml-2 font-semibold" style={{ color: VIZ.estado.good }}>· corte confirmado</span>}
+        </p>
+
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Notas de pruebas <span className="normal-case font-normal">(sintéticas mientras no haya dato real del comité)</span>
+        </div>
+        <div className="rounded border overflow-hidden mb-3" style={{ borderColor: N.rule }}>
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: N.paper }}>
+                <th className="text-left px-3 py-2 font-medium" style={{ color: N.ink70 }}>Candidato</th>
+                <th className="text-left px-3 py-2 font-medium" style={{ color: N.ink70 }}>Nota teórica</th>
+                <th className="text-left px-3 py-2 font-medium" style={{ color: N.ink70 }}>Nota física</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidatos.map((c) => (
+                <tr key={c.arbitroId} className="border-t" style={{ borderColor: N.rule }}>
+                  <td className="px-3 py-2" style={{ color: N.ink }}>{nombrePorId.get(c.arbitroId) ?? `#${c.arbitroId}`}</td>
+                  <td className="px-3 py-2">
+                    <input type="number" min="0" max="10" step="0.1" disabled={corteConfirmado}
+                      value={notas[c.arbitroId]?.notaTeorica ?? ""}
+                      onChange={(e) => setNotas((prev) => ({ ...prev, [c.arbitroId]: { ...prev[c.arbitroId], notaTeorica: e.target.value } }))}
+                      className="w-20 text-sm rounded border px-2 py-1 disabled:opacity-60" style={{ borderColor: N.rule, color: N.ink }} />
+                  </td>
+                  <td className="px-3 py-2">
+                    <input type="number" min="0" max="10" step="0.1" disabled={corteConfirmado}
+                      value={notas[c.arbitroId]?.notaFisica ?? ""}
+                      onChange={(e) => setNotas((prev) => ({ ...prev, [c.arbitroId]: { ...prev[c.arbitroId], notaFisica: e.target.value } }))}
+                      className="w-20 text-sm rounded border px-2 py-1 disabled:opacity-60" style={{ borderColor: N.rule, color: N.ink }} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {errorNotas && (
+          <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{errorNotas}</p>
+        )}
+        {!corteConfirmado && (
+          <button onClick={handleGuardarNotas} disabled={guardandoNotas}
+            className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60 mb-6" style={{ background: T.primary }}>
+            {guardandoNotas ? "Guardando…" : "Guardar notas"}
+          </button>
+        )}
+
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Clasificación {corteConfirmado ? "" : "en vivo (previsualización)"}
+        </div>
+        <div className="rounded border overflow-hidden mb-3" style={{ borderColor: N.rule }}>
+          {candidatosOrdenados.length === 0 && (
+            <p className="text-xs p-3" style={{ color: N.ink40 }}>Ningún candidato tiene todavía las dos notas registradas.</p>
+          )}
+          {candidatosOrdenados.map((c, i) => {
+            const dentro = corteConfirmado
+              ? (detalle.ascendidos_arbitro_ids ?? []).includes(c.arbitroId)
+              : dentroDeCorte.includes(c.arbitroId);
+            return (
+              <div key={c.arbitroId} className="flex items-center justify-between px-3 py-2 border-t first:border-t-0" style={{ borderColor: N.rule }}>
+                <span className="text-sm" style={{ color: N.ink }}>{i + 1}. {nombrePorId.get(c.arbitroId) ?? `#${c.arbitroId}`}</span>
+                <span className="text-xs flex items-center gap-2">
+                  <span className="font-mono" style={{ color: N.ink70 }}>{c.notaFinal.toFixed(1)}</span>
+                  {dentro && (
+                    <span className="rounded-full px-2 py-0.5 font-medium" style={{ background: VIZ.estado.goodT, color: VIZ.estado.good }}>
+                      {corteConfirmado ? "Ascendido" : "Dentro del corte"}
+                    </span>
+                  )}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        {candidatosIncompletos.length > 0 && (
+          <p className="text-[11px] mb-4" style={{ color: N.ink40 }}>
+            Sin ambas notas todavía, fuera de la clasificación: {candidatosIncompletos.map((c) => nombrePorId.get(c.arbitroId) ?? `#${c.arbitroId}`).join(", ")}
+          </p>
+        )}
+
+        <div className="text-[10px] uppercase tracking-[0.14em] font-semibold mb-2" style={{ color: N.ink40 }}>
+          Plazas y confirmación del corte
+        </div>
+        {corteConfirmado ? (
+          <p className="text-sm" style={{ color: VIZ.estado.good }}>
+            Corte confirmado con {detalle.plazas_disponibles} plaza(s) — campaña inmutable, resultado basado en pruebas sintéticas.
+          </p>
+        ) : (
+          <div className="flex items-end gap-3 flex-wrap">
+            <div>
+              <label className="text-xs font-medium block mb-1" style={{ color: N.ink70 }}>Plazas disponibles</label>
+              <input type="number" min="0" value={plazas} onChange={(e) => setPlazas(e.target.value)}
+                className="w-24 text-sm rounded border px-3 py-2" style={{ borderColor: N.rule, color: N.ink }} />
+            </div>
+            <button onClick={handleConfirmarCorte} disabled={confirmando}
+              className="text-xs rounded px-4 py-2 font-medium text-white disabled:opacity-60" style={{ background: T.accent }}>
+              {confirmando ? "Confirmando…" : "Confirmar corte"}
+            </button>
+          </div>
+        )}
+        {errorConfirmar && (
+          <p className="text-xs rounded px-3 py-2 mt-3" style={{ color: VIZ.estado.critical, background: VIZ.estado.criticalT }}>{errorConfirmar}</p>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+/* Componente propio (no solo un bloque dentro de VistaDecisiones) para poder
+   remontarlo con key={} al volver de crear/ver una decisión — el remonte
+   reinicia estadoLista a "cargando" de forma natural, sin llamar a setState
+   de forma síncrona dentro del efecto (regla de Next.js 16, ver webapp/AGENTS.md). */
+const ESTADO_REVISION_INFO = {
+  pendiente: { label: "Pendiente de revisión", bg: VIZ.estado.warningT, fg: VIZ.estado.warning },
+  plazo_no_cumplido: { label: "Plazo no cumplido", bg: N.paper, fg: N.ink40 },
+  revisada: { label: "Revisada", bg: VIZ.estado.goodT, fg: VIZ.estado.good },
+};
+
+function ListaDecisiones({ T, onAbrir, onNueva, onNuevaCampana }) {
+  const [decisiones, setDecisiones] = useState(null);
+  const [estadoLista, setEstadoLista] = useState("cargando"); // cargando | listo | error
+  const [filtroTipo, setFiltroTipo] = useState("");
+
+  useEffect(() => {
+    let cancelado = false;
+    listarDecisiones({}).then((resultado) => {
+      if (cancelado) return;
+      if (resultado.ok) {
+        setDecisiones(resultado.decisiones);
+        setEstadoLista("listo");
+      } else {
+        setEstadoLista("error");
+      }
+    });
+    return () => { cancelado = true; };
+  }, []);
+
+  const decisionesFiltradas = decisiones && filtroTipo ? decisiones.filter((d) => d.tipo === filtroTipo) : decisiones;
+
+  return (
+    <div>
+      <div className="flex justify-end mb-3 gap-2">
+        <button onClick={onNuevaCampana} className="text-xs rounded px-4 py-2 font-medium" style={{ border: `1px solid ${T.primary}`, color: T.primary }}>
+          + Campaña de ascenso
+        </button>
+        <button onClick={onNueva} className="text-xs rounded px-4 py-2 font-medium text-white" style={{ background: T.primary }}>
+          + Nueva decisión
+        </button>
+      </div>
+      <Panel title="Decisiones registradas"
+        right={
+          <select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}
+            className="text-xs rounded border px-2 py-1" style={{ borderColor: N.rule, color: N.ink70 }}>
+            <option value="">Todos los tipos</option>
+            {Object.entries(TIPOS_DECISION).map(([valor, label]) => <option key={valor} value={valor}>{label}</option>)}
+          </select>
+        }>
+        {estadoLista === "cargando" && <p className="text-sm" style={{ color: N.ink40 }}>Cargando…</p>}
+        {estadoLista === "error" && (
+          <p className="text-sm" style={{ color: VIZ.estado.critical }}>No se pudieron cargar las decisiones. Recarga la página.</p>
+        )}
+        {estadoLista === "listo" && decisiones.length === 0 && (
+          <p className="text-sm" style={{ color: N.ink40 }}>Todavía no hay decisiones registradas.</p>
+        )}
+        {estadoLista === "listo" && decisiones.length > 0 && decisionesFiltradas.length === 0 && (
+          <p className="text-sm" style={{ color: N.ink40 }}>Ninguna decisión de este tipo todavía.</p>
+        )}
+        {estadoLista === "listo" && decisionesFiltradas?.length > 0 && (
+          <div className="space-y-2">
+            {decisionesFiltradas.map((d) => {
+              const infoEstado = ESTADO_REVISION_INFO[d.estadoRevision] ?? ESTADO_REVISION_INFO.plazo_no_cumplido;
+              return (
+                <button key={d.id} onClick={() => onAbrir(d.id, d.tipo)}
+                  className="w-full text-left rounded border p-3 transition-colors hover:bg-[rgba(255,255,255,.04)]" style={{ borderColor: N.rule }}>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="text-sm font-medium" style={{ color: N.ink }}>{d.titulo}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] rounded-full px-2 py-0.5 font-medium" style={{ background: infoEstado.bg, color: infoEstado.fg }}>
+                        {infoEstado.label}
+                      </span>
+                      <span className="text-[11px]" style={{ color: N.ink40 }}>{TIPOS_DECISION[d.tipo] ?? d.tipo}</span>
+                    </div>
+                  </div>
+                  <div className="text-xs mt-1" style={{ color: N.ink40 }}>
+                    {new Date(d.creadoEn).toLocaleDateString("es-ES")} · {d.autor}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+function VistaDecisiones({ T }) {
+  const [sub, setSub] = useState("lista"); // lista | nueva | nueva_campana | detalle | detalle_campana
+  const [decisionSelId, setDecisionSelId] = useState(null);
+  const [listaKey, setListaKey] = useState(0);
+
+  const abrirDetalle = (id, tipo) => {
+    setDecisionSelId(id);
+    setSub(tipo === "campana_ascenso" ? "detalle_campana" : "detalle");
+  };
+  const volverALista = () => { setSub("lista"); setListaKey((k) => k + 1); };
+
+  if (sub === "nueva") {
+    return <FormularioDecision T={T} onCancelar={() => setSub("lista")} onCreada={(id) => abrirDetalle(id, "accion_motivacion")} />;
+  }
+  if (sub === "nueva_campana") {
+    return <FormularioCampana T={T} onCancelar={() => setSub("lista")} onCreada={(id) => abrirDetalle(id, "campana_ascenso")} />;
+  }
+  if (sub === "detalle" && decisionSelId) {
+    return <DetalleDecision key={decisionSelId} T={T} decisionId={decisionSelId} onVolver={volverALista} />;
+  }
+  if (sub === "detalle_campana" && decisionSelId) {
+    return <DetalleCampana key={decisionSelId} T={T} decisionId={decisionSelId} onVolver={volverALista} />;
+  }
+
+  return (
+    <div>
+      <p className="text-xs mb-4 max-w-2xl" style={{ color: N.ink40 }}>
+        Gestión de decisiones del comité sobre árbitros, categorías o grupos — registra una decisión con una foto de
+        su estado actual, y revisa más adelante si tuvo el efecto esperado. No tiene todavía control de acceso propio
+        (visible a quien entre al prototipo, mismo criterio sin cuentas de la Fase 1 de rollout que el resto de la
+        demo, hasta que exista <code>004-roles-permisos</code>).
+      </p>
+      <ListaDecisiones key={listaKey} T={T} onAbrir={abrirDetalle} onNueva={() => setSub("nueva")} onNuevaCampana={() => setSub("nueva_campana")} />
+    </div>
+  );
+}
+
 /* ------------------------------- shell ------------------------------- */
 export default function CRMExpedientes() {
   const [vista, setVista] = useState("dashboard");
@@ -2826,8 +3771,12 @@ export default function CRMExpedientes() {
     { id: "partidos", label: "Partidos", icon: Swords },
     { id: "designacion", label: "Designación", icon: Route },
   ];
-  /* Único hueco real que queda como vista previa bloqueada (v3, sin construir). */
+  /* "Próximas versiones": IA sigue bloqueada (v3, sin construir). "Decisiones" (spec 007,
+     6 ago 2026) es la primera página de management/gestión del comité que vive aquí —
+     funcionalidad real, sin candado, decisión explícita de Roberto de agrupar aquí este
+     tipo de páginas según se vayan construyendo. */
   const navFuturo = [
+    { id: "decisiones", label: "Decisiones", icon: ListChecks },
     { id: "ia", label: "Consultar con IA", icon: Sparkles, v: "v3" },
   ];
   /* Grupo aparte, deliberadamente menos vistoso (decisión 30 jul 2026): control interno
@@ -2845,7 +3794,7 @@ export default function CRMExpedientes() {
   const tituloVista = {
     dashboard: "Cuadro de Mando", arbitros: "Árbitros", equipos: "Equipos", partidos: "Partidos",
     designacion: "Designación inteligente", roles: "Configuración", economico: "Seguimiento operativo",
-    glosario: "Glosario y gobernanza", ia: "Consultar con IA",
+    glosario: "Glosario y gobernanza", ia: "Consultar con IA", decisiones: "Decisiones",
   };
   const todosLosItems = [...navV1, ...navFuturo, ...navSistema];
 
@@ -2855,7 +3804,7 @@ export default function CRMExpedientes() {
       return (
         <button key={n.id} onClick={() => ir(n.id)} title={n.label}
           className="w-full flex items-center justify-center rounded px-2 py-2.5 transition-colors"
-          style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : "#A9C3D8" }}>
+          style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : N.ink70 }}>
           <n.icon size={16} />
         </button>
       );
@@ -2863,11 +3812,11 @@ export default function CRMExpedientes() {
     return (
       <button key={n.id} onClick={() => ir(n.id)}
         className="w-full flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors"
-        style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : "#A9C3D8", boxShadow: on ? `inset 3px 0 0 ${T.accent}` : "none" }}>
+        style={{ background: on ? "rgba(255,255,255,0.12)" : "transparent", color: on ? "#FFF" : N.ink70, boxShadow: on ? `inset 3px 0 0 ${T.accent}` : "none" }}>
         <n.icon size={tamañoIcono} />
         <span className="flex-1 text-left">{n.label}</span>
         {futuro && <>
-          <span className="text-[9px] font-mono rounded px-1 py-0.5" style={{ background: "rgba(255,255,255,0.1)", color: "#8FA9BF" }}>{n.v}</span>
+          <span className="text-[9px] font-mono rounded px-1 py-0.5" style={{ background: "rgba(255,255,255,0.1)", color: N.ink40 }}>{n.v}</span>
           <Lock size={10} />
         </>}
       </button>
@@ -2877,36 +3826,36 @@ export default function CRMExpedientes() {
   return (
     <div className="min-h-screen font-sans" style={{ background: N.paper, color: N.ink }}>
       <div className="flex">
-        <aside className={`${colapsado ? "w-16" : "w-56"} shrink-0 min-h-screen hidden md:flex flex-col transition-[width] duration-150`} style={{ background: T.primary }}>
+        <aside className={`${colapsado ? "w-16" : "w-56"} shrink-0 min-h-screen hidden md:flex flex-col transition-[width] duration-150`} style={{ background: T.deep }}>
           <div className={`p-5 flex items-center ${colapsado ? "justify-center" : "gap-3"} border-b`} style={{ borderColor: "rgba(255,255,255,0.12)" }}>
             <Escudo T={T} />
             {!colapsado && (
               <div className="min-w-0">
                 <div className="text-white text-base font-semibold leading-none">Colegial</div>
-                <div className="text-[10px] mt-1 truncate" style={{ color: "#A9C3D8" }}>Comité Técnico · {T.corto}</div>
+                <div className="text-[10px] mt-1 truncate" style={{ color: N.ink70 }}>Comité Técnico · {T.corto}</div>
               </div>
             )}
           </div>
           <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
             {navV1.map((n) => <BotonNav key={n.id} n={n} />)}
             <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: "#6C8AA5" }}>Próximas versiones</div>}
-              {navFuturo.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} futuro />)}
+              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Próximas versiones</div>}
+              {navFuturo.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} futuro={Boolean(n.v)} />)}
             </div>
             <div className="pt-3 mt-3 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: "#6C8AA5" }}>Sistema</div>}
+              {!colapsado && <div className="px-3 text-[9px] uppercase tracking-[0.14em] mb-1.5" style={{ color: N.ink40 }}>Sistema</div>}
               {navSistema.map((n) => <BotonNav key={n.id} n={n} tamañoIcono={14} />)}
             </div>
           </nav>
           <div className="p-2 border-t" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
             <button onClick={() => setColapsado(!colapsado)} title={colapsado ? "Expandir menú" : "Plegar menú"}
               className="w-full flex items-center justify-center gap-2 rounded px-3 py-2 text-xs transition-colors"
-              style={{ color: "#A9C3D8" }}
+              style={{ color: N.ink70 }}
               onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
               onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
               {colapsado ? <ChevronsRight size={15} /> : <><ChevronsLeft size={15} /> Plegar menú</>}
             </button>
-            {!colapsado && <p className="text-[9px] leading-snug px-3 mt-2" style={{ color: "#7B9BB5" }}>Datos sintéticos. Ningún colegiado real.</p>}
+            {!colapsado && <p className="text-[9px] leading-snug px-3 mt-2" style={{ color: N.ink40 }}>Datos sintéticos. Ningún colegiado real.</p>}
           </div>
         </aside>
 
@@ -2921,7 +3870,7 @@ export default function CRMExpedientes() {
             <div className="flex md:hidden gap-1 flex-wrap">
               {todosLosItems.map((n) => (
                 <button key={n.id} onClick={() => ir(n.id)} className="text-xs rounded border px-2 py-1"
-                  style={{ borderColor: N.rule, background: vista === n.id ? T.primary : "#FFF", color: vista === n.id ? "#FFF" : N.ink70 }}>{n.label}</button>
+                  style={{ borderColor: N.rule, background: vista === n.id ? T.deep : N.card, color: vista === n.id ? "#FFF" : N.ink70 }}>{n.label}</button>
               ))}
             </div>
           </header>
@@ -2936,6 +3885,7 @@ export default function CRMExpedientes() {
           {vista === "economico" && <VistaSeguimientoOperativo T={T} />}
           {vista === "glosario" && <VistaGlosario T={T} />}
           {vista === "ia" && <VistaIA T={T} />}
+          {vista === "decisiones" && <VistaDecisiones T={T} />}
         </main>
       </div>
     </div>

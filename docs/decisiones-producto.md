@@ -428,6 +428,20 @@ De paso, Roberto adelantó contexto nuevo: el comité tiene su propio cloud (AWS
 
 **Pendiente abierto**: en cuanto Roberto consiga cualquier documentación técnica real de Novanet (o confirme que no la hay), diseñar el primer adaptador real siguiendo este mismo patrón — hoy no hay nada concreto sobre lo que diseñar más allá de la convención genérica.
 
+## 34. Nuevo módulo "Gestión y seguimiento de decisiones del comité" — spec 007 completa, MVP implementado (8 ago 2026)
+
+Roberto pidió una página de "management" al estilo Football Manager: el comité registra decisiones/acciones sobre árbitros, categorías o grupos, estima su impacto, y el sistema hace seguimiento en el tiempo de si ese impacto se cumplió — explícitamente distinta de Designación (decisión de partido) y Seguimiento operativo (impacto económico), que no se tocan. Cubre dos tipos de decisión desde el principio: acciones libres de motivación/seguimiento, y campañas de ascenso de categoría con su ciclo completo (candidatos → pruebas → clasificación → plazas → corte confirmado).
+
+**Proceso completo de SDD seguido esta sesión**, sin atajos: `/speckit-specify` → `/speckit-clarify` conversacional (decisiones/impacto/mecánica antes-y-después, y ampliación explícita a "categoría completa" y "grupo dentro de categoría" como niveles de objetivo, no solo árbitro individual) → `/speckit-plan` → `/speckit-tasks` → `/speckit-analyze` (6 hallazgos, 0 CRITICAL/HIGH, corregidos en el propio commit) → `/speckit-implement`. Rama propia `007-gestion-decisiones-comite`, spec/plan/research/data-model/contracts/tasks commiteados y pusheados antes de tocar código.
+
+**La pieza sin precedente en el proyecto**: al registrar cualquier decisión, `lib/snapshotArbitro.js` construye una "foto" del estado relevante del árbitro (estado de forma, disponibilidad vigente, informes, últimas pruebas) con cada campo etiquetado real/sintético — hoy solo la disponibilidad es real, el resto sigue sintético hasta que exista dato del comité (Principio VI). `lib/compararSnapshots.js` compara esa foto contra el estado actual en la revisión de impacto, campo a campo, nunca con un índice agregado — y dos métricas (`disponibilidad_vigente`, `num_informes`) quedan siempre `no_comparable` a propósito: no tienen una dirección de "mejor/peor" (mismo principio que ya aplica la constitución a la disciplina — descriptiva, nunca evaluativa).
+
+**Diseño de datos**: 3 tablas nuevas (`decisiones`, `snapshots_arbitro`, `revisiones_impacto`, migración `supabase/migrations/0005_decisiones_comite.sql`), todas append-only desde el día 1 — ninguna con `UPDATE`/`DELETE`, RLS con solo `SELECT`+`INSERT` sin necesitar el paso de endurecimiento posterior que sí hizo falta en `0001`-`0004`. Las campañas de ascenso avanzan de fase insertando una fila nueva agrupada por `campana_id`, nunca reescribiendo — mismo patrón "vigente = fila más reciente" que ya usan `designaciones`/`declaraciones_disponibilidad`, aplicado aquí por primera vez a una entidad con ciclo de vida multi-fase.
+
+**Página nueva en el sidebar**: "Decisiones", en el bloque "Próximas versiones" junto a "Consultar con IA" pero sin candado (funcionalidad real) — Roberto confirmó explícitamente que ese bloque pasa a acoger las páginas de management/gestión del comité en general, no solo IA.
+
+**Estado al cerrar la sesión — MVP de las 4 historias implementado, verificado hasta la frontera real de Supabase**: formularios (decisión libre y campaña de ascenso), selector de objetivo a 3 niveles con semáforo de estado de forma, snapshot visible con etiqueta real/sintético, revisión de impacto con comparación por métrica y lenguaje de correlación-no-causalidad, clasificación de campaña con corte que exige confirmación humana explícita (nunca automático, Principio II), y bitácora filtrable con `estadoRevision` derivado. `npm run lint` y 57/57 tests (`npx vitest run`) en verde. **Pendiente real, no de código**: aplicar `supabase/migrations/0005_decisiones_comite.sql` contra el proyecto Supabase real (acción de Roberto, mismo paso manual que `0001`-`0004`) — hasta entonces cada guardado muestra un error real y legible de Supabase ("tabla no encontrada") en vez de completar, comportamiento correcto y verificado, no un bug.
+
 ## Ver también
 - [product-vision.md](./product-vision.md)
 - [data-model.md](./data-model.md)
@@ -435,3 +449,21 @@ De paso, Roberto adelantó contexto nuevo: el comité tiene su propio cloud (AWS
 - [tarifas.md](./tarifas.md)
 - [reference-analysis.md](./reference-analysis.md) — historial, parcialmente superado por este documento
 - [../colegial-frontend-guia.md](../colegial-frontend-guia.md)
+
+## 33. Paleta "Cuarto árbitro" extendida a toda la app, y `git worktree` para trabajo en paralelo (8 ago 2026)
+
+Roberto pidió dos cosas seguidas sobre el Cuadro de Mando ya fusionado en §30-32: (1) bajar "Cobertura por categoría" de posición, dejando los dos gauges y los KPIs primero — Cobertura sigue cumpliendo SC-001 (visible sin filtrar), solo deja de ser el primer elemento; (2) "basar el diseño general de la webapp en los colores del Cuadro de Mando... saca la magia igual que hiciste".
+
+**Enfoque técnico**: en vez de reescribir cada pantalla a mano, se recalibraron los tokens compartidos que ya usa toda la app — `N` (neutros), `THEMES.ffcv` y `VIZ.estado` — a los mismos valores ya validados en el objeto `DARK` del Cuadro de Mando. Como `Panel`/`KpiCard`/`Eyebrow`/el sidebar ya leían de esos tokens en todas las páginas, el cambio se propagó solo sin tocar Árbitros, Equipos, Partidos, Designación, etc. uno por uno.
+
+**Decisión de arquitectura de color que no era obvia**: `T.primary` antes servía a la vez de fondo (sidebar, botones sólidos) y de color de texto/acento — funcionaba porque el resto de la app era clara (navy sobre blanco). Con fondo oscuro esos dos roles no pueden compartir un mismo tono (texto oscuro sobre fondo oscuro es invisible), así que se separaron: `T.primary` pasa a ser el acento claro (mayoría de usos: texto, iconos, enlaces — ahora un azul cielo `#7fd4ff`), y `T.deep` pasa a ser la superficie estructural oscura (sidebar, botones sólidos — antes solo se usaba una vez, como texto sobre `T.accent`).
+
+**Bugs de contraste reales encontrados verificando en navegador** (no solo grep de hex — dos de ellos NO los habría encontrado sin abrir cada página): un recuadro "Estado de forma actual" en la ficha de árbitro y un aviso de insights de cruce de equipos tenían fondo claro fijo (`#FFFFFF`/`#FEF3E2`) con texto ya recalibrado a claro por el cambio de tokens — texto invisible sobre fondo del mismo tono. Corregidos. También: buscadores de Árbitros y Equipos con `bg-white`/sin fondo, y seis sitios con `hover:bg-slate-50` (flash claro al pasar el ratón sobre una fila oscura).
+
+**Ajuste de luminancia**: primera versión "demasiado oscura" (feedback de Roberto tras verlo). Subido un escalón pitchDeep/pitch/surface/surfaceRaised (y sus alias N.paper/N.card/THEMES.ffcv.deep), mismo hue verde-noche.
+
+**Incidente de sesión paralela — resuelto con `git worktree`**: a mitad de este trabajo, cambiar de rama en el directorio compartido (`/Users/Rober/Desktop/Referee_Management`) hizo que el propio servidor de desarrollo de Roberto (puerto 3000, corriendo en paralelo sobre `007-gestion-decisiones-comite`) empezara a servir el contenido de mi rama — "desapareció" la página de Gestión de decisiones sin que se perdiera nada (seguía commiteada). Se restauró el directorio compartido a la rama de Roberto de inmediato, y el trabajo de este punto en adelante se mudó a `git worktree add ../Referee_Management-tema-oscuro 001-app-wide-tema-oscuro` — un checkout físicamente aparte con su propio `node_modules` (el symlink al original no funcionó, Turbopack rechaza symlinks que apuntan fuera de la raíz del proyecto — hubo que hacer `npm install` real ahí) y su propio `.env.local` copiado. Con esto, dos sesiones pueden tener cada una su propia rama activa a la vez sin pisarse — recomendado como patrón por defecto la próxima vez que haya trabajo en paralelo real, no solo cuando ya ha pasado el incidente.
+
+Verificado en navegador real (puerto 3002 del worktree, no solo el Cuadro de Mando): Árbitros (KPIs, tabla, buscador, ficha completa con "Estado de forma actual"), Equipos (tarjetas, buscador, badges de categoría), Glosario y gobernanza (bloques de código, texto denso). Lint 0/0, 30/30 tests, `npm run build` limpio.
+
+**Pendiente**: fusión a `main` a la espera de que Roberto lo revise él mismo (puerto 3002 o tras merge).
