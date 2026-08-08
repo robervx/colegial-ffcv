@@ -435,3 +435,21 @@ De paso, Roberto adelantó contexto nuevo: el comité tiene su propio cloud (AWS
 - [tarifas.md](./tarifas.md)
 - [reference-analysis.md](./reference-analysis.md) — historial, parcialmente superado por este documento
 - [../colegial-frontend-guia.md](../colegial-frontend-guia.md)
+
+## 33. Paleta "Cuarto árbitro" extendida a toda la app, y `git worktree` para trabajo en paralelo (8 ago 2026)
+
+Roberto pidió dos cosas seguidas sobre el Cuadro de Mando ya fusionado en §30-32: (1) bajar "Cobertura por categoría" de posición, dejando los dos gauges y los KPIs primero — Cobertura sigue cumpliendo SC-001 (visible sin filtrar), solo deja de ser el primer elemento; (2) "basar el diseño general de la webapp en los colores del Cuadro de Mando... saca la magia igual que hiciste".
+
+**Enfoque técnico**: en vez de reescribir cada pantalla a mano, se recalibraron los tokens compartidos que ya usa toda la app — `N` (neutros), `THEMES.ffcv` y `VIZ.estado` — a los mismos valores ya validados en el objeto `DARK` del Cuadro de Mando. Como `Panel`/`KpiCard`/`Eyebrow`/el sidebar ya leían de esos tokens en todas las páginas, el cambio se propagó solo sin tocar Árbitros, Equipos, Partidos, Designación, etc. uno por uno.
+
+**Decisión de arquitectura de color que no era obvia**: `T.primary` antes servía a la vez de fondo (sidebar, botones sólidos) y de color de texto/acento — funcionaba porque el resto de la app era clara (navy sobre blanco). Con fondo oscuro esos dos roles no pueden compartir un mismo tono (texto oscuro sobre fondo oscuro es invisible), así que se separaron: `T.primary` pasa a ser el acento claro (mayoría de usos: texto, iconos, enlaces — ahora un azul cielo `#7fd4ff`), y `T.deep` pasa a ser la superficie estructural oscura (sidebar, botones sólidos — antes solo se usaba una vez, como texto sobre `T.accent`).
+
+**Bugs de contraste reales encontrados verificando en navegador** (no solo grep de hex — dos de ellos NO los habría encontrado sin abrir cada página): un recuadro "Estado de forma actual" en la ficha de árbitro y un aviso de insights de cruce de equipos tenían fondo claro fijo (`#FFFFFF`/`#FEF3E2`) con texto ya recalibrado a claro por el cambio de tokens — texto invisible sobre fondo del mismo tono. Corregidos. También: buscadores de Árbitros y Equipos con `bg-white`/sin fondo, y seis sitios con `hover:bg-slate-50` (flash claro al pasar el ratón sobre una fila oscura).
+
+**Ajuste de luminancia**: primera versión "demasiado oscura" (feedback de Roberto tras verlo). Subido un escalón pitchDeep/pitch/surface/surfaceRaised (y sus alias N.paper/N.card/THEMES.ffcv.deep), mismo hue verde-noche.
+
+**Incidente de sesión paralela — resuelto con `git worktree`**: a mitad de este trabajo, cambiar de rama en el directorio compartido (`/Users/Rober/Desktop/Referee_Management`) hizo que el propio servidor de desarrollo de Roberto (puerto 3000, corriendo en paralelo sobre `007-gestion-decisiones-comite`) empezara a servir el contenido de mi rama — "desapareció" la página de Gestión de decisiones sin que se perdiera nada (seguía commiteada). Se restauró el directorio compartido a la rama de Roberto de inmediato, y el trabajo de este punto en adelante se mudó a `git worktree add ../Referee_Management-tema-oscuro 001-app-wide-tema-oscuro` — un checkout físicamente aparte con su propio `node_modules` (el symlink al original no funcionó, Turbopack rechaza symlinks que apuntan fuera de la raíz del proyecto — hubo que hacer `npm install` real ahí) y su propio `.env.local` copiado. Con esto, dos sesiones pueden tener cada una su propia rama activa a la vez sin pisarse — recomendado como patrón por defecto la próxima vez que haya trabajo en paralelo real, no solo cuando ya ha pasado el incidente.
+
+Verificado en navegador real (puerto 3002 del worktree, no solo el Cuadro de Mando): Árbitros (KPIs, tabla, buscador, ficha completa con "Estado de forma actual"), Equipos (tarjetas, buscador, badges de categoría), Glosario y gobernanza (bloques de código, texto denso). Lint 0/0, 30/30 tests, `npm run build` limpio.
+
+**Pendiente**: fusión a `main` a la espera de que Roberto lo revise él mismo (puerto 3002 o tras merge).
