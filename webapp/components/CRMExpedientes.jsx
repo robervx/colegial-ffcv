@@ -52,7 +52,7 @@ import { validarAntelacionFestivo } from "../lib/reglaFestivo";
    sólidos, la minoría de usos que pintaban fondo). */
 const THEMES = {
   ffcv: { nombre: "Federació de Futbol Comunitat Valenciana", corto: "FFCV", siglas: "FFCV",
-    primary: "#7fd4ff", deep: "#0a1712", accent: "#F59B1E", tint: "rgba(127,212,255,.12)", accentTint: "rgba(245,155,30,.14)" },
+    primary: "#7fd4ff", deep: "#0d1f16", accent: "#F59B1E", tint: "rgba(127,212,255,.12)", accentTint: "rgba(245,155,30,.14)" },
   fcf: { nombre: "Federació Catalana de Futbol", corto: "FCF", siglas: "FCF",
     primary: "#1B3F94", deep: "#132D6B", accent: "#D8232A", tint: "#ECEFF9", accentTint: "#FBEAEA" },
   rfaf: { nombre: "Real Federación Andaluza de Fútbol", corto: "RFAF", siglas: "RFAF",
@@ -66,7 +66,7 @@ const THEMES = {
    el Cuadro de Mando — antes eran tonos distintos y más apagados, pensados
    para fondo claro. */
 const N = {
-  paper: "#0a1712", card: "#1b3524", ink: "#f8fbf8", ink70: "#cbdace",
+  paper: "#0d1f16", card: "#244530", ink: "#f8fbf8", ink70: "#cbdace",
   ink40: "#93ab9b", rule: "rgba(237,247,240,.17)",
   verde: "#34e19b", verdeT: "rgba(52,225,155,.14)", ambar: "#ffc24b", ambarT: "rgba(255,194,75,.14)",
   rojo: "#ff5c5c", rojoT: "rgba(255,92,92,.16)", ta: "#ffc24b", tr: "#ff5c5c",
@@ -97,19 +97,17 @@ const VIZ = {
   pastelSoft: ["#E3F1FC", "#FFEEE6", "#E1F9F5", "#EFEBFE", "#FDEBF3", "#FEF3DE", "#E8F8EB"],
 };
 
-/* Paleta oscura "Cuarto árbitro" — SOLO para el lienzo del Cuadro de Mando
-   (aprobada por Roberto 4 ago 2026 tras dos rondas de revisión visual, ver
-   docs/decisiones-producto.md §30-32: campo de noche, líneas de campo como
-   estructura, círculo central alojando los dos gauges de estado de forma/
-   disponibilidad). El resto de la app (sidebar, Árbitros, Seguimiento
-   operativo, Equipos, Partidos...) sigue con N/THEMES/VIZ sin tocar —
-   Roberto pidió expresamente no rediseñar la app entera, solo esta página.
-   Los 4 colores de estado son una recalibración de VIZ.estado para fondo
-   oscuro (misma semántica good/warning/serious/critical, más luminancia
-   porque un fondo oscuro exige colores más claros para el mismo contraste
-   percibido que sobre blanco) — nunca se usan fuera de este lienzo. */
+/* Paleta oscura "Cuarto árbitro" — nació solo para el Cuadro de Mando (4 ago
+   2026, docs/decisiones-producto.md §30-32) y se extendió a toda la app el
+   8 ago 2026 (N/THEMES ya usan estos mismos tonos arriba). Este objeto DARK
+   se queda como está por los componentes bespoke del propio Cuadro de Mando
+   (GaugeSemicircular, DarkPanel, DarkStat) que necesitan más matices que los
+   4-5 tokens de N — pero ya no es "solo esta página", es la misma paleta que
+   N.paper/N.card en el resto de la app. Los 4 colores de estado son la misma
+   recalibración de VIZ.estado para fondo oscuro (más luminancia que sobre
+   blanco, para el mismo contraste percibido). */
 const DARK = {
-  pitchDeep: "#0a1712", pitch: "#13281d", surface: "#1b3524", surfaceRaised: "#22402c",
+  pitchDeep: "#0d1f16", pitch: "#17301f", surface: "#244530", surfaceRaised: "#2d5439",
   line06: "rgba(237,247,240,.10)", line12: "rgba(237,247,240,.17)", line16: "rgba(237,247,240,.21)",
   line24: "rgba(237,247,240,.32)", lineStrong: "rgba(237,247,240,.52)",
   ink: "#f8fbf8", ink70: "#cbdace", ink40: "#93ab9b",
