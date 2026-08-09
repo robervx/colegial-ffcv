@@ -638,15 +638,30 @@ function Dashboard({ irArbitros }) {
       background: "radial-gradient(ellipse 1100px 620px at 50% -6%, #123322 0%, transparent 60%), "
         + `radial-gradient(ellipse 1400px 900px at 50% 10%, ${DARK.pitch} 0%, ${DARK.pitchDeep} 72%)`,
     }}>
-      <div className="p-5 sm:p-7 space-y-6">
+      <div className="p-5 sm:p-7 space-y-4">
 
-        {/* ---- Comité en un vistazo: los dos gauges (US4/P2, FR-010/011/012) — primero,
-             Roberto pidió priorizar gauges+KPIs sobre Cobertura (8 ago 2026). SC-001 de la
-             spec (verla en <10s sin filtrar) se sigue cumpliendo: sin scroll ni filtro, no
-             exige ser el primer elemento del layout. ---- */}
+        {/* ---- Panorama del comité: los 4 KPIs de universo FFCV van antes que los
+             gauges (Roberto, 8 ago 2026) — junto con los gauges tienen que caber en
+             la vista inicial, sensación de dashboard real sin scroll. ---- */}
         <div>
-          <div className="text-[13px] font-semibold" style={{ color: DARK.ink }}>Comité en un vistazo</div>
-          <div className="text-[12px] mb-3" style={{ color: DARK.ink40 }}>Dos preguntas de negocio distintas — rendimiento y disponibilidad operativa — nunca combinadas en un solo indicador.</div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            {[
+              { eyebrow: "Árbitros activos", valor: nf(agregadosReales.total_arbitros_activos_adulta), sub: `${nf(agregadosReales.total_arbitros_activos_adulta)} en toda la FFCV · temporada completa — real` },
+              { eyebrow: "Partidos temporada", valor: nf(agregadosReales.total_partidos_categoria_adulta), sub: `de ${nf(agregadosReales.total_partidos_temporada)} incl. fútbol base — real` },
+              { eyebrow: "Equipos con dato real", valor: nf(EQUIPOS.length), sub: "categoría adulta, ver página Equipos · real" },
+              { eyebrow: "Equidad de carga (CV)", valor: cv.toFixed(2), sub: `carga ${cvTexto} entre árbitros — real`, valorColor: cvTono === "bad" ? DARK.critical : cvTono === "warn" ? DARK.warning : DARK.good },
+            ].map((s) => (
+              <div key={s.eyebrow} className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+                <DarkStat {...s} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ---- los dos gauges (US4/P2, FR-010/011/012) — sin cabecera de sección,
+             van pegados a los KPIs de arriba (Roberto, 8 ago 2026: quitar texto que
+             no aporta y aleja los indicadores entre sí). ---- */}
+        <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <DarkPanel title="Estado de forma del comité" right={<DarkTag real={false} />}>
               <div className="rounded-md py-5 px-2" style={{
@@ -717,38 +732,11 @@ function Dashboard({ irArbitros }) {
                   </div>
                 </div>
               )}
-              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
-                Declaraciones vigentes del ciclo activo (<code>specs/002-disponibilidad-arbitro</code>). Los motivos se colorean con la paleta de identidad, no con el semáforo — no hay un motivo “peor” que otro, solo distinto.
-              </p>
             </DarkPanel>
           </div>
         </div>
 
-        {/* ---- KPIs: dos universos, etiquetados explícitamente para no leerse como el mismo dato ---- */}
         <div>
-          <div className="flex items-baseline gap-2.5 mb-3 flex-wrap">
-            <div className="text-[13px] font-bold" style={{ color: DARK.ink }}>Panorama FFCV</div>
-            <div className="text-[11.5px]" style={{ color: DARK.ink40 }}>temporada completa · {nf(agregadosReales.total_arbitros_activos_adulta)} activos — universo distinto a la plantilla de trabajo de abajo</div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            {[
-              { eyebrow: "Árbitros activos", valor: nf(agregadosReales.total_arbitros_activos_adulta), sub: `${nf(agregadosReales.total_arbitros_activos_adulta)} en toda la FFCV · temporada completa — real` },
-              { eyebrow: "Partidos temporada", valor: nf(agregadosReales.total_partidos_categoria_adulta), sub: `de ${nf(agregadosReales.total_partidos_temporada)} incl. fútbol base — real` },
-              { eyebrow: "Equipos con dato real", valor: nf(EQUIPOS.length), sub: "categoría adulta, ver página Equipos · real" },
-              { eyebrow: "Equidad de carga (CV)", valor: cv.toFixed(2), sub: `carga ${cvTexto} entre árbitros — real`, valorColor: cvTono === "bad" ? DARK.critical : cvTono === "warn" ? DARK.warning : DARK.good },
-            ].map((s) => (
-              <div key={s.eyebrow} className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
-                <DarkStat {...s} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-baseline gap-2.5 mb-3 flex-wrap">
-            <div className="text-[13px] font-bold" style={{ color: DARK.ink }}>Plantilla operativa de este comité</div>
-            <div className="text-[11.5px]" style={{ color: DARK.ink40 }}>{ARBITROS.length} expedientes de trabajo activos este ciclo — no es un recorte de “Panorama FFCV”, es el otro universo</div>
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
               <DarkStat eyebrow="Informes por árbitro" valor={informesStats.media.toFixed(1)} sub={`rango ${informesStats.min}-${informesStats.max}, ${nf(informesStats.total)} en total · real`} />
@@ -766,21 +754,23 @@ function Dashboard({ irArbitros }) {
              dashboard y SC-001 exige verla sin filtrar, pero ya no es el primer
              elemento: Roberto priorizó los gauges y KPIs por delante (8 ago 2026). ---- */}
         <div>
-          <div className="flex items-baseline justify-between gap-3 mb-3 flex-wrap">
-            <div className="text-[15px] font-semibold" style={{ color: DARK.ink }}>Cobertura por categoría · {cicloActivo.finDeSemana}</div>
-            {disponibilidadEstado !== "listo" ? (
-              <span className="text-[12px]" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</span>
-            ) : categoriasEnRiesgo.length > 0 ? (
-              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.critical }}>
-                <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
-              </span>
-            ) : (
-              <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.good }}>
-                <Check size={12} /> sin alertas de cobertura
-              </span>
-            )}
-          </div>
-          <DarkPanel accent={categoriasEnRiesgo.length > 0 ? DARK.critical : DARK.line24}>
+          <DarkPanel
+            title={`Cobertura por categoría · ${cicloActivo.finDeSemana}`}
+            accent={categoriasEnRiesgo.length > 0 ? DARK.critical : DARK.line24}
+            right={
+              disponibilidadEstado !== "listo" ? (
+                <span className="text-[12px]" style={{ color: DARK.ink40 }}>{disponibilidadTexto}</span>
+              ) : categoriasEnRiesgo.length > 0 ? (
+                <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.critical }}>
+                  <AlertTriangle size={12} /> {categoriasEnRiesgo.length} en riesgo
+                </span>
+              ) : (
+                <span className="text-[12px] font-semibold flex items-center gap-1" style={{ color: DARK.good }}>
+                  <Check size={12} /> sin alertas de cobertura
+                </span>
+              )
+            }
+          >
             {disponibilidadEstado === "cargando" ? (
               <p className="text-xs" style={{ color: DARK.ink40 }}>Cargando disponibilidad real del ciclo…</p>
             ) : disponibilidadEstado === "error" ? (
@@ -838,7 +828,8 @@ function Dashboard({ irArbitros }) {
           </DarkPanel>
         </div>
 
-        {/* ---- rejilla de apoyo ---- */}
+        {/* ---- rejilla de apoyo — Insights e Incidencias a la izquierda (Roberto, 8 ago
+             2026: centrar el layout, que la columna derecha no obligue a tanto scroll) ---- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2 space-y-5">
             <DarkPanel title="Partidos de la jornada por categoría" sub={cicloActivo.finDeSemana} right={<span className="text-[11.5px]" style={{ color: DARK.ink40 }}>{cicloActivo.partidos.length} partidos · real</span>}>
@@ -867,6 +858,40 @@ function Dashboard({ irArbitros }) {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+            </DarkPanel>
+
+            <DarkPanel title="Incidencias más frecuentes" sub="proxy sobre etiquetas de anotaciones de seguimiento" right={<DarkTag real={false} />}>
+              <div className="space-y-2">
+                {etiquetasNotas.map(([etiqueta, n], i) => (
+                  <div key={etiqueta} className="flex items-center gap-2.5">
+                    <span className="text-xs w-24 shrink-0 capitalize" style={{ color: DARK.ink70 }}>{etiqueta}</span>
+                    <div className="flex-1 rounded-full h-2" style={{ background: DARK.line06 }}>
+                      <div className="h-2 rounded-full" style={{ width: `${(n / maxEtiqueta) * 100}%`, background: VIZ.pastel[i % VIZ.pastel.length] }} />
+                    </div>
+                    <span className="text-xs font-mono tabular-nums w-6 text-right" style={{ color: DARK.ink }}>{n}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
+                No hay todavía un registro de incidencias independiente. «Disciplinaria» no aparece porque hoy no hay ninguna anotación con esa etiqueta en los {ARBITROS.length} expedientes, no es un error.
+              </p>
+            </DarkPanel>
+
+            <DarkPanel title="Insights" sub="vista previa — no se recorta" accent={DARK.accentDeep} right={
+              <span className="text-[10.5px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full" style={{ color: DARK.accent, background: "rgba(127,212,255,.10)", border: `1px solid rgba(127,212,255,.28)` }}>
+                Vista previa
+              </span>
+            }>
+              <p className="text-[11.5px] italic mb-3.5" style={{ color: DARK.ink40 }}>Hoy: síntesis honesta de los datos ya calculados en los paneles de arriba. Próximamente: patrones que la IA cruce entre KPIs y que a simple vista no se ven.</p>
+              <div className="space-y-3 text-sm" style={{ color: DARK.ink70 }}>
+                <p>
+                  <span className="font-semibold" style={{ color: DARK.ink }}>Reparto de carga muy desigual: </span>
+                  el árbitro con más partidos dirige {agregadosReales.equidad_carga.max_partidos}, el de menos solo {agregadosReales.equidad_carga.min_partidos}. Media {agregadosReales.equidad_carga.media_partidos_por_arbitro} partidos/árbitro. <span className="text-[11px] font-semibold" style={{ color: DARK.accent }}>· real</span>
+                </p>
+                <p>
+                  <span className="font-semibold" style={{ color: DARK.ink }}>{formaCounts.rojo} de {ARBITROS.length} árbitros</span> están en «necesita seguimiento» por caída de nota o tendencia descendente en sus últimos informes — umbral propio, todavía sin validar con el comité. <span className="text-[11px] font-semibold" style={{ color: DARK.synth }}>· sintético</span>
+                </p>
+              </div>
             </DarkPanel>
           </div>
 
@@ -906,40 +931,6 @@ function Dashboard({ irArbitros }) {
               <button onClick={irArbitros} className="mt-3 text-xs font-medium flex items-center gap-1" style={{ color: DARK.accent }}>
                 Ver en Árbitros <ChevronRight size={13} />
               </button>
-            </DarkPanel>
-
-            <DarkPanel title="Incidencias más frecuentes" sub="proxy sobre etiquetas de anotaciones de seguimiento" right={<DarkTag real={false} />}>
-              <div className="space-y-2">
-                {etiquetasNotas.map(([etiqueta, n], i) => (
-                  <div key={etiqueta} className="flex items-center gap-2.5">
-                    <span className="text-xs w-24 shrink-0 capitalize" style={{ color: DARK.ink70 }}>{etiqueta}</span>
-                    <div className="flex-1 rounded-full h-2" style={{ background: DARK.line06 }}>
-                      <div className="h-2 rounded-full" style={{ width: `${(n / maxEtiqueta) * 100}%`, background: VIZ.pastel[i % VIZ.pastel.length] }} />
-                    </div>
-                    <span className="text-xs font-mono tabular-nums w-6 text-right" style={{ color: DARK.ink }}>{n}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-[11.5px] mt-3 pt-3 border-t" style={{ color: DARK.ink40, borderColor: DARK.line12 }}>
-                No hay todavía un registro de incidencias independiente. «Disciplinaria» no aparece porque hoy no hay ninguna anotación con esa etiqueta en los {ARBITROS.length} expedientes, no es un error.
-              </p>
-            </DarkPanel>
-
-            <DarkPanel title="Insights" sub="vista previa — no se recorta" accent={DARK.accentDeep} right={
-              <span className="text-[10.5px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full" style={{ color: DARK.accent, background: "rgba(127,212,255,.10)", border: `1px solid rgba(127,212,255,.28)` }}>
-                Vista previa
-              </span>
-            }>
-              <p className="text-[11.5px] italic mb-3.5" style={{ color: DARK.ink40 }}>Hoy: síntesis honesta de los datos ya calculados en los paneles de arriba. Próximamente: patrones que la IA cruce entre KPIs y que a simple vista no se ven.</p>
-              <div className="space-y-3 text-sm" style={{ color: DARK.ink70 }}>
-                <p>
-                  <span className="font-semibold" style={{ color: DARK.ink }}>Reparto de carga muy desigual: </span>
-                  el árbitro con más partidos dirige {agregadosReales.equidad_carga.max_partidos}, el de menos solo {agregadosReales.equidad_carga.min_partidos}. Media {agregadosReales.equidad_carga.media_partidos_por_arbitro} partidos/árbitro. <span className="text-[11px] font-semibold" style={{ color: DARK.accent }}>· real</span>
-                </p>
-                <p>
-                  <span className="font-semibold" style={{ color: DARK.ink }}>{formaCounts.rojo} de {ARBITROS.length} árbitros</span> están en «necesita seguimiento» por caída de nota o tendencia descendente en sus últimos informes — umbral propio, todavía sin validar con el comité. <span className="text-[11px] font-semibold" style={{ color: DARK.synth }}>· sintético</span>
-                </p>
-              </div>
             </DarkPanel>
           </div>
         </div>
@@ -3860,12 +3851,11 @@ export default function CRMExpedientes() {
         </aside>
 
         <main className="flex-1 p-5 sm:p-7 max-w-[1400px]">
-          <header className="mb-6 flex items-end justify-between flex-wrap gap-3">
+          <header className="mb-4 flex items-end justify-between flex-wrap gap-3">
             <div>
               <h1 className="text-xl font-semibold tracking-tight" style={{ color: T.primary }}>
                 {sel ? "Expediente del colegiado" : tituloVista[vista]}
               </h1>
-              <p className="text-xs mt-1" style={{ color: N.ink70 }}>{T.nombre} · Base de datos de expedientes arbitrales</p>
             </div>
             <div className="flex md:hidden gap-1 flex-wrap">
               {todosLosItems.map((n) => (
