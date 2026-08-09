@@ -3851,8 +3851,12 @@ export default function CRMExpedientes() {
         </aside>
 
         <main className="flex-1 p-5 sm:p-7 max-w-[1400px]">
-          <header className="mb-4 flex items-end justify-between flex-wrap gap-3">
-            <div>
+          {/* En el Cuadro de Mando el título de página se quita en escritorio (Roberto,
+              8 ago 2026): la ficha oscura del propio Dashboard toca arriba del todo, y
+              el nombre de la vista ya lo da el ítem resaltado del sidebar. Se conserva
+              en móvil, donde el sidebar está oculto y hace falta esa referencia. */}
+          <header className={`flex items-end justify-between flex-wrap gap-3 ${vista === "dashboard" ? "mb-3 md:mb-0" : "mb-4"}`}>
+            <div className={vista === "dashboard" ? "md:hidden" : ""}>
               <h1 className="text-xl font-semibold tracking-tight" style={{ color: T.primary }}>
                 {sel ? "Expediente del colegiado" : tituloVista[vista]}
               </h1>
