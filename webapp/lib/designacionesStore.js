@@ -69,6 +69,7 @@ export function invalidarCiclo(cicloId) {
 export function useVigentesPorCiclo(cicloId) {
   useSyncExternalStore(suscribir, obtenerVersion, obtenerVersion);
   useEffect(() => {
+    if (!cicloId) return;
     asegurarCargado(cicloId);
   }, [cicloId]);
   return entradaCiclo(cicloId);

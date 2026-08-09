@@ -467,3 +467,25 @@ Roberto pidió dos cosas seguidas sobre el Cuadro de Mando ya fusionado en §30-
 Verificado en navegador real (puerto 3002 del worktree, no solo el Cuadro de Mando): Árbitros (KPIs, tabla, buscador, ficha completa con "Estado de forma actual"), Equipos (tarjetas, buscador, badges de categoría), Glosario y gobernanza (bloques de código, texto denso). Lint 0/0, 30/30 tests, `npm run build` limpio.
 
 **Pendiente**: fusión a `main` a la espera de que Roberto lo revise él mismo (puerto 3002 o tras merge).
+
+## 34. Primera pasada de "mejoras operativas" página a página — empezando por Designación (10 ago 2026)
+
+Roberto pidió mejorar la usabilidad real del prototipo pantalla a pantalla, pensando en fisuras del flujo de usuario bajo prueba real (no solo que compile). Acordado explícitamente: tratamiento de pulido sobre pantallas ya existentes, **sin spec propia** (no es pantalla ni funcionalidad nueva), página por página, empezando por Designación.
+
+**Auditoría previa** (agente Explore sobre `DesignacionInteligente`/`FilaJornada` en `CRMExpedientes.jsx`, `designacionesRepo.js`, `designacionesStore.js`) encontró 8 fisuras reales, todas corregidas en esta sesión:
+1. El candidato sugerido podía cambiar sin aviso al llegar la disponibilidad real (se calculaba con mapa vacío mientras cargaba).
+2. Filas ya decididas se mostraban como pendientes mientras `useVigentesPorCiclo` seguía en `"cargando"`.
+3. Un error de guardado solo era visible si la fila estaba expandida.
+4. Sin botón de reintento cuando fallaba la carga global de designaciones vigentes.
+5. El motivo real de "sin candidato disponible" (a quién excluyó el filtro duro) solo se veía expandiendo la fila.
+6. Sin feedback visual de éxito tras confirmar/cambiar candidato (solo cambiaba un badge).
+7. Riesgo de `setState` tras desmontar el componente si se cambiaba de ciclo con un guardado en vuelo.
+8. `ciclosAsignacion[0].id` sin guard — habría crasheado con el array de ciclos vacío.
+
+**Solución para 1+2**: un único `cargandoDatos` (`vigentesDisponibilidad === null || vigentesEstado === "cargando"`) que sustituye "Situaciones a tener en cuenta", el resumen de contadores y la tabla entera por un estado de carga explícito, en vez de mostrar contenido provisional que se corrige solo un instante después sin avisar. El resto (3, 5, 6, 7, 8) resueltos localmente en `FilaJornada` (guard `montadoRef`, aviso de éxito autolimpiable a los 2,5s, error visible fuera del bloque `expandido`) y en `DesignacionInteligente`/`designacionesStore.js` (guard de `cicloId` nulo, botón "Reintentar" que llama a `invalidarCiclo`, ya existente pero sin usar desde UI).
+
+**Verificado en navegador real** (servidor ya corriendo en `:3000`, no local aislado) contra Supabase real: expandir fila con alternativas, confirmar el sugerido de un partido "para revisar" — guardó correctamente y el contador pasó de "2 para revisar · 8 decididos" a "1 para revisar · 9 decididos" al instante. `npm run lint` limpio, 57/57 tests.
+
+**Incidente a registrar**: esa verificación con clic real en "Confirmar" escribió una fila real y no reversible desde la app (RLS sin `UPDATE`/`DELETE` para `anon`, `0004_endurecer_rls_solo_lectura_insercion.sql`) en la tabla `designaciones` de Supabase — partido C.F. Moro "A" – Vinaròs C.F "B" (ciclo "26-27 jul 2026"), árbitro Monfort Colomina Miguel, `decidido_por_rol: comite`, `decidido_en` 10/08/26 01:44. Roberto confirmó explícitamente dejarla tal cual (dato de prototipo sin consecuencia real, no hace falta limpiarla). **Lección para próximas verificaciones de escritura en pantallas operativas**: preferir revisar el resultado por lectura/consola en vez de disparar una acción de guardado real contra Supabase compartido cuando sea evitable, o avisar antes de hacerlo.
+
+Pendiente explícito: seguir con el resto de páginas (Ficha de árbitro, Cuadro de Mando, Equipos, Partidos, Seguimiento operativo, Decisiones) una a una, mismo criterio (fisuras de flujo real, sin spec, pulido).

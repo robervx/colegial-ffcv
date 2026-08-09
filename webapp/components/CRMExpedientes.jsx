@@ -13,6 +13,7 @@ import {
   Route, Info, Phone, Mail, Dumbbell, BookOpen,
   MailCheck, UserCog, Trophy, Swords, Goal,
   Gauge, Settings, ChevronsLeft, ChevronsRight, ListChecks,
+  RefreshCw, Loader2,
 } from "lucide-react";
 import agregadosReales from "../data/agregados-reales.json";
 import localidadesGeo from "../data/localidades-geo.json";
@@ -26,7 +27,7 @@ import { conDisponibilidad } from "../lib/disponibilidad";
 import { coberturaPorCategoria } from "../lib/coberturaCategoria";
 import { obtenerAnotaciones, guardarAnotacion, contarAnotaciones } from "../lib/anotacionesRepo";
 import { decidir as decidirDesignacion, conDecisionVigente } from "../lib/designacionesRepo";
-import { useVigentesPorCiclo, useVigentesPorCiclos, registrarDecision } from "../lib/designacionesStore";
+import { useVigentesPorCiclo, useVigentesPorCiclos, registrarDecision, invalidarCiclo } from "../lib/designacionesStore";
 import {
   obtenerLog as obtenerLogDisponibilidad,
   declararDisponibilidad,
@@ -1750,6 +1751,18 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
   const [errorDecision, setErrorDecision] = useState(null);
   const [alternativaMotivo, setAlternativaMotivo] = useState(null); // id del arbitro cuyo campo de motivo está abierto
   const [motivoTexto, setMotivoTexto] = useState("");
+  const [avisoExito, setAvisoExito] = useState(null); // texto breve que se autolimpia tras guardar con éxito
+
+  // Guard contra setState tras desmontar: si el usuario cambia de ciclo (o colapsa
+  // la lista) con un guardado en vuelo, la respuesta que llega tarde no debe tocar
+  // el estado de un componente que ya no existe.
+  const montadoRef = React.useRef(true);
+  useEffect(() => () => { montadoRef.current = false; }, []);
+  useEffect(() => {
+    if (!avisoExito) return;
+    const t = setTimeout(() => { if (montadoRef.current) setAvisoExito(null); }, 2500);
+    return () => clearTimeout(t);
+  }, [avisoExito]);
 
   const candidatoDecidido = decisionVigente ? candidatoPorId(r, decisionVigente.arbitroId) : null;
   const fechaDecision = decisionVigente
@@ -1762,8 +1775,10 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
     setGuardandoId("sugerido");
     setErrorDecision(null);
     const resultado = await onDecidir({ partidoId: partido.id, arbitroId: asignado.arbitro.id, esSugerido: true, motivo: null });
+    if (!montadoRef.current) return;
     setGuardandoId(null);
     if (!resultado.ok) setErrorDecision(resultado.error);
+    else setAvisoExito(`${asignado.arbitro.n} confirmado.`);
   };
 
   const abrirMotivo = (e, arbitroId) => {
@@ -1785,10 +1800,13 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
     setGuardandoId(arbitroId);
     setErrorDecision(null);
     const resultado = await onDecidir({ partidoId: partido.id, arbitroId, esSugerido: false, motivo: motivoTexto });
+    if (!montadoRef.current) return;
     setGuardandoId(null);
     if (!resultado.ok) { setErrorDecision(resultado.error); return; }
     setAlternativaMotivo(null);
     setMotivoTexto("");
+    const candidato = candidatoPorId(r, arbitroId);
+    setAvisoExito(`${candidato?.n ?? "Candidato"} confirmado.`);
   };
 
   return (
@@ -1813,7 +1831,12 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
               </div>
             </div>
           ) : (
-            <span className="text-xs" style={{ color: N.rojo }}>Sin candidato disponible</span>
+            <div>
+              <span className="text-xs" style={{ color: N.rojo }}>Sin candidato disponible</span>
+              {motivoRevision.length > 0 && (
+                <div className="text-[10px] mt-0.5" style={{ color: N.ink40 }}>{motivoRevision[0]}</div>
+              )}
+            </div>
           )}
           {!decisionVigente && asignado && (
             <button onClick={confirmarSugerido} disabled={guardandoId === "sugerido"}
@@ -1834,6 +1857,11 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
               {decisionVigente.motivo && (
                 <div className="text-[10px] italic mt-0.5" style={{ color: N.ink40 }}>{`"${decisionVigente.motivo}"`}</div>
               )}
+              {avisoExito && (
+                <div className="text-[10px] font-medium mt-1 flex items-center gap-1" style={{ color: N.verde }}>
+                  <Check size={10} /> {avisoExito}
+                </div>
+              )}
             </div>
           ) : requiereRevision ? (
             <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium" style={{ background: N.ambarT, color: N.ambar }}>
@@ -1849,63 +1877,68 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
           <ChevronRight size={14} style={{ color: N.ink40, transform: expandido ? "rotate(90deg)" : "none" }} />
         </td>
       </tr>
-      {expandido && (
+      {(expandido || errorDecision) && (
         <tr>
           <td colSpan={4} className="px-3 pb-4" style={{ background: N.paper }}>
-            {motivoRevision.length > 0 && !decisionVigente && (
-              <div className="rounded p-2.5 mb-3 text-xs" style={{ background: N.ambarT, color: N.ambarInk }}>
-                {motivoRevision.map((m, i) => <div key={i}>· {m}</div>)}
-              </div>
-            )}
             {errorDecision && (
               <p className="text-xs rounded px-3 py-2 mb-3" style={{ color: N.rojo, background: N.rojoT }}>
                 No se pudo guardar: {errorDecision}
+                {!expandido && <span style={{ color: N.ink40 }}> · abre la fila para reintentar.</span>}
               </p>
             )}
-            <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2" style={{ color: N.ink40 }}>
-              Alternativas ({alternativas.length})
-            </div>
-            {alternativas.length === 0 ? (
-              <p className="text-xs" style={{ color: N.ink40 }}>No hay más candidatos disponibles para este partido.</p>
-            ) : (
-              <div className="space-y-1.5">
-                {alternativas.map(({ arbitro, score, coste }) => (
-                  <div key={arbitro.id} className="text-xs rounded border p-2" style={{ borderColor: N.rule, background: N.card }}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Avatar txt={arbitro.foto} T={T} size={22} />
-                        <span style={{ color: N.ink }}>{arbitro.n}</span>
-                        <span style={{ color: N.ink40 }}>vive en {arbitro.loc}</span>
-                      </div>
-                      <div className="flex items-center gap-4 font-mono" style={{ color: N.ink70 }}>
-                        <span>{score.toFixed(2)}</span>
-                        <span>{coste.distanciaKmAprox != null ? `${coste.distanciaKmAprox} km` : "s/d"}</span>
-                        <span>{coste.dentroTermino ? "sin dieta" : coste.costeFederacionEstimado != null ? `${coste.costeFederacionEstimado.toFixed(2)} €` : "s/d"}</span>
-                      </div>
-                    </div>
-                    {!decisionVigente && (
-                      alternativaMotivo === arbitro.id ? (
-                        <div className="mt-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                          <input value={motivoTexto} onChange={(e) => setMotivoTexto(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && confirmarAlternativa(e, arbitro.id)}
-                            placeholder="Motivo del cambio (obligatorio)…" autoFocus
-                            className="flex-1 text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink }} />
-                          <button onClick={(e) => confirmarAlternativa(e, arbitro.id)} disabled={!motivoTexto.trim() || guardandoId === arbitro.id}
-                            className="text-[11px] rounded px-2 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.deep }}>
-                            {guardandoId === arbitro.id ? "Guardando…" : "Guardar"}
-                          </button>
-                          <button onClick={cancelarMotivo} className="text-[11px]" style={{ color: N.ink40 }}>Cancelar</button>
-                        </div>
-                      ) : (
-                        <button onClick={(e) => abrirMotivo(e, arbitro.id)}
-                          className="mt-2 text-[11px] rounded px-2 py-1 font-medium" style={{ color: T.primary, background: T.accentTint }}>
-                          Elegir este candidato
-                        </button>
-                      )
-                    )}
+            {expandido && (
+              <>
+                {motivoRevision.length > 0 && !decisionVigente && (
+                  <div className="rounded p-2.5 mb-3 text-xs" style={{ background: N.ambarT, color: N.ambarInk }}>
+                    {motivoRevision.map((m, i) => <div key={i}>· {m}</div>)}
                   </div>
-                ))}
-              </div>
+                )}
+                <div className="text-[10px] uppercase tracking-[0.12em] font-semibold mb-2" style={{ color: N.ink40 }}>
+                  Alternativas ({alternativas.length})
+                </div>
+                {alternativas.length === 0 ? (
+                  <p className="text-xs" style={{ color: N.ink40 }}>No hay más candidatos disponibles para este partido.</p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {alternativas.map(({ arbitro, score, coste }) => (
+                      <div key={arbitro.id} className="text-xs rounded border p-2" style={{ borderColor: N.rule, background: N.card }}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Avatar txt={arbitro.foto} T={T} size={22} />
+                            <span style={{ color: N.ink }}>{arbitro.n}</span>
+                            <span style={{ color: N.ink40 }}>vive en {arbitro.loc}</span>
+                          </div>
+                          <div className="flex items-center gap-4 font-mono" style={{ color: N.ink70 }}>
+                            <span>{score.toFixed(2)}</span>
+                            <span>{coste.distanciaKmAprox != null ? `${coste.distanciaKmAprox} km` : "s/d"}</span>
+                            <span>{coste.dentroTermino ? "sin dieta" : coste.costeFederacionEstimado != null ? `${coste.costeFederacionEstimado.toFixed(2)} €` : "s/d"}</span>
+                          </div>
+                        </div>
+                        {!decisionVigente && (
+                          alternativaMotivo === arbitro.id ? (
+                            <div className="mt-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                              <input value={motivoTexto} onChange={(e) => setMotivoTexto(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && confirmarAlternativa(e, arbitro.id)}
+                                placeholder="Motivo del cambio (obligatorio)…" autoFocus
+                                className="flex-1 text-xs rounded border px-2 py-1.5 outline-none" style={{ borderColor: N.rule, color: N.ink }} />
+                              <button onClick={(e) => confirmarAlternativa(e, arbitro.id)} disabled={!motivoTexto.trim() || guardandoId === arbitro.id}
+                                className="text-[11px] rounded px-2 py-1 font-medium text-white disabled:opacity-60" style={{ background: T.deep }}>
+                                {guardandoId === arbitro.id ? "Guardando…" : "Guardar"}
+                              </button>
+                              <button onClick={cancelarMotivo} className="text-[11px]" style={{ color: N.ink40 }}>Cancelar</button>
+                            </div>
+                          ) : (
+                            <button onClick={(e) => abrirMotivo(e, arbitro.id)}
+                              className="mt-2 text-[11px] rounded px-2 py-1 font-medium" style={{ color: T.primary, background: T.accentTint }}>
+                              Elegir este candidato
+                            </button>
+                          )
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </td>
         </tr>
@@ -1915,16 +1948,18 @@ function FilaJornada({ r, T, expandido, onToggle, onDecidir }) {
 }
 
 function DesignacionInteligente({ T, onIrAPartido }) {
-  const [cicloId, setCicloId] = useState(ciclosAsignacion[0].id);
+  const primerCicloId = ciclosAsignacion[0]?.id ?? null;
+  const [cicloId, setCicloId] = useState(primerCicloId);
   const [expandidoId, setExpandidoId] = useState(null);
   const [vigentesDisponibilidad, setVigentesDisponibilidad] = useState(null);
-  const ciclo = ciclosAsignacion.find((c) => c.id === cicloId);
+  const ciclo = ciclosAsignacion.find((c) => c.id === cicloId) ?? null;
 
   /* Disponibilidad real (specs/002), no solo el heurístico sintético de
      conDisponibilidad — una baja médica sin justificar excluye de verdad
      al árbitro como candidato (Roberto, 30 jul 2026). Ver filtroDuro en
      motorAsignacion.js. */
   useEffect(() => {
+    if (!cicloId) return;
     let cancelado = false;
     obtenerVigentesDisponibilidadPorCiclo(cicloId).then((resultado) => {
       if (cancelado) return;
@@ -1934,6 +1969,7 @@ function DesignacionInteligente({ T, onIrAPartido }) {
   }, [cicloId]);
 
   const resultados = useMemo(() => {
+    if (!ciclo) return [];
     const arbitrosConExtras = ARBITROS.map(conDisponibilidad);
     return asignarJornada(ciclo.partidos, arbitrosConExtras, localidadesGeo, vigentesDisponibilidad ?? new Map());
   }, [ciclo, vigentesDisponibilidad]);
@@ -1955,9 +1991,27 @@ function DesignacionInteligente({ T, onIrAPartido }) {
   const nAutoConfirmable = resultadosConDecision.length - nDecididos - nRevisar;
   const situacionesSensibles = resultadosConDecision.filter((r) => r.partido.sensible);
 
+  // Mientras la disponibilidad real o las decisiones ya tomadas siguen en vuelo,
+  // el sugerido/estado de cada fila puede ser provisional o directamente erróneo
+  // (ej. una fila ya decidida se vería como "pendiente"): se oculta el contenido
+  // dependiente en vez de mostrarlo y corregirlo un instante después sin avisar.
+  const cargandoDatos = vigentesDisponibilidad === null || vigentesEstado === "cargando";
+
+  if (!ciclo) {
+    return (
+      <div className="rounded-md border p-6 text-center text-sm" style={{ borderColor: N.rule, color: N.ink40 }}>
+        No hay ningún ciclo de asignación configurado todavía.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
-      {situacionesSensibles.length > 0 && (
+      {cargandoDatos ? (
+        <div className="rounded-md border p-4 flex items-center gap-2 text-sm" style={{ borderColor: N.rule, color: N.ink40 }}>
+          <Loader2 size={14} className="animate-spin" /> Cargando disponibilidad y decisiones ya tomadas…
+        </div>
+      ) : situacionesSensibles.length > 0 && (
         <Panel title={`Situaciones a tener en cuenta esta jornada · ${situacionesSensibles.length}`}>
           <p className="text-xs mb-3" style={{ color: N.ink70 }}>
             Partidos con algo que el comité debería valorar al confirmar — derbis, historial de tarjetas entre estos equipos,
@@ -2001,15 +2055,23 @@ function DesignacionInteligente({ T, onIrAPartido }) {
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
           <span className="flex items-center gap-1.5" style={{ color: N.ink }}><Calendar size={14} style={{ color: N.ink40 }} /> {ciclo.finDeSemana}</span>
           <span style={{ color: N.ink70 }}>{resultados.length} partidos</span>
-          <span style={{ color: nRevisar > 0 ? N.ambar : N.verde }} className="font-medium">
-            {nRevisar} para revisar · {nDecididos} decididos · {nAutoConfirmable} auto-confirmables
-          </span>
+          {cargandoDatos ? (
+            <span className="flex items-center gap-1.5" style={{ color: N.ink40 }}><Loader2 size={12} className="animate-spin" /> Calculando estado…</span>
+          ) : (
+            <span style={{ color: nRevisar > 0 ? N.ambar : N.verde }} className="font-medium">
+              {nRevisar} para revisar · {nDecididos} decididos · {nAutoConfirmable} auto-confirmables
+            </span>
+          )}
         </div>
       </Panel>
 
       {vigentesEstado === "error" && (
-        <p className="text-xs rounded px-3 py-2" style={{ color: N.rojo, background: N.rojoT }}>
-          No se pudieron cargar las decisiones ya tomadas para esta jornada. Comprueba la conexión y recarga antes de confirmar o cambiar candidatos.
+        <p className="text-xs rounded px-3 py-2 flex items-center justify-between gap-3 flex-wrap" style={{ color: N.rojo, background: N.rojoT }}>
+          <span>No se pudieron cargar las decisiones ya tomadas para esta jornada. Comprueba la conexión antes de confirmar o cambiar candidatos.</span>
+          <button onClick={() => invalidarCiclo(cicloId)}
+            className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium text-white" style={{ background: N.rojo }}>
+            <RefreshCw size={11} /> Reintentar
+          </button>
         </p>
       )}
 
@@ -2025,7 +2087,13 @@ function DesignacionInteligente({ T, onIrAPartido }) {
               </tr>
             </thead>
             <tbody>
-              {resultadosConDecision.map((r) => (
+              {cargandoDatos ? (
+                <tr>
+                  <td colSpan={4} className="px-3 py-6 text-center text-sm" style={{ color: N.ink40 }}>
+                    <Loader2 size={14} className="animate-spin inline-block mr-2" /> Cargando partidos de la jornada…
+                  </td>
+                </tr>
+              ) : resultadosConDecision.map((r) => (
                 <FilaJornada key={r.partido.id} r={r} T={T} expandido={expandidoId === r.partido.id}
                   onToggle={() => setExpandidoId(expandidoId === r.partido.id ? null : r.partido.id)}
                   onDecidir={decidirYActualizar} />
