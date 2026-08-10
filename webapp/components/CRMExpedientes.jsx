@@ -481,7 +481,7 @@ function GaugeSemicircular({ segments, scale = 200, heroValue, heroColor, heroMa
    usan en ninguna otra página, para no afectar al resto de la app. ---- */
 function DarkPanel({ title, sub, right, children, accent }) {
   return (
-    <section style={{ background: DARK.surface, borderTop: `2px solid ${accent || DARK.line24}` }}>
+    <section className="rounded-md overflow-hidden" style={{ background: DARK.surface, borderTop: `2px solid ${accent || DARK.line24}` }}>
       <div className="flex items-start justify-between gap-2.5 px-5 py-4 flex-wrap">
         <div>
           <div className="text-[13.5px] font-semibold" style={{ color: DARK.ink }}>{title}</div>
@@ -652,7 +652,7 @@ function Dashboard({ irArbitros }) {
               { eyebrow: "Equipos con dato real", valor: nf(EQUIPOS.length), sub: "categoría adulta, ver página Equipos · real" },
               { eyebrow: "Equidad de carga (CV)", valor: cv.toFixed(2), sub: `carga ${cvTexto} entre árbitros — real`, valorColor: cvTono === "bad" ? DARK.critical : cvTono === "warn" ? DARK.warning : DARK.good },
             ].map((s) => (
-              <div key={s.eyebrow} className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+              <div key={s.eyebrow} className="p-4 rounded-md overflow-hidden" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
                 <DarkStat {...s} />
               </div>
             ))}
@@ -739,13 +739,13 @@ function Dashboard({ irArbitros }) {
 
         <div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+            <div className="p-4 rounded-md overflow-hidden" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
               <DarkStat eyebrow="Informes por árbitro" valor={informesStats.media.toFixed(1)} sub={`rango ${informesStats.min}-${informesStats.max}, ${nf(informesStats.total)} en total · real`} />
             </div>
-            <div className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+            <div className="p-4 rounded-md overflow-hidden" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
               <DarkStat eyebrow="Score B.1 fiable (4+ informes)" valor={`${bandasFiabilidad.fiable}/${bandasFiabilidad.total}`} sub="árbitros con ranking fiable (shrinkage 100% propio) · real" />
             </div>
-            <div className="p-4" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
+            <div className="p-4 rounded-md overflow-hidden" style={{ background: DARK.surface, borderTop: `2px solid ${DARK.line24}` }}>
               <DarkStat eyebrow="Mejorando esta temporada" valor={`${ratioMejorando}/${ARBITROS.length}`} sub="anotación de mejora + tendencia positiva · sintético" />
             </div>
           </div>
