@@ -489,3 +489,26 @@ Roberto pidió mejorar la usabilidad real del prototipo pantalla a pantalla, pen
 **Incidente a registrar**: esa verificación con clic real en "Confirmar" escribió una fila real y no reversible desde la app (RLS sin `UPDATE`/`DELETE` para `anon`, `0004_endurecer_rls_solo_lectura_insercion.sql`) en la tabla `designaciones` de Supabase — partido C.F. Moro "A" – Vinaròs C.F "B" (ciclo "26-27 jul 2026"), árbitro Monfort Colomina Miguel, `decidido_por_rol: comite`, `decidido_en` 10/08/26 01:44. Roberto confirmó explícitamente dejarla tal cual (dato de prototipo sin consecuencia real, no hace falta limpiarla). **Lección para próximas verificaciones de escritura en pantallas operativas**: preferir revisar el resultado por lectura/consola en vez de disparar una acción de guardado real contra Supabase compartido cuando sea evitable, o avisar antes de hacerlo.
 
 Pendiente explícito: seguir con el resto de páginas (Ficha de árbitro, Cuadro de Mando, Equipos, Partidos, Seguimiento operativo, Decisiones) una a una, mismo criterio (fisuras de flujo real, sin spec, pulido).
+
+## 35. Repo hecho público y saneamiento de privacidad (25 nov 2026)
+
+Roberto hizo público el repositorio en GitHub para enseñarlo en su portfolio. Al revisarlo para darle un acabado profesional se detectó que contenía datos personales reales ahora expuestos públicamente, en contradicción directa con el Principio de datos personales de `constitution.md` ("el repositorio del proyecto es privado; no se publican exports ni capturas con datos reales de árbitros"):
+
+- `pantalla_fichas_arbitros.png` (captura real de la intranet FFCV): DNI, dirección, teléfono, email personal, firma e IBAN parcial de Roberto.
+- `partidos_2025_2026.csv`/`.xlsx` (29 MB): ~1.400 nombres reales de árbitros, scraping de la **intranet privada** (`scrape_listado_partidos.py`), no de la web pública — ya superseded como fuente (ver §6 de `estado-actual.md`), nunca debió quedar en el repo.
+- `ffcv_public_data/arbitros_partido.csv`, `goles_partido.csv`, `tarjetas_partido.csv`: nombres reales de árbitros y jugadores (scraping público, pero un nombre sigue siendo dato personal aunque la fuente sea pública).
+- Otras capturas de la intranet real, un `.txt` con el mapa de URLs internas del comité, y varios `.webp` que resultaron ser mockups genéricos de stock sin relación con el proyecto.
+
+**Decisión (confirmada explícitamente por Roberto)**: el repo se queda público — el dato de partidos/equipos/tarjetas/goles es real y se mantiene (viene de scraping público), pero **el nombre de las personas (árbitros y jugadores) se sustituye por nombre sintético**, determinista por `cod_arbitro`/`cod_jugador` (mismo ID → mismo nombre siempre), para que el dataset siga siendo "testeable" en el enlace de demo sin exponer identidad real de terceros.
+
+**Acciones tomadas**:
+1. `scripts/anonimizar_personas.py` (nuevo) — reescribe `nombre_arbitro`/`nombre_jugador` en los tres CSV de `ffcv_public_data/` por nombre sintético estable.
+2. Regenerados `webapp/data/{arbitros-reales,arbitros-sintetico,arbitros-200,agregados-reales,equipos-reales,heatmap-intrasemanal}.json` desde la fuente ya anonimizada (incluye `top_goleadores` de Equipos, que también mostraba nombres reales de jugadores).
+3. Eliminados del repo: `partidos_2025_2026.csv`/`.xlsx`, `ffcv_publico_2025_2026.xlsx`, `comite_arbitros_links.txt`, las 4 capturas reales de la intranet, 4 `.webp` de mockups genéricos sin relación con el proyecto, y los scripts que requerían login a la intranet privada (`explorar_comite_arbitros.py`, `scrape_listado_partidos.py`, `scrape_directorio_equipos.py`) — se mantiene `scrape_ffcv_public.py` (público, sin login).
+4. Reorganización de la raíz: scripts Python movidos a `scripts/`, PDF de tarifas a `docs/`, referencia JSX suelta a `archive/reference/`.
+5. Añadidos `LICENSE` (Apache 2.0, decisión de Roberto) y `CONTRIBUTING.md`; README reescrito para audiencia de portfolio (demo, stack, contacto, aviso real/sintético).
+6. Pendiente de completar en la misma sesión: reescritura del historial de git (`git filter-repo`) para purgar los blobs sensibles de todas las ramas remotas afectadas, no solo del commit más reciente — un repo público ya clonado no se limpia con un commit nuevo encima.
+
+**Explícitamente no tocado**: `generar_jornadas.py` seguía leyendo `partidos_2025_2026.csv` (ahora eliminado) solo para pares de equipos — `webapp/data/ciclos-asignacion.json` ya generado no contiene nombres, así que se deja tal cual y el script queda con una nota de que necesitaría adaptarse a `ffcv_public_data/partidos_index.csv` para volver a lanzarse.
+
+**Lección para el futuro**: si se vuelve a lanzar `scrape_ffcv_public.py` para refrescar el dataset, el paso de `scripts/anonimizar_personas.py` es obligatorio antes de cualquier commit — no se vuelve a versionar un nombre real de árbitro o jugador en este repo.
