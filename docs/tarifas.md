@@ -1,6 +1,6 @@
 # Tarifas arbitrales FFCV — temporada 2025/26
 
-Fuente: Circular Nº 1 (partidos oficiales de liga, desde 01/07/2025) y Circular Nº 2 (amistosos, desde 01/07/2025), Comité Tècnic d'Àrbitres FFCV. Documentos originales en `C1_2526_TARIFAS_FUTBOL.pdf` / `C2_2526_TARIFAS_FUTBOL_AMISTOSOS.pdf` (no versionados en el repo — son PDFs oficiales del comité, se referencian aquí en la parte que afecta al modelo de datos y al motor de asignación).
+Fuente: Circular Nº 1 (partidos oficiales de liga, desde 01/07/2025) y Circular Nº 2 (amistosos, desde 01/07/2025), Comité Tècnic d'Àrbitres FFCV. Circular Nº 1 versionada en [`docs/tarifas-C1-2526.pdf`](./tarifas-C1-2526.pdf) (documento público oficial del comité); Circular Nº 2 no versionada en el repo — se referencian aquí en la parte que afecta al modelo de datos y al motor de asignación.
 
 Esto es **dato de negocio real**, no supuesto — sustituye cualquier estimación previa de coste en `data-model.md`/`kpis.md`.
 

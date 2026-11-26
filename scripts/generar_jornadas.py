@@ -11,6 +11,14 @@ Modela la cadencia acordada 22 jul 2026:
   semana siguiente (una semana de antelación para que el árbitro se organice).
 
 Salida: webapp/data/ciclos-asignacion.json
+
+NOTA (limpieza del repo para publicación): este script originalmente leía
+partidos_2025_2026.csv (scraping de la intranet FFCV), eliminado del repo
+por venir de una fuente privada. webapp/data/ciclos-asignacion.json ya
+generado no contiene nombres de árbitros (solo equipos/localidades, datos
+no personales) y se mantiene tal cual. Para volver a lanzar este script
+habría que adaptar `main()` para leer los pares de equipos desde
+ffcv_public_data/partidos_index.csv en su lugar.
 """
 import json
 import random
