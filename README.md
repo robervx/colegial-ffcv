@@ -2,7 +2,7 @@
   <img src="docs/assets/logo.png" alt="FFCV" height="90">
 </p>
 
-<h1 align="center">Colegial <sup><sub>(nombre de trabajo)</sub></sup></h1>
+<h1 align="center">Colegial <sup><sub>Intelligence</sub></sup></h1>
 <p align="center">
   CRM de gestión arbitral y motor de designación inteligente para el<br>
   Comité Tècnic d'Àrbitres de la Federació de Futbol Comunitat Valenciana (FFCV)
