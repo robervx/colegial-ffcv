@@ -1,0 +1,234 @@
+{
+  "fuente": "ffcv_public_data/partidos_index.csv, todas las categorías, temporada 25/26",
+  "generado": "2026-11-25",
+  "total_partidos": 25256,
+  "dias": [
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+    "Domingo"
+  ],
+  "franjas": [
+    "Mañana (8-12h)",
+    "Mediodía (12-15h)",
+    "Tarde (15-18h)",
+    "Tarde-noche (18-21h)",
+    "Noche (21h+)",
+    "Otra"
+  ],
+  "celdas": [
+    {
+      "dia": "Lunes",
+      "franja": "Mañana (8-12h)",
+      "partidos": 55
+    },
+    {
+      "dia": "Lunes",
+      "franja": "Mediodía (12-15h)",
+      "partidos": 61
+    },
+    {
+      "dia": "Lunes",
+      "franja": "Tarde (15-18h)",
+      "partidos": 34
+    },
+    {
+      "dia": "Lunes",
+      "franja": "Tarde-noche (18-21h)",
+      "partidos": 94
+    },
+    {
+      "dia": "Lunes",
+      "franja": "Noche (21h+)",
+      "partidos": 24
+    },
+    {
+      "dia": "Lunes",
+      "franja": "Otra",
+      "partidos": 6
+    },
+    {
+      "dia": "Martes",
+      "franja": "Mañana (8-12h)",
+      "partidos": 59
+    },
+    {
+      "dia": "Martes",
+      "franja": "Mediodía (12-15h)",
+      "partidos": 62
+    },
+    {
+      "dia": "Martes",
+      "franja": "Tarde (15-18h)",
+      "partidos": 28
+    },
+    {
+      "dia": "Martes",
+      "franja": "Tarde-noche (18-21h)",
+      "partidos": 331
+    },
+    {
+      "dia": "Martes",
+      "franja": "Noche (21h+)",
+      "partidos": 76
+    },
+    {
+      "dia": "Martes",
+      "franja": "Otra",
+      "partidos": 3
+    },
+    {
+      "dia": "Miércoles",
+      "franja": "Mañana (8-12h)",
+      "partidos": 0
+    },
+    {
+      "dia": "Miércoles",
+      "franja": "Mediodía (12-15h)",
+      "partidos": 0
+    },
+    {
+      "dia": "Miércoles",
+      "franja": "Tarde (15-18h)",
+      "partidos": 11
+    },
+    {
+      "dia": "Miércoles",
+      "franja": "Tarde-noche (18-21h)",
+      "partidos": 919
+    },
+    {
+      "dia": "Miércoles",
+      "franja": "Noche (21h+)",
+      "partidos": 104
+    },
+    {
+      "dia": "Miércoles",
+      "franja": "Otra",
+      "partidos": 1
+    },
+    {
+      "dia": "Jueves",
+      "franja": "Mañana (8-12h)",
+      "partidos": 62
+    },
+    {
+      "dia": "Jueves",
+      "franja": "Mediodía (12-15h)",
+      "partidos": 63
+    },
+    {
+      "dia": "Jueves",
+      "franja": "Tarde (15-18h)",
+      "partidos": 20
+    },
+    {
+      "dia": "Jueves",
+      "franja": "Tarde-noche (18-21h)",
+      "partidos": 377
+    },
+    {
+      "dia": "Jueves",
+      "franja": "Noche (21h+)",
+      "partidos": 139
+    },
+    {
+      "dia": "Jueves",
+      "franja": "Otra",
+      "partidos": 6
+    },
+    {
+      "dia": "Viernes",
+      "franja": "Mañana (8-12h)",
+      "partidos": 8
+    },
+    {
+      "dia": "Viernes",
+      "franja": "Mediodía (12-15h)",
+      "partidos": 10
+    },
+    {
+      "dia": "Viernes",
+      "franja": "Tarde (15-18h)",
+      "partidos": 20
+    },
+    {
+      "dia": "Viernes",
+      "franja": "Tarde-noche (18-21h)",
+      "partidos": 757
+    },
+    {
+      "dia": "Viernes",
+      "franja": "Noche (21h+)",
+      "partidos": 141
+    },
+    {
+      "dia": "Viernes",
+      "franja": "Otra",
+      "partidos": 1
+    },
+    {
+      "dia": "Sábado",
+      "franja": "Mañana (8-12h)",
+      "partidos": 521
+    },
+    {
+      "dia": "Sábado",
+      "franja": "Mediodía (12-15h)",
+      "partidos": 540
+    },
+    {
+      "dia": "Sábado",
+      "franja": "Tarde (15-18h)",
+      "partidos": 5645
+    },
+    {
+      "dia": "Sábado",
+      "franja": "Tarde-noche (18-21h)",
+      "partidos": 4096
+    },
+    {
+      "dia": "Sábado",
+      "franja": "Noche (21h+)",
+      "partidos": 3
+    },
+    {
+      "dia": "Sábado",
+      "franja": "Otra",
+      "partidos": 2
+    },
+    {
+      "dia": "Domingo",
+      "franja": "Mañana (8-12h)",
+      "partidos": 1870
+    },
+    {
+      "dia": "Domingo",
+      "franja": "Mediodía (12-15h)",
+      "partidos": 2116
+    },
+    {
+      "dia": "Domingo",
+      "franja": "Tarde (15-18h)",
+      "partidos": 3550
+    },
+    {
+      "dia": "Domingo",
+      "franja": "Tarde-noche (18-21h)",
+      "partidos": 3031
+    },
+    {
+      "dia": "Domingo",
+      "franja": "Noche (21h+)",
+      "partidos": 1
+    },
+    {
+      "dia": "Domingo",
+      "franja": "Otra",
+      "partidos": 409
+    }
+  ]
+}

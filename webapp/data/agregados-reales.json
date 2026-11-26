@@ -1,0 +1,101 @@
+{
+  "temporada": "2025/26",
+  "fuente": "ffcv_public_data/ (scraping publico ffcv.es/competiciones)",
+  "nota": "Datos reales de partidos, arbitros designados y tarjetas de categorias adultas (la web publica no incluye futbol base). Informes/evaluaciones siguen siendo sinteticos hasta tener export del comite.",
+  "total_partidos_temporada": 96385,
+  "total_partidos_categoria_adulta": 25256,
+  "total_arbitros_activos_adulta": 1208,
+  "total_equipos": 1267,
+  "partidos_sin_arbitro_asignado": 4708,
+  "equidad_carga": {
+    "media_partidos_por_arbitro": 17.0,
+    "desviacion_estandar": 13.6,
+    "coeficiente_variacion": 0.801,
+    "max_partidos": 78,
+    "min_partidos": 1
+  },
+  "top_carga_arbitros": [
+    {
+      "nombre": "Calvo Martínez, Noé",
+      "partidos": 78
+    },
+    {
+      "nombre": "Fernández Garrido, Samuel",
+      "partidos": 76
+    },
+    {
+      "nombre": "Fernández León, Rubén",
+      "partidos": 76
+    },
+    {
+      "nombre": "Ruiz Álvarez, María",
+      "partidos": 76
+    },
+    {
+      "nombre": "Gómez Medina, Ana",
+      "partidos": 75
+    },
+    {
+      "nombre": "Muñoz Fernández, Noé",
+      "partidos": 68
+    },
+    {
+      "nombre": "Suárez Cano, Irene",
+      "partidos": 67
+    },
+    {
+      "nombre": "Medina Ortega, Javier",
+      "partidos": 65
+    }
+  ],
+  "distribucion_categorias": [
+    {
+      "competicion": "Tercera FFCV Juvenil",
+      "partidos": 6224
+    },
+    {
+      "competicion": "Tercera FFCV",
+      "partidos": 3552
+    },
+    {
+      "competicion": "Segona FFCV",
+      "partidos": 2010
+    },
+    {
+      "competicion": "Segona FFCV Juvenil",
+      "partidos": 1970
+    },
+    {
+      "competicion": "2ª Regional Futsal",
+      "partidos": 1092
+    },
+    {
+      "competicion": "Primera FFCV",
+      "partidos": 960
+    },
+    {
+      "competicion": "Primera FFCV Juvenil",
+      "partidos": 960
+    },
+    {
+      "competicion": "Lliga Preferent Cadet",
+      "partidos": 928
+    },
+    {
+      "competicion": "1ª Regional Futsal",
+      "partidos": 786
+    },
+    {
+      "competicion": "Lliga Juvenil Caixa Popular Valenta",
+      "partidos": 648
+    },
+    {
+      "competicion": "Lliga de Veterans",
+      "partidos": 612
+    },
+    {
+      "competicion": "Lliga Preferent Futsal",
+      "partidos": 552
+    }
+  ]
+}
